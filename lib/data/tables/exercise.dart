@@ -14,6 +14,7 @@ class Exercise {
   final DateTime? updatedAt;
 }
 
+@UseRowClass(Exercise)
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1)();

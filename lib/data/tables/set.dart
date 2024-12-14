@@ -26,6 +26,7 @@ class ExerciseSet {
   double? get volume => weight != null ? weight! * repetitions : null;
 }
 
+@UseRowClass(ExerciseSet)
 class ExerciseSets extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get workoutExerciseId =>

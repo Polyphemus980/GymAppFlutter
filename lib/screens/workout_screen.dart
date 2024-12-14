@@ -1,27 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/data_sources/workout_data_source.dart';
+import 'package:gym_app/data/tables/workout.dart';
 
 class WorkoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton:
-          FloatingActionButton(onPressed: () {}, child: Icon(Icons.add)),
-      body: Expanded(
-        child: Column(
-          children: [
-            const Text("Quick start"),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Expanded(
-                child: Row(
-                  children: [Icon(Icons.add), Text("Start Workout")],
-                ),
-              ),
-            ),
-            const Text("Routines")
-          ],
-        ),
-      ),
-    );
+    WorkoutDataSource d = WorkoutDataSource(AppDatabase());
+    return StreamBuilder<Workout?>(
+        stream: d.watchWorkoutWithExercises(1),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // Show loading state
+          }
+
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Text("Workout not found"); // Handle empty state
+          }
+
+          final workout = snapshot.data!;
+
+          return Column(
+            children: [
+              Text(workout.workoutName!),
+              ...workout.exercises!.map((exercise) {
+                return Column(
+                  children: [
+                    Text(exercise.id.toString()),
+                    ...exercise.sets!.map((set) {
+                      return Text(
+                          "Set: ${set.repetitions} reps @ ${set.weight} kg");
+                    }),
+                  ],
+                );
+              }),
+            ],
+          );
+        });
   }
 }

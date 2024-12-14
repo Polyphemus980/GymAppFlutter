@@ -14,6 +14,7 @@ class WorkoutPlan {
   final DateTime? updatedAt;
 }
 
+@UseRowClass(WorkoutPlan)
 class WorkoutPlans extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get description => text()();

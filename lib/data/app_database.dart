@@ -19,4 +19,8 @@ class AppDatabase extends _$AppDatabase {
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'my_database');
   }
+
+  Future<void> insertExercise(Insertable<Exercise> exercise) async {
+    await into(exercises).insert(exercise);
+  }
 }

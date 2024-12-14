@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_app/screens/exercise_list_screen.dart';
 
 import 'workout_screen.dart';
 
@@ -13,7 +14,7 @@ class MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
   List<Widget> widgets = [
     Text("koks"),
-    Placeholder(),
+    ExerciseScreen(),
     WorkoutScreen(),
     Placeholder(),
   ];

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/main_screen.dart';
+
+import 'data/app_database.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,33 +33,16 @@ final _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => MainScreen(),
-    ),
+      routes: [
+        GoRoute(
+          path: '/exercise/add',
+          builder: (BuildContext context, GoRouterState state) {
+            final AppDatabase db_ = state.extra as AppDatabase;
+
+            return AddExerciseScreen(db_: db_);
+          },
+        ),
+      ],
+    )
   ],
 );
-
-// class WorkoutPlanWidget extends StatelessWidget {
-//   @override
-//   WorkoutPlanWidget(this.data);
-//
-//   final WorkoutPlan data;
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(data.title),
-//       ),
-//       body: CustomScrollView(
-//         slivers: [
-//           SliverPadding(
-//             padding: const EdgeInsetsDirectional.all(16),
-//             sliver: SliverList.separated(
-//               itemCount: data.exercises.length,
-//               separatorBuilder: (context, _) => const SizedBox(height: 16),
-//               itemBuilder: (context, index) => Text(
-//                   "Exercise $index: ${data.exercises.elementAt(index).name}"),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

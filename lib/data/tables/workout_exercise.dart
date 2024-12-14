@@ -11,9 +11,9 @@ class WorkoutExercise {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  final List<ExerciseSet>? sets;
+  List<ExerciseSet>? sets;
 
-  const WorkoutExercise({
+  WorkoutExercise({
     required this.id,
     required this.workoutId,
     required this.exerciseId,
@@ -26,6 +26,7 @@ class WorkoutExercise {
   int get totalSets => sets?.length ?? 0;
 }
 
+@UseRowClass(WorkoutExercise)
 class WorkoutExercises extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get workoutId => integer().references(Workouts, #id)();

@@ -12,7 +12,7 @@ class Workout {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  final List<WorkoutExercise>? exercises;
+  List<WorkoutExercise>? exercises;
 
   Workout({
     required this.id,
@@ -27,6 +27,7 @@ class Workout {
   });
 }
 
+@UseRowClass(Workout)
 class Workouts extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get workoutPlanId =>
@@ -34,6 +35,8 @@ class Workouts extends Table {
   TextColumn get workoutName => text().nullable()();
   IntColumn get totalDuration =>
       integer().nullable().check(totalDuration.isBiggerThanValue(0))();
+  DateTimeColumn get workoutDate =>
+      dateTime().withDefault(currentDateAndTime)();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().nullable()();
