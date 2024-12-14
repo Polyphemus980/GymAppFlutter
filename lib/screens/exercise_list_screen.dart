@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
+import 'package:provider/provider.dart';
 
 class ExerciseScreen extends StatelessWidget {
   const ExerciseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final db_ = AppDatabase();
-
+    final db = Provider.of<AppDatabase>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text("Exercises")),
         actions: [
           ElevatedButton(
-            onPressed: () => context.push('/exercise/add', extra: db_),
+            onPressed: () => context.push('/exercise/add'),
             child: const Text("Add new"),
           ),
         ],
       ),
       body: StreamBuilder(
-        stream: db_.select(db_.exercises).watch(),
+        stream: db.select(db.exercises).watch(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
