@@ -95,6 +95,13 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
                     ),
               const SizedBox(height: 16),
               ElevatedButton(
+                onPressed: () async {
+                  var results = await context.push('/exercise/add/pick')
+                      as List<MuscleGroup>?;
+                },
+                child: const Text('Pick muscles'),
+              ),
+              ElevatedButton(
                 onPressed: () {
                   _formKey.currentState?.reset();
                   _nameController.clear();

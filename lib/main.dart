@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
+import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -57,9 +58,13 @@ final _router = GoRouter(initialLocation: '/home', routes: [
         builder: (context, state) => const ExerciseScreen(),
         routes: [
           GoRoute(
-            path: 'add',
-            builder: (context, state) => const AddExerciseScreen(),
-          )
+              path: 'add',
+              builder: (context, state) => const AddExerciseScreen(),
+              routes: [
+                GoRoute(
+                    path: 'pick',
+                    builder: (context, state) => const MusclePicker())
+              ])
         ]),
     GoRoute(
       path: '/social',
