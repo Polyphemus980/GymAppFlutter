@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:provider/provider.dart';
 
-class MusclePicker extends StatefulWidget {
-  const MusclePicker({super.key});
+import '../data/tables/muscle_group.dart';
 
+class MusclePicker extends StatefulWidget {
+  const MusclePicker({super.key, required this.list});
+  final List<MuscleGroup> list;
   @override
   State<StatefulWidget> createState() {
     return _MusclePickerState();
@@ -14,7 +16,7 @@ class MusclePicker extends StatefulWidget {
 
 class _MusclePickerState extends State<MusclePicker> {
   late AppDatabase db;
-  List<MuscleGroup> pickedGroups = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,28 +34,42 @@ class _MusclePickerState extends State<MusclePicker> {
                   return const Center(
                       child: Text('No muscle groups available'));
                 } else {
-                  return ListView.builder(itemBuilder: (build, index) {
-                    return ListTile(
-                        title: Text(snapshot.data!.elementAt(index).name),
-                        trailing: Checkbox(
-                            value: false,
-                            onChanged: (value) {
-                              if (value == true) {
-                                pickedGroups
-                                    .add(snapshot.data!.elementAt(index));
-                              } else {
-                                pickedGroups
-                                    .remove(snapshot.data!.elementAt(index));
-                              }
-                            }));
-                  });
+                  return Expanded(
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (build, index) {
+                          final ValueNotifier<bool> isChecked = ValueNotifier(
+                              widget.list
+                                  .contains(snapshot.data!.elementAt(index)));
+
+                          return ValueListenableBuilder<bool>(
+                              valueListenable: isChecked,
+                              builder: (context, value, child) {
+                                return ListTile(
+                                    title: Text(
+                                        snapshot.data!.elementAt(index).name),
+                                    trailing: Checkbox(
+                                        value: isChecked.value,
+                                        onChanged: (value) {
+                                          if (value == true) {
+                                            widget.list.add(snapshot.data!
+                                                .elementAt(index));
+                                          } else {
+                                            widget.list.remove(snapshot.data!
+                                                .elementAt(index));
+                                          }
+                                          isChecked.value = !isChecked.value;
+                                        }));
+                              });
+                        }),
+                  );
                 }
               }),
           ElevatedButton(
               onPressed: () {
-                context.pop(pickedGroups);
+                context.pop();
               },
-              child: const Text('End picking'))
+              child: const Text('End picking')),
         ],
       ),
     );

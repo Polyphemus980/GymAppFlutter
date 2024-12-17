@@ -4,6 +4,8 @@ import 'package:gym_app/data/data_sources/workout_data_source.dart';
 import 'package:gym_app/data/tables/workout.dart';
 
 class WorkoutScreen extends StatelessWidget {
+  const WorkoutScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     WorkoutDataSource d = WorkoutDataSource(AppDatabase());
@@ -11,7 +13,7 @@ class WorkoutScreen extends StatelessWidget {
         stream: d.watchWorkoutWithExercises(1),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Show loading state
+            return const CircularProgressIndicator(); // Show loading state
           }
 
           if (!snapshot.hasData || snapshot.data == null) {

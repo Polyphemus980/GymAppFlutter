@@ -6,6 +6,7 @@ import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'data/app_database.dart';
+import 'data/tables/muscle_group.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,20 +34,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// final _router = GoRouter(
-//   routes: [
-//     GoRoute(
-//       path: '/',
-//       builder: (context, state) => MainScreen(),
-//       routes: [
-//         GoRoute(
-//           path: '/exercise/add',
-//           builder: (context, state) => const AddExerciseScreen(),
-//         ),
-//       ],
-//     )
-//   ],
-// );
 final _router = GoRouter(initialLocation: '/home', routes: [
   ShellRoute(builder: (context, state, child) => BottomNavBar(child), routes: [
     GoRoute(
@@ -63,7 +50,11 @@ final _router = GoRouter(initialLocation: '/home', routes: [
               routes: [
                 GoRoute(
                     path: 'pick',
-                    builder: (context, state) => const MusclePicker())
+                    builder: (context, state) {
+                      final selectedOptions =
+                          state.extra as List<MuscleGroup>? ?? [];
+                      return MusclePicker(list: selectedOptions);
+                    })
               ])
         ]),
     GoRoute(
