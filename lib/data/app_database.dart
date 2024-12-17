@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'tables/exercise.dart';
 import 'tables/exercise_muscles.dart';
@@ -10,6 +11,11 @@ import 'tables/workout_exercise.dart';
 import 'tables/workout_plan.dart';
 
 part 'app_database.g.dart';
+
+typedef ExerciseWithMuscleGroups = ({
+  Exercise exercise,
+  List<MuscleGroup> muscleGroups,
+});
 
 @DriftDatabase(tables: [
   Workouts,
@@ -34,13 +40,41 @@ class AppDatabase extends _$AppDatabase {
     await into(exercises).insert(exercise);
   }
 
+  Stream<List<ExerciseWithMuscleGroups>> getExercises() {
+    final exerciseStream = select(exercises).watch();
+    return exerciseStream.switchMap((exercises) {
+      final idToExercise = {
+        for (var exercise in exercises) exercise.id: exercise
+      };
+      final ids = idToExercise.keys;
+      final muscleQuery = select(exerciseMuscles).join(
+        [
+          innerJoin(muscleGroups,
+              muscleGroups.id.equalsExp(exerciseMuscles.muscleGroupId))
+        ],
+      )..where(exerciseMuscles.exerciseId.isIn(ids));
+      return muscleQuery.watch().map((rows) {
+        final idToMuscles = <int, List<MuscleGroup>>{};
+        for (final row in rows) {
+          final item = row.readTable(muscleGroups);
+          final id = row.readTable(exerciseMuscles).exerciseId;
+
+          idToMuscles.putIfAbsent(id, () => []).add(item);
+        }
+        return [
+          for (var id in ids)
+            (exercise: idToExercise[id]!, muscleGroups: idToMuscles[id]!)
+        ];
+      });
+    });
+  }
+
   Future<void> insertExerciseMuscles(
       List<MuscleGroup> muscles, int exerciseId) async {
     for (final muscle in muscles) {
       await into(exerciseMuscles).insert(ExerciseMusclesCompanion(
           exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
     }
-
   }
 
   Future<void> insertMuscleGroup(Insertable<MuscleGroup> muscleGroup) async {

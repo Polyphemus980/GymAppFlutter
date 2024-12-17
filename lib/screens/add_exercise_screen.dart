@@ -29,18 +29,24 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
     super.dispose();
   }
 
+  bool validateMuscles() {
+    return selected.isNotEmpty;
+  }
+
   Future<void> _insertExercise() async {
-    if (_formKey.currentState?.validate() ?? false) {
+    if ((_formKey.currentState?.validate() ?? false) && validateMuscles()) {
       final db = Provider.of<AppDatabase>(context, listen: false);
       final name = _nameController.text.trim();
       final description = _descriptionController.text.trim();
-      ExercisesCompanion exercise = ExercisesCompanion(
+      ExercisesCompanion exerciseCompanion = ExercisesCompanion(
           name: drift.Value(name), description: drift.Value(description));
       setState(() {
         _isLoading = true;
       });
       try {
-        await db.insertExercise(exercise);
+        final exercise =
+            await db.into(db.exercises).insertReturning(exerciseCompanion);
+        await db.insertExerciseMuscles(selected, exercise.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Exercise '$name' added successfully!")),

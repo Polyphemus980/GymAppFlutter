@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:gym_app/data/tables/muscle_group.dart';
 
 class Exercise {
   Exercise(
@@ -12,6 +13,8 @@ class Exercise {
   final String? description;
   final DateTime createdAt;
   final DateTime? updatedAt;
+
+  List<MuscleGroup>? muscleGroups;
 }
 
 @UseRowClass(Exercise)

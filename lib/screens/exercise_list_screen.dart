@@ -19,31 +19,46 @@ class ExerciseScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream: db.select(db.exercises).watch(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text("No exercises found"));
-          } else {
-            final exercises = snapshot.data!;
+      body: Column(children: [
+        SearchBar(
+          hintText: 'Search exercises',
+        ),
+        Expanded(
+          child: StreamBuilder(
+            stream: db.getExercises(), //db.select(db.exercises).watch(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (!snapshot.hasData || snapshot.data == null) {
+                return const Center(child: Text("No exercises found"));
+              } else {
+                final exerciseMuscles = snapshot.data!;
 
-            return ListView.builder(
-              itemCount: exercises.length,
-              itemBuilder: (context, index) {
-                final exercise = exercises[index];
-                return ListTile(
-                  title: Text(exercise.name),
-                  subtitle: exercise.description != null
-                      ? Text(exercise.description!)
-                      : null,
+                return ListView.builder(
+                  itemCount: exerciseMuscles.length,
+                  itemBuilder: (context, index) {
+                    final exercise = exerciseMuscles[index];
+                    return ListTile(
+                      title: Text(exercise.exercise.name),
+                      subtitle: Text(
+                          exercise.muscleGroups.map((m) => m.name).join(", ")),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          (db.delete(db.exercises)
+                                ..where(
+                                    (t) => t.id.equals(exercise.exercise.id)))
+                              .go();
+                        },
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          }
-        },
-      ),
+              }
+            },
+          ),
+        ),
+      ]),
     );
   }
 }

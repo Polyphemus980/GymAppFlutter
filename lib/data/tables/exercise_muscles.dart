@@ -10,8 +10,10 @@ class ExerciseMuscle {
 }
 
 class ExerciseMuscles extends Table {
-  IntColumn get exerciseId => integer().references(Exercises, #id)();
-  IntColumn get muscleGroupId => integer().references(MuscleGroups, #id)();
+  IntColumn get exerciseId =>
+      integer().references(Exercises, #id, onDelete: KeyAction.cascade)();
+  IntColumn get muscleGroupId =>
+      integer().references(MuscleGroups, #id, onDelete: KeyAction.cascade)();
 
   @override
   Set<Column> get primaryKey => {exerciseId, muscleGroupId};
