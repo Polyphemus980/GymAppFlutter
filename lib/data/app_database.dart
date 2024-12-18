@@ -69,6 +69,42 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  Stream<List<ExerciseWithMuscleGroups>> getExercisesWithFilters(
+      String query, List<MuscleGroup> groups) {
+    final exerciseStream = (select(exercises)
+          ..where((exercise) =>
+              exercise.name.lower().contains(query.toLowerCase())))
+        .watch();
+    return exerciseStream.switchMap((exercises) {
+      final idToExercise = {
+        for (var exercise in exercises) exercise.id: exercise
+      };
+      final ids = idToExercise.keys;
+      final muscleQuery = (select(exerciseMuscles)).join(
+        [
+          innerJoin(muscleGroups,
+              muscleGroups.id.equalsExp(exerciseMuscles.muscleGroupId))
+        ],
+      )..where(exerciseMuscles.exerciseId.isIn(ids));
+      return muscleQuery.watch().map((rows) {
+        final idToMuscles = <int, List<MuscleGroup>>{};
+        for (final row in rows) {
+          final item = row.readTable(muscleGroups);
+          final id = row.readTable(exerciseMuscles).exerciseId;
+
+          idToMuscles.putIfAbsent(id, () => []).add(item);
+        }
+        return [
+          for (var id in ids)
+            if (idToMuscles.containsKey(id) &&
+                idToMuscles[id]!.toSet().containsAll(
+                    groups.toSet())) // Ensures all muscle groups match
+              (exercise: idToExercise[id]!, muscleGroups: idToMuscles[id]!),
+        ];
+      });
+    });
+  }
+
   Future<void> insertExerciseMuscles(
       List<MuscleGroup> muscles, int exerciseId) async {
     for (final muscle in muscles) {

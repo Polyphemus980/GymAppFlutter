@@ -2533,7 +2533,7 @@ final class $$WorkoutExercisesTableReferences extends BaseReferences<
 
   $$WorkoutsTableProcessedTableManager get workoutId {
     final manager = $$WorkoutsTableTableManager($_db, $_db.workouts)
-        .filter((f) => f.id($_item.workoutId!));
+        .filter((f) => f.id($_item.workoutId));
     final item = $_typedResult.readTableOrNull(_workoutIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -2546,7 +2546,7 @@ final class $$WorkoutExercisesTableReferences extends BaseReferences<
 
   $$ExercisesTableProcessedTableManager get exerciseId {
     final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id($_item.exerciseId!));
+        .filter((f) => f.id($_item.exerciseId));
     final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -2973,7 +2973,7 @@ final class $$ExerciseSetsTableReferences
   $$WorkoutExercisesTableProcessedTableManager get workoutExerciseId {
     final manager =
         $$WorkoutExercisesTableTableManager($_db, $_db.workoutExercises)
-            .filter((f) => f.id($_item.workoutExerciseId!));
+            .filter((f) => f.id($_item.workoutExerciseId));
     final item = $_typedResult.readTableOrNull(_workoutExerciseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -3486,7 +3486,7 @@ final class $$ExerciseMusclesTableReferences extends BaseReferences<
 
   $$ExercisesTableProcessedTableManager get exerciseId {
     final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id($_item.exerciseId!));
+        .filter((f) => f.id($_item.exerciseId));
     final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -3499,7 +3499,7 @@ final class $$ExerciseMusclesTableReferences extends BaseReferences<
 
   $$MuscleGroupsTableProcessedTableManager get muscleGroupId {
     final manager = $$MuscleGroupsTableTableManager($_db, $_db.muscleGroups)
-        .filter((f) => f.id($_item.muscleGroupId!));
+        .filter((f) => f.id($_item.muscleGroupId));
     final item = $_typedResult.readTableOrNull(_muscleGroupIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
