@@ -3,13 +3,52 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
+import 'package:gym_app/screens/workout_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'data/app_database.dart';
 import 'data/tables/muscle_group.dart';
 
+class ThemeNotifier extends ChangeNotifier {
+  //Switched around for now
+  ThemeData _currentTheme = ThemeMode.system != ThemeMode.light
+      ? ThemeData.light()
+      : ThemeData.dark();
+
+  ThemeData get currentTheme => _currentTheme;
+
+  void toggleTheme() {
+    if (_currentTheme.brightness == Brightness.light) {
+      _currentTheme = ThemeData.dark();
+    } else {
+      _currentTheme = ThemeData.light();
+    }
+    notifyListeners();
+  }
+}
+
+class GlobalProviders extends StatelessWidget {
+  const GlobalProviders({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        Provider<AppDatabase>(
+          create: (_) => AppDatabase(),
+          dispose: (_, db) => db.close(),
+        ),
+        ChangeNotifierProvider<ThemeNotifier>(
+          create: (_) => ThemeNotifier(),
+        )
+      ],
+      child: const MyApp(),
+    );
+  }
+}
+
 void main() {
-  runApp(const MyApp());
+  runApp(const GlobalProviders());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,19 +56,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<AppDatabase>(
-      create: (_) => AppDatabase(),
-      dispose: (context, db) => db.close,
-      child: MaterialApp.router(
-        routerConfig: _router,
-        title: 'Week 4',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepOrange,
-            dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-          ),
-        ),
-      ),
+    final theme = context.watch<ThemeNotifier>().currentTheme;
+    return MaterialApp.router(
+      theme: theme,
+      themeMode: ThemeMode.system,
+      routerConfig: _router,
+      title: 'Week 4',
     );
   }
 }
@@ -58,8 +90,8 @@ final _router = GoRouter(initialLocation: '/home', routes: [
               ])
         ]),
     GoRoute(
-      path: '/social',
-      builder: (context, state) => const Placeholder(),
+      path: '/workout',
+      builder: (context, state) => const WorkoutScreen(),
     ),
     GoRoute(
       path: '/profile',
@@ -111,7 +143,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             case 0:
               context.go('/home');
             case 1:
-              context.go('/social');
+              context.go('/workout');
             case 2:
               context.go('/exercise');
             case 3:

@@ -5,6 +5,8 @@ import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/exercise_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
+
 class ExerciseScreen extends StatelessWidget {
   const ExerciseScreen({super.key});
 
@@ -85,6 +87,13 @@ class ExerciseScreen extends StatelessWidget {
                 onPressed: () => context.push('/exercise/add'),
                 child: const Text("Add new"),
               ),
+              IconButton(
+                icon: const Icon(Icons.dark_mode),
+                onPressed: () {
+                  Provider.of<ThemeNotifier>(context, listen: false)
+                      .toggleTheme();
+                },
+              )
             ],
           ),
           body: Column(children: [
