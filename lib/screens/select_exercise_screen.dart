@@ -10,15 +10,13 @@ import '../main.dart';
 import '../widgets/exercise_common_widgets.dart';
 
 class SelectExerciseScreen extends StatefulWidget {
-  const SelectExerciseScreen({super.key});
-
+  const SelectExerciseScreen({super.key, required this.selectedExercises});
+  final List<Exercise> selectedExercises;
   @override
   State<SelectExerciseScreen> createState() => _SelectExerciseScreenState();
 }
 
 class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
-  final List<Exercise> selectedExercises = [];
-  get i => selectedExercises.isNotEmpty;
   @override
   Widget build(BuildContext context) {
     final db = Provider.of<AppDatabase>(context);
@@ -47,28 +45,28 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
             Expanded(
               child: ExerciseList(
                 onTapMethod: (e) {
-                  if (selectedExercises.contains(e)) {
+                  if (widget.selectedExercises.contains(e)) {
                     setState(() {
-                      selectedExercises.remove(e);
+                      widget.selectedExercises.remove(e);
                     });
                   } else {
                     setState(() {
-                      selectedExercises.add(e);
+                      widget.selectedExercises.add(e);
                     });
                   }
                 },
                 selectCheckMethod: (e) {
-                  return selectedExercises.contains(e);
+                  return widget.selectedExercises.contains(e);
                 },
               ),
             ),
-            if (i)
+            if (widget.selectedExercises.isNotEmpty)
               Padding(
                 padding: const EdgeInsetsDirectional.all(16.0),
                 child: FloatingActionButton.extended(
                     onPressed: () => context.pop(),
-                    label:
-                        Text("${selectedExercises.length} exercises selected")),
+                    label: Text(
+                        "${widget.selectedExercises.length} exercises selected")),
               ),
           ]),
         );
