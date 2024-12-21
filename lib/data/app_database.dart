@@ -125,12 +125,20 @@ class AppDatabase extends _$AppDatabase {
         const MuscleGroupsCompanion(name: Value("Triceps")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Chest")));
     await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Shoulders")));
+        const MuscleGroupsCompanion(name: Value("Front deltoids")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Rear deltoids")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Lateral deltoids")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Abs")));
     await insertMuscleGroup(
         const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Calves")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Glutes")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Traps")));
   }
 }

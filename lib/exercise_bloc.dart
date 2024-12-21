@@ -53,7 +53,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     );
     on<SearchExerciseEvent>(_onSearch, transformer: debounce());
     on<LoadedExerciseEvent>(_onLoaded);
-
+    db.insertMuscleGroups();
     _initializeMuscles();
 
     _exerciseSubscription = db.getExercises().listen((exercises) {

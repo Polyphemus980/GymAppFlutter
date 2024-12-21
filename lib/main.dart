@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
+import 'package:gym_app/screens/select_exercise_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -90,9 +91,15 @@ final _router = GoRouter(initialLocation: '/home', routes: [
               ])
         ]),
     GoRoute(
-      path: '/workout',
-      builder: (context, state) => const WorkoutScreen(),
-    ),
+        path: '/workout',
+        builder: (context, state) => const WorkoutScreen(),
+        routes: [
+          GoRoute(
+              path: 'select',
+              builder: (context, state) {
+                return const SelectExerciseScreen();
+              })
+        ]),
     GoRoute(
       path: '/profile',
       builder: (context, state) => const Placeholder(),
