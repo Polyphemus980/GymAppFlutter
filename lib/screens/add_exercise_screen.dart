@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:provider/provider.dart';
 
+import '../data/tables/muscle_group.dart';
+
 class AddExerciseScreen extends StatefulWidget {
   const AddExerciseScreen({super.key});
 
@@ -15,7 +17,11 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+
   bool _isLoading = false;
+  List<MuscleGroup> selected = [];
+  String text = "";
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -23,30 +29,36 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
     super.dispose();
   }
 
+  bool validateMuscles() {
+    return selected.isNotEmpty;
+  }
+
   Future<void> _insertExercise() async {
-    if (_formKey.currentState?.validate() ?? false) {
+    if ((_formKey.currentState?.validate() ?? false) && validateMuscles()) {
       final db = Provider.of<AppDatabase>(context, listen: false);
       final name = _nameController.text.trim();
       final description = _descriptionController.text.trim();
-      ExercisesCompanion exercise = ExercisesCompanion(
+      ExercisesCompanion exerciseCompanion = ExercisesCompanion(
           name: drift.Value(name), description: drift.Value(description));
       setState(() {
         _isLoading = true;
       });
       try {
-        await db.insertExercise(exercise);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Exercise '$name' added successfully!")),
-        );
-        _formKey.currentState?.reset();
-        _nameController.clear();
-        _descriptionController.clear();
-        // Only pop the screen after the insertion is successful
-        context.pop();
+        final exercise =
+            await db.into(db.exercises).insertReturning(exerciseCompanion);
+        await db.insertExerciseMuscles(selected, exercise.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Exercise '$name' added successfully!")),
+          );
+          context.pop();
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add exercise: $e")),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Failed to add exercise: $e")),
+          );
+        }
       } finally {
         setState(() {
           _isLoading = false;
@@ -60,10 +72,12 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
     return Scaffold(
         appBar:
             AppBar(title: const Center(child: Text("Add exercise")), actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.pop(),
-          )
+          _isLoading
+              ? const CircularProgressIndicator()
+              : ElevatedButton(
+                  onPressed: _insertExercise,
+                  child: const Text('Save'),
+                ),
         ]),
         body: Form(
           key: _formKey,
@@ -87,20 +101,30 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
                     const InputDecoration(label: Text('Exercise Description')),
               ),
               const SizedBox(height: 16),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _insertExercise,
-                      child: const Text('Save Exercise'),
+              Column(
+                children: [
+                  // Label for the muscles selection
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Muscle Groups', // The label text
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  _formKey.currentState?.reset();
-                  _nameController.clear();
-                  _descriptionController.clear();
-                },
-                child: const Text('Clear Form'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await context.push('/exercise/add/pick', extra: selected);
+
+                      setState(() {
+                        text = selected
+                            .map((muscleGroup) => muscleGroup.name)
+                            .join(', ');
+                      });
+                    },
+                    child: Text(text.isNotEmpty ? text : 'Pick exercise'),
+                  )
+                ],
               ),
             ]),
           ),
