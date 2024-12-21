@@ -5,6 +5,7 @@ import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/exercise_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../data/tables/exercise.dart';
 import '../main.dart';
 import '../widgets/exercise_common_widgets.dart';
 
@@ -16,7 +17,7 @@ class SelectExerciseScreen extends StatefulWidget {
 }
 
 class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
-  final List<ExerciseWithMuscleGroups> selectedExercises = [];
+  final List<Exercise> selectedExercises = [];
   get i => selectedExercises.isNotEmpty;
   @override
   Widget build(BuildContext context) {

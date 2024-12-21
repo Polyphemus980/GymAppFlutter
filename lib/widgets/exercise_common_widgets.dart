@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gym_app/data/tables/exercise.dart';
 import 'package:provider/provider.dart';
 
 import '../data/app_database.dart';
@@ -58,9 +59,9 @@ class SearchAndFilterRow extends StatelessWidget {
 class ExerciseList extends StatelessWidget {
   const ExerciseList({super.key, this.onTapMethod, this.selectCheckMethod});
 
-  final Function(ExerciseWithMuscleGroups)? onTapMethod;
+  final Function(Exercise)? onTapMethod;
 
-  final bool Function(ExerciseWithMuscleGroups)? selectCheckMethod;
+  final bool Function(Exercise)? selectCheckMethod;
   @override
   Widget build(BuildContext context) {
     final db = Provider.of<AppDatabase>(context, listen: false);
@@ -77,15 +78,15 @@ class ExerciseList extends StatelessWidget {
             itemBuilder: (context, index) {
               final exercise = exercises[index];
               return ListTile(
-                title: Text(exercise.exercise.name),
+                title: Text(exercise.name),
                 subtitle: Text(
-                  exercise.muscleGroups.map((m) => m.name).join(", "),
+                  exercise.muscleGroups!.map((m) => m.name).join(", "),
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
                     (db.delete(db.exercises)
-                          ..where((t) => t.id.equals(exercise.exercise.id)))
+                          ..where((t) => t.id.equals(exercise.id)))
                         .go();
                   },
                 ),

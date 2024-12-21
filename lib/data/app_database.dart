@@ -40,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
     await into(exercises).insert(exercise);
   }
 
-  Stream<List<ExerciseWithMuscleGroups>> getExercises() {
+  Stream<List<Exercise>> getExercises() {
     final exerciseStream = select(exercises).watch();
     return exerciseStream.switchMap((exercises) {
       final idToExercise = {
@@ -61,15 +61,18 @@ class AppDatabase extends _$AppDatabase {
 
           idToMuscles.putIfAbsent(id, () => []).add(item);
         }
-        return [
-          for (var id in ids)
-            (exercise: idToExercise[id]!, muscleGroups: idToMuscles[id]!)
-        ];
+        final exerciseList = <Exercise>[];
+        for (var id in ids) {
+          final exercise = idToExercise[id]!;
+          exercise.muscleGroups = idToMuscles[id]!;
+          exerciseList.add(exercise);
+        }
+        return exerciseList;
       });
     });
   }
 
-  Stream<List<ExerciseWithMuscleGroups>> getExercisesWithFilters(
+  Stream<List<Exercise>> getExercisesWithFilters(
       String query, List<MuscleGroup> groups) {
     final exerciseStream = (select(exercises)
           ..where((exercise) =>
@@ -94,13 +97,17 @@ class AppDatabase extends _$AppDatabase {
 
           idToMuscles.putIfAbsent(id, () => []).add(item);
         }
-        return [
-          for (var id in ids)
-            if (idToMuscles.containsKey(id) &&
-                idToMuscles[id]!.toSet().containsAll(
-                    groups.toSet())) // Ensures all muscle groups match
-              (exercise: idToExercise[id]!, muscleGroups: idToMuscles[id]!),
-        ];
+
+        final exerciseList = <Exercise>[];
+        for (var id in ids) {
+          if (idToMuscles.containsKey(id) &&
+              idToMuscles[id]!.toSet().containsAll(groups.toSet())) {
+            final exercise = idToExercise[id]!;
+            exercise.muscleGroups = idToMuscles[id]!;
+            exerciseList.add(exercise);
+          }
+        }
+        return exerciseList;
       });
     });
   }

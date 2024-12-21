@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/tables/exercise.dart';
 import 'package:gym_app/data/tables/muscle_group.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -19,7 +20,7 @@ class FilterExerciseEvent extends ExerciseEvent {
 
 class LoadedExerciseEvent extends ExerciseEvent {
   LoadedExerciseEvent(this.loadedExercises);
-  final List<ExerciseWithMuscleGroups> loadedExercises;
+  final List<Exercise> loadedExercises;
 }
 
 sealed class ExerciseState {}
@@ -29,7 +30,7 @@ class ExerciseLoading extends ExerciseState {}
 class ExerciseLoaded extends ExerciseState {
   ExerciseLoaded(
       this.loadedExercises, this.query, this.selectedMuscles, this.allMuscles);
-  final List<ExerciseWithMuscleGroups> loadedExercises;
+  final List<Exercise> loadedExercises;
   final String query;
   final List<MuscleGroup> selectedMuscles;
   final List<MuscleGroup> allMuscles;
@@ -45,7 +46,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   late List<MuscleGroup> _muscles;
   String _query = '';
   List<MuscleGroup> _filters = [];
-  late StreamSubscription<List<ExerciseWithMuscleGroups>> _exerciseSubscription;
+  late StreamSubscription<List<Exercise>> _exerciseSubscription;
 
   ExerciseBloc(this.db) : super(ExerciseLoading()) {
     on<FilterExerciseEvent>(
@@ -53,7 +54,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     );
     on<SearchExerciseEvent>(_onSearch, transformer: debounce());
     on<LoadedExerciseEvent>(_onLoaded);
-    db.insertMuscleGroups();
+
     _initializeMuscles();
 
     _exerciseSubscription = db.getExercises().listen((exercises) {

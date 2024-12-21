@@ -15,6 +15,21 @@ class Exercise {
   final DateTime? updatedAt;
 
   List<MuscleGroup>? muscleGroups;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Exercise) return false;
+
+    return other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
 }
 
 @UseRowClass(Exercise)
