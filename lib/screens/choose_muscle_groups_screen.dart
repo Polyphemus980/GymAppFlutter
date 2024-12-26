@@ -16,7 +16,8 @@ class MusclePicker extends StatefulWidget {
 
 class _MusclePickerState extends State<MusclePicker> {
   late AppDatabase db;
-
+  List<MuscleGroup> muscles = [];
+  late String ff = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +66,18 @@ class _MusclePickerState extends State<MusclePicker> {
                   );
                 }
               }),
+          ElevatedButton(
+              onPressed: () async {
+                bool f = await db.insertMuscleGroups();
+                setState(() {
+                  ff = f.toString();
+                });
+                final result = await db.select(db.muscleGroups).get();
+                setState(() {
+                  muscles = result;
+                });
+              },
+              child: Text('Load muscles - length ${ff}')),
           ElevatedButton(
               onPressed: () {
                 context.pop();

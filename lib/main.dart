@@ -1,9 +1,11 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/tables/exercise.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
+import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
 import 'package:provider/provider.dart';
@@ -12,18 +14,20 @@ import 'data/app_database.dart';
 import 'data/tables/muscle_group.dart';
 
 class ThemeNotifier extends ChangeNotifier {
+  final lightTheme = FlexThemeData.light(scheme: FlexScheme.deepOrangeM3);
+  final darkTheme = FlexThemeData.dark(scheme: FlexScheme.aquaBlue);
   //Switched around for now
   ThemeData _currentTheme = ThemeMode.system != ThemeMode.light
-      ? ThemeData.light()
-      : ThemeData.dark();
+      ? FlexThemeData.light(scheme: FlexScheme.aquaBlue)
+      : FlexThemeData.dark(scheme: FlexScheme.aquaBlue);
 
   ThemeData get currentTheme => _currentTheme;
 
   void toggleTheme() {
-    if (_currentTheme.brightness == Brightness.light) {
-      _currentTheme = ThemeData.dark();
+    if (_currentTheme == lightTheme) {
+      _currentTheme = darkTheme;
     } else {
-      _currentTheme = ThemeData.light();
+      _currentTheme = lightTheme;
     }
     notifyListeners();
   }
@@ -96,15 +100,23 @@ final _router = GoRouter(initialLocation: '/home', routes: [
         builder: (context, state) => const WorkoutScreen(),
         routes: [
           GoRoute(
-              path: 'select',
+              path: 'new',
               builder: (context, state) {
-                final selectedList = state.extra as List<Exercise>? ?? [];
-                return SelectExerciseScreen(selectedExercises: selectedList);
-              })
+                return const Placeholder();
+              },
+              routes: [
+                GoRoute(
+                    path: 'select',
+                    builder: (context, state) {
+                      final selectedList = state.extra as List<Exercise>? ?? [];
+                      return SelectExerciseScreen(
+                          selectedExercises: selectedList);
+                    })
+              ]),
         ]),
     GoRoute(
       path: '/profile',
-      builder: (context, state) => const Placeholder(),
+      builder: (context, state) => ProfileScreen(),
     )
   ])
 ]);

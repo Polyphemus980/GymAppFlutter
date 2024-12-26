@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift/native.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import 'tables/exercise.dart';
 import 'tables/exercise_muscles.dart';
@@ -32,8 +38,33 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _openConnection() {
-    return driftDatabase(name: 'my_database');
+  // static QueryExecutor _openConnection() {
+  //   return driftDatabase(
+  //     name: 'my_database',
+  //     web: DriftWebOptions(
+  //       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+  //       driftWorker: Uri.parse('drift_worker.dart.js'),
+  //     ),
+  //   );
+  // }
+
+  static LazyDatabase _openConnection() {
+    return LazyDatabase(() async {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, 'app.db'));
+
+      if (!await file.exists()) {
+        final blob = await rootBundle.load('assets/my_database.sqlite');
+        final buffer = blob.buffer;
+        await file.writeAsBytes(
+            buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
+      }
+
+      final cachebase = (await getTemporaryDirectory()).path;
+      sqlite3.tempDirectory = cachebase;
+
+      return NativeDatabase.createInBackground(file);
+    });
   }
 
   Future<void> insertExercise(Insertable<Exercise> exercise) async {
@@ -124,7 +155,11 @@ class AppDatabase extends _$AppDatabase {
     await into(muscleGroups).insert(muscleGroup);
   }
 
-  Future<void> insertMuscleGroups() async {
+  Future<bool> insertMuscleGroups() async {
+    final r = await select(muscleGroups).get();
+    if (r.isNotEmpty) {
+      return false;
+    }
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Back")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Legs")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Biceps")));
@@ -147,5 +182,6 @@ class AppDatabase extends _$AppDatabase {
     await insertMuscleGroup(
         const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Traps")));
+    return true;
   }
 }
