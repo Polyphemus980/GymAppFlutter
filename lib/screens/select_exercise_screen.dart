@@ -5,7 +5,7 @@ import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/exercise_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../data/tables/exercise.dart';
+import '../data/models/exercise.dart';
 import '../main.dart';
 import '../widgets/exercise_common_widgets.dart';
 

@@ -1,9 +1,13 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/tables/exercise.dart';
+import 'package:gym_app/data/models/exercise.dart';
+import 'package:gym_app/data/repositories/drift_exercise_repository.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
+import 'package:gym_app/screens/empty_workout_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
@@ -11,7 +15,7 @@ import 'package:gym_app/screens/workout_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'data/app_database.dart';
-import 'data/tables/muscle_group.dart';
+import 'data/models/muscle_group.dart';
 
 class ThemeNotifier extends ChangeNotifier {
   final lightTheme = FlexThemeData.light(scheme: FlexScheme.deepOrangeM3);
@@ -31,6 +35,13 @@ class ThemeNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }
+}
+
+final getIt = GetIt.instance;
+void setUp() {
+  getIt.registerSingleton<AppDatabase>(AppDatabase());
+  getIt.registerSingleton<LocalExerciseRepository>(
+      DriftExerciseRepository(db: getIt.get<AppDatabase>()));
 }
 
 class GlobalProviders extends StatelessWidget {
@@ -97,12 +108,12 @@ final _router = GoRouter(initialLocation: '/home', routes: [
         ]),
     GoRoute(
         path: '/workout',
-        builder: (context, state) => const WorkoutScreen(),
+        builder: (context, state) => const WorkoutListScreen(),
         routes: [
           GoRoute(
               path: 'new',
               builder: (context, state) {
-                return const Placeholder();
+                return const WorkoutScreen();
               },
               routes: [
                 GoRoute(

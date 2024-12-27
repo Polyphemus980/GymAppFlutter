@@ -8,13 +8,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-import 'tables/exercise.dart';
-import 'tables/exercise_muscles.dart';
-import 'tables/muscle_group.dart';
-import 'tables/set.dart';
-import 'tables/workout.dart';
-import 'tables/workout_exercise.dart';
-import 'tables/workout_plan.dart';
+import 'models/exercise.dart';
+import 'models/exercise_muscles.dart';
+import 'models/muscle_group.dart';
+import 'models/set.dart';
+import 'models/workout.dart';
+import 'models/workout_exercise.dart';
+import 'models/workout_plan.dart';
 
 part 'app_database.g.dart';
 
@@ -37,16 +37,6 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
-
-  // static QueryExecutor _openConnection() {
-  //   return driftDatabase(
-  //     name: 'my_database',
-  //     web: DriftWebOptions(
-  //       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-  //       driftWorker: Uri.parse('drift_worker.dart.js'),
-  //     ),
-  //   );
-  // }
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
@@ -141,47 +131,5 @@ class AppDatabase extends _$AppDatabase {
         return exerciseList;
       });
     });
-  }
-
-  Future<void> insertExerciseMuscles(
-      List<MuscleGroup> muscles, int exerciseId) async {
-    for (final muscle in muscles) {
-      await into(exerciseMuscles).insert(ExerciseMusclesCompanion(
-          exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
-    }
-  }
-
-  Future<void> insertMuscleGroup(Insertable<MuscleGroup> muscleGroup) async {
-    await into(muscleGroups).insert(muscleGroup);
-  }
-
-  Future<bool> insertMuscleGroups() async {
-    final r = await select(muscleGroups).get();
-    if (r.isNotEmpty) {
-      return false;
-    }
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Back")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Legs")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Biceps")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Triceps")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Chest")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Front deltoids")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Rear deltoids")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Lateral deltoids")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Forearms")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Abs")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Forearms")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Calves")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Glutes")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Forearms")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Traps")));
-    return true;
   }
 }

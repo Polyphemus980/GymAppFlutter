@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:provider/provider.dart';
 
-import '../data/tables/muscle_group.dart';
+import '../data/models/muscle_group.dart';
 
 class MusclePicker extends StatefulWidget {
   const MusclePicker({super.key, required this.list});
@@ -66,18 +66,6 @@ class _MusclePickerState extends State<MusclePicker> {
                   );
                 }
               }),
-          ElevatedButton(
-              onPressed: () async {
-                bool f = await db.insertMuscleGroups();
-                setState(() {
-                  ff = f.toString();
-                });
-                final result = await db.select(db.muscleGroups).get();
-                setState(() {
-                  muscles = result;
-                });
-              },
-              child: Text('Load muscles - length ${ff}')),
           ElevatedButton(
               onPressed: () {
                 context.pop();

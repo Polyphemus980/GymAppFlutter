@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:gym_app/data/tables/muscle_group.dart';
+import 'package:gym_app/data/models/muscle_group.dart';
 
 class Exercise {
   Exercise(
@@ -30,6 +30,8 @@ class Exercise {
 
   @override
   int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
+
+  String? get muscles => muscleGroups!.map((m) => m.name).join(", ");
 }
 
 @UseRowClass(Exercise)

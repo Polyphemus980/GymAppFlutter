@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/tables/exercise.dart';
+import '../data/models/exercise.dart';
 
 class WorkoutExerciseItem extends StatefulWidget {
   final Exercise exercise;
@@ -46,7 +46,8 @@ class _WorkoutExerciseItemState extends State<WorkoutExerciseItem> {
                 children: [
                   Text(
                     widget.exercise.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.more_vert),

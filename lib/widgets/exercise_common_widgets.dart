@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/data/tables/exercise.dart';
+import 'package:gym_app/data/models/exercise.dart';
 import 'package:provider/provider.dart';
 
 import '../data/app_database.dart';
@@ -80,7 +80,7 @@ class ExerciseList extends StatelessWidget {
               return ListTile(
                 title: Text(exercise.name),
                 subtitle: Text(
-                  exercise.muscleGroups!.map((m) => m.name).join(", "),
+                  exercise.muscles!,
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),

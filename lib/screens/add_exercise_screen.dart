@@ -1,10 +1,9 @@
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
-import 'package:provider/provider.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/main.dart';
 
-import '../data/tables/muscle_group.dart';
+import '../data/models/muscle_group.dart';
 
 class AddExerciseScreen extends StatefulWidget {
   const AddExerciseScreen({super.key});
@@ -35,18 +34,14 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
 
   Future<void> _insertExercise() async {
     if ((_formKey.currentState?.validate() ?? false) && validateMuscles()) {
-      final db = Provider.of<AppDatabase>(context, listen: false);
+      final repository = getIt.get<LocalExerciseRepository>();
       final name = _nameController.text.trim();
       final description = _descriptionController.text.trim();
-      ExercisesCompanion exerciseCompanion = ExercisesCompanion(
-          name: drift.Value(name), description: drift.Value(description));
       setState(() {
         _isLoading = true;
       });
       try {
-        final exercise =
-            await db.into(db.exercises).insertReturning(exerciseCompanion);
-        await db.insertExerciseMuscles(selected, exercise.id);
+        repository.addExercise(name, description, selected);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Exercise '$name' added successfully!")),

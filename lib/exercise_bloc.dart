@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/app_database.dart';
-import 'package:gym_app/data/tables/exercise.dart';
-import 'package:gym_app/data/tables/muscle_group.dart';
+import 'package:gym_app/data/models/exercise.dart';
+import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:rxdart/rxdart.dart';
 
 sealed class ExerciseEvent {}

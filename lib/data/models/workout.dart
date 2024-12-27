@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:gym_app/data/tables/workout_exercise.dart';
-import 'package:gym_app/data/tables/workout_plan.dart';
+import 'package:gym_app/data/models/workout_exercise.dart';
+import 'package:gym_app/data/models/workout_plan.dart';
 
 class Workout {
   final int id;
