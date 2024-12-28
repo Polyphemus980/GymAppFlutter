@@ -37,11 +37,16 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
+bool setUpEnded = false;
 final getIt = GetIt.instance;
 void setUp() {
+  if (setUpEnded) {
+    return;
+  }
   getIt.registerSingleton<AppDatabase>(AppDatabase());
   getIt.registerSingleton<LocalExerciseRepository>(
       DriftExerciseRepository(db: getIt.get<AppDatabase>()));
+  setUpEnded = true;
 }
 
 class GlobalProviders extends StatelessWidget {
@@ -51,10 +56,6 @@ class GlobalProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AppDatabase>(
-          create: (_) => AppDatabase(),
-          dispose: (_, db) => db.close(),
-        ),
         ChangeNotifierProvider<ThemeNotifier>(
           create: (_) => ThemeNotifier(),
         )
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    setUp();
     final theme = context.watch<ThemeNotifier>().currentTheme;
     return MaterialApp.router(
       theme: theme,
@@ -164,8 +166,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
             label: 'Profile',
           ),
         ],
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: Colors.black,
+        selectedItemColor: Theme.of(context)
+            .colorScheme
+            .primary, // Use accentColor from the theme
+        unselectedItemColor: Theme.of(context).colorScheme.secondary,
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {

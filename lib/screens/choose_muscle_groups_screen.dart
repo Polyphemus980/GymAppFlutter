@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
-import 'package:provider/provider.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 
 import '../data/models/muscle_group.dart';
+import '../main.dart';
 
 class MusclePicker extends StatefulWidget {
   const MusclePicker({super.key, required this.list});
@@ -15,7 +15,7 @@ class MusclePicker extends StatefulWidget {
 }
 
 class _MusclePickerState extends State<MusclePicker> {
-  late AppDatabase db;
+  final exerciseRepository = getIt.get<LocalExerciseRepository>();
   List<MuscleGroup> muscles = [];
   late String ff = "";
   @override
@@ -27,7 +27,7 @@ class _MusclePickerState extends State<MusclePicker> {
       body: Column(
         children: [
           FutureBuilder(
-              future: db.select(db.muscleGroups).get(),
+              future: exerciseRepository.getAllMuscleGroups(),
               builder: (build, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -74,11 +74,5 @@ class _MusclePickerState extends State<MusclePicker> {
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    db = Provider.of<AppDatabase>(context, listen: false);
   }
 }

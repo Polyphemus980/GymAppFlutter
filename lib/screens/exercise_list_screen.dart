@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/exercise_bloc.dart';
 import 'package:provider/provider.dart';
 
@@ -13,9 +13,9 @@ class ExerciseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context);
     return BlocProvider<ExerciseBloc>(
-      create: (BuildContext context) => ExerciseBloc(db),
+      create: (BuildContext context) => ExerciseBloc(
+          exerciseRepository: getIt.get<LocalExerciseRepository>()),
       child: Builder(builder: (context) {
         return Scaffold(
           appBar: AppBar(

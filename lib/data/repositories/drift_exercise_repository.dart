@@ -97,4 +97,10 @@ class DriftExerciseRepository implements LocalExerciseRepository {
       });
     });
   }
+
+  @override
+  Future<List<MuscleGroup>> getAllMuscleGroups() async {
+    final muscleList = db.select(db.muscleGroups).get();
+    return muscleList;
+  }
 }

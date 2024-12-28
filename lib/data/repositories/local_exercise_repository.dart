@@ -10,4 +10,5 @@ abstract class LocalExerciseRepository {
   Future<void> updateExercise(Exercise exercise);
   Stream<List<Exercise>> getExercisesWithFilters(
       String query, List<MuscleGroup> groups);
+  Future<List<MuscleGroup>> getAllMuscleGroups();
 }

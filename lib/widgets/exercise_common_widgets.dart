@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:provider/provider.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/main.dart';
 
-import '../data/app_database.dart';
 import '../exercise_bloc.dart';
 
 class SearchAndFilterRow extends StatelessWidget {
@@ -64,7 +64,7 @@ class ExerciseList extends StatelessWidget {
   final bool Function(Exercise)? selectCheckMethod;
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context, listen: false);
+    final exerciseRepository = getIt.get<LocalExerciseRepository>();
     return BlocBuilder<ExerciseBloc, ExerciseState>(
       builder: (context, state) {
         if (state is ExerciseLoading) {
@@ -85,9 +85,7 @@ class ExerciseList extends StatelessWidget {
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    (db.delete(db.exercises)
-                          ..where((t) => t.id.equals(exercise.id)))
-                        .go();
+                    exerciseRepository.deleteExercise(exercise.id);
                   },
                 ),
                 onTap: () {
