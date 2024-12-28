@@ -86,12 +86,20 @@ class _SetCardState extends State<SetCard> {
             },
           ),
           const SizedBox(height: 10),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => setState(() {
-              sets.add(SetHelper());
-            }),
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => setState(() {
+                sets.add(SetHelper());
+              }),
+            ),
+            IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: () => setState(() {
+                sets.removeLast();
+              }),
+            )
+          ]),
         ],
       ),
     );

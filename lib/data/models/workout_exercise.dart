@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/set.dart';
+import 'package:gym_app/data/models/sets.dart';
 import 'package:gym_app/data/models/workout.dart';
 
 class WorkoutExercise {
@@ -11,7 +11,7 @@ class WorkoutExercise {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  List<ExerciseSet>? sets;
+  List<CompletedSet>? sets;
 
   WorkoutExercise({
     required this.id,

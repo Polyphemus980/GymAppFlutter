@@ -37,6 +37,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
             BlocBuilder<WorkoutConfigurationBloc, WorkoutConfigurationState>(
               builder: (BuildContext context, state) {
+                if (state is LoadingConfig) {}
                 return Expanded(
                   child: ListView.builder(
                     itemCount: exercises.length,
@@ -54,3 +55,49 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 }
+
+// class WorkoutConfigurationScreen extends StatelessWidget {
+//   const WorkoutConfigurationScreen({super.key, required this.isCustom});
+//
+//   final bool isCustom;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Workout"),
+//       ),
+//       body: BlocProvider<WorkoutConfigurationBloc>(
+//         create: (BuildContext context) => WorkoutConfigurationBloc(),
+//         child: Column(
+//           children: [
+//             Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: ElevatedButton(
+//                 onPressed: () async {
+//                   await context.push('/workout/new/select',
+//                       extra:
+//                           context.read<WorkoutConfigurationBloc>().exercises);
+//                 },
+//                 child: const Text("Add exercises"),
+//               ),
+//             ),
+//             BlocBuilder<WorkoutConfigurationBloc, WorkoutConfigurationState>(
+//               builder: (BuildContext context, state) {
+//                 if (state is LoadingConfig) {}
+//                 return Expanded(
+//                   child: ListView.builder(
+//                     itemCount: exercises.length,
+//                     itemBuilder: (context, index) {
+//                       final exercise = exercises[index];
+//                       return SetCard(exercise: exercise);
+//                     },
+//                   ),
+//                 );
+//               },
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

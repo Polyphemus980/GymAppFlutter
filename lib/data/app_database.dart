@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -10,7 +9,7 @@ import 'package:sqlite3/sqlite3.dart';
 import 'models/exercise.dart';
 import 'models/exercise_muscles.dart';
 import 'models/muscle_group.dart';
-import 'models/set.dart';
+import 'models/sets.dart';
 import 'models/workout.dart';
 import 'models/workout_exercise.dart';
 import 'models/workout_plan.dart';
@@ -25,11 +24,12 @@ typedef ExerciseWithMuscleGroups = ({
 @DriftDatabase(tables: [
   Workouts,
   WorkoutPlans,
-  ExerciseSets,
+  CompleteSets,
   Exercises,
   WorkoutExercises,
   MuscleGroups,
-  ExerciseMuscles
+  ExerciseMuscles,
+  PlannedSets
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -42,12 +42,12 @@ class AppDatabase extends _$AppDatabase {
       final dbFolder = await getApplicationDocumentsDirectory();
       final file = File(p.join(dbFolder.path, 'app.db'));
 
-      if (!await file.exists()) {
-        final blob = await rootBundle.load('assets/my_database.sqlite');
-        final buffer = blob.buffer;
-        await file.writeAsBytes(
-            buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
-      }
+      // if (!await file.exists()) {
+      //   final blob = await rootBundle.load('assets/my_database.sqlite');
+      //   final buffer = blob.buffer;
+      //   await file.writeAsBytes(
+      //       buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
+      // }
 
       final cachebase = (await getTemporaryDirectory()).path;
       sqlite3.tempDirectory = cachebase;
@@ -56,7 +56,11 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  Future<void> insertExercise(Insertable<Exercise> exercise) async {
-    await into(exercises).insert(exercise);
+  Future<void> insertExerciseMuscles(
+      List<MuscleGroup> muscles, int exerciseId) async {
+    for (final muscle in muscles) {
+      await into(exerciseMuscles).insert(ExerciseMusclesCompanion(
+          exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
+    }
   }
 }
