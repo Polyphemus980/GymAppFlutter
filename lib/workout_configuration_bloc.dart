@@ -13,5 +13,6 @@ class ExercisesAddedEvent extends WorkoutConfigurationEvent {}
 class WorkoutConfigurationBloc
     extends Bloc<WorkoutConfigurationEvent, WorkoutConfigurationState> {
   List<Exercise> exercises = [];
-  WorkoutConfigurationBloc() : super(LoadingConfig());
+  WorkoutConfigurationBloc({this.workoutId}) : super(LoadingConfig());
+  final int? workoutId;
 }

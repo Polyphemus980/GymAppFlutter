@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_app/data/models/exercise.dart';
+import 'package:gym_app/data/models/sets.dart';
 
 class SetCard extends StatefulWidget {
   const SetCard({super.key, required this.exercise});
@@ -12,20 +13,15 @@ class SetCard extends StatefulWidget {
   }
 }
 
-class SetHelper {
-  int? repCount;
-  int? weight;
-}
-
 class _SetCardState extends State<SetCard> {
-  final List<SetHelper> sets = [];
+  final List<WorkoutConfigSet> sets = [];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.all(8.0),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 16.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         color: theme.canvasColor,
@@ -64,7 +60,7 @@ class _SetCardState extends State<SetCard> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        sets[index].weight = int.tryParse(value);
+                        sets[index].weight = double.tryParse(value);
                       },
                     ),
                   ),
@@ -77,7 +73,7 @@ class _SetCardState extends State<SetCard> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        sets[index].repCount = int.tryParse(value);
+                        sets[index].repetitions = int.tryParse(value);
                       },
                     ),
                   ),
@@ -90,7 +86,8 @@ class _SetCardState extends State<SetCard> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => setState(() {
-                sets.add(SetHelper());
+                sets.add(WorkoutConfigSet(
+                    exerciseId: widget.exercise.id, setNumber: sets.length));
               }),
             ),
             IconButton(

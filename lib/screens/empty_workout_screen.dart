@@ -39,11 +39,20 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               builder: (BuildContext context, state) {
                 if (state is LoadingConfig) {}
                 return Expanded(
-                  child: ListView.builder(
+                  child: ReorderableListView.builder(
+                    //ListView.builder(
                     itemCount: exercises.length,
                     itemBuilder: (context, index) {
                       final exercise = exercises[index];
-                      return SetCard(exercise: exercise);
+                      return SetCard(
+                          key: ValueKey(exercise), exercise: exercise);
+                    },
+                    onReorder: (int oldIndex, int newIndex) {
+                      if (newIndex > oldIndex) {
+                        newIndex -= 1;
+                      }
+                      final temp = exercises.removeAt(oldIndex);
+                      exercises.insert(newIndex, temp);
                     },
                   ),
                 );

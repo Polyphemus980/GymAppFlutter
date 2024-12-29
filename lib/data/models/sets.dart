@@ -68,8 +68,8 @@ class PlannedSets extends Table {
 class WorkoutConfigSet {
   final int exerciseId;
   final int setNumber;
-  final int? repetitions;
-  final double? weight;
+  int? repetitions;
+  double? weight;
 
   WorkoutConfigSet({
     required this.exerciseId,
