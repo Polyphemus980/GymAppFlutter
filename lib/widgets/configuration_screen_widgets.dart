@@ -3,10 +3,10 @@ import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/sets.dart';
 
 class SetCard extends StatefulWidget {
-  const SetCard({super.key, required this.exercise});
+  const SetCard({super.key, required this.exercise, required this.onUpdate});
 
   final Exercise exercise;
-
+  final Function(List<WorkoutConfigSet>) onUpdate;
   @override
   State<SetCard> createState() {
     return _SetCardState();
@@ -61,6 +61,7 @@ class _SetCardState extends State<SetCard> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         sets[index].weight = double.tryParse(value);
+                        widget.onUpdate(sets);
                       },
                     ),
                   ),
@@ -74,6 +75,7 @@ class _SetCardState extends State<SetCard> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         sets[index].repetitions = int.tryParse(value);
+                        widget.onUpdate(sets);
                       },
                     ),
                   ),
@@ -84,17 +86,26 @@ class _SetCardState extends State<SetCard> {
           const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => setState(() {
-                sets.add(WorkoutConfigSet(
-                    exerciseId: widget.exercise.id, setNumber: sets.length));
-              }),
-            ),
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  setState(
+                    () {
+                      sets.add(WorkoutConfigSet(
+                          completed: false,
+                          exerciseId: widget.exercise.id,
+                          setNumber: sets.length));
+                    },
+                  );
+                  widget.onUpdate(sets);
+                }),
             IconButton(
               icon: const Icon(Icons.remove),
-              onPressed: () => setState(() {
-                sets.removeLast();
-              }),
+              onPressed: () {
+                setState(() {
+                  sets.removeLast();
+                });
+                widget.onUpdate(sets);
+              },
             )
           ]),
         ],

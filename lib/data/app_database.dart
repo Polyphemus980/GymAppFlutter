@@ -22,11 +22,13 @@ typedef ExerciseWithMuscleGroups = ({
 });
 
 @DriftDatabase(tables: [
-  Workouts,
+  PlannedWorkouts,
+  CompletedWorkouts,
   WorkoutPlans,
-  CompleteSets,
+  CompletedSets,
   Exercises,
-  WorkoutExercises,
+  PlannedWorkoutExercises,
+  CompletedWorkoutExercises,
   MuscleGroups,
   ExerciseMuscles,
   PlannedSets
