@@ -1,6 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'exercise.g.dart';
+
+@JsonSerializable()
 class Exercise {
   Exercise(
       {this.description,
@@ -32,6 +36,10 @@ class Exercise {
   int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
 
   String? get muscles => muscleGroups!.map((m) => m.name).join(", ");
+
+  factory Exercise.fromJson(Map<String, dynamic> json) =>
+      _$ExerciseFromJson(json);
+  Map<String, dynamic> toJson() => _$ExerciseToJson(this);
 }
 
 @UseRowClass(Exercise)

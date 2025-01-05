@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/screens/empty_workout_screen.dart';
+import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -32,16 +32,10 @@ class FocusWorkoutScreen extends StatelessWidget {
         create: (_) =>
             WorkoutBloc(_pageController)..add(InitializeSetsEvent(sets: sets)),
         child:
-            BlocConsumer<WorkoutBloc, WorkoutState>(listener: (context, state) {
-          if (state is WorkoutInProgress && state.shouldMoveToNext) {
-            _moveNextPage(state.sets.length);
-          }
-        }, builder: (context, state) {
+            BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
           if (state is WorkoutInProgress && state.sets.isNotEmpty) {
             return Scaffold(
-              appBar: AppBar(
-                  title: Text(
-                      "Exercise ${state.currentExerciseIndex + 1}/${state.sets.length}")),
+              appBar: AppBar(title: Text("Workout started}")),
               body: KeyboardListener(
                 focusNode: FocusNode(),
                 onKeyEvent: (event) {
@@ -52,44 +46,51 @@ class FocusWorkoutScreen extends StatelessWidget {
                   }
                 },
                 child: Column(children: [
+                  SmoothPageIndicator(
+                      controller: _pageController, count: state.sets.length),
+                  SizedBox(height: 16),
                   Expanded(
                     child: PageView.builder(
                       controller: _pageController,
                       itemCount: state.sets.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Stack(children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FloatingActionButton(
-                                onPressed: () {
-                                  _movePreviousPage();
-                                },
-                                child: const Icon(Icons.keyboard_arrow_left)),
-                          ),
                           ExerciseList(
                               exerciseIndex: index, setData: state.sets[index]),
                           Align(
+                            alignment: Alignment.centerLeft,
+                            child: FloatingActionButton(
+                              heroTag: "previousButton$index",
+                              onPressed: () {
+                                _movePreviousPage();
+                              },
+                              child: const Icon(Icons.keyboard_arrow_left),
+                            ),
+                          ),
+                          Align(
                             alignment: Alignment.centerRight,
                             child: FloatingActionButton(
-                                onPressed: () {
-                                  _moveNextPage(state.sets.length);
-                                },
-                                child: const Icon(Icons.keyboard_arrow_right)),
+                              heroTag: "nextButton$index",
+                              onPressed: () {
+                                _moveNextPage(state.sets.length);
+                              },
+                              child: const Icon(Icons.keyboard_arrow_right),
+                            ),
                           )
                         ]);
                       },
                     ),
                   ),
-                  SmoothPageIndicator(
-                      controller: _pageController, count: state.sets.length)
                 ]),
               ),
             );
+          } else if (state is WorkoutInProgress) {
+            return Text("${(state as WorkoutInProgress).sets.toString()}");
           } else if (state is WorkoutEnded) {
             return const Center(child: Text("Workout ended"));
           } else {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return Center(
+              child: Text(state.toString()),
             );
           }
         }));
@@ -149,13 +150,41 @@ class ExerciseList extends StatelessWidget {
                 WorkoutContainer(
                   title: "Statistics",
                   width: 0.3 * constraints.maxWidth,
-                  height: 0.2 * constraints.maxHeight,
+                  height: 0.3 * constraints.maxHeight,
                   child: const SizedBox.shrink(),
                 ),
               ])
             ]);
       } else {
-        return const Placeholder();
+        return Column(children: [
+          WorkoutContainer(
+              title: setData.exercise.name,
+              width: 0.95 * constraints.maxWidth,
+              height: 0.9 * constraints.maxHeight,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () {
+                    context
+                        .read<WorkoutBloc>()
+                        .add(RemoveSetEvent(exerciseIndex: exerciseIndex));
+                  },
+                ),
+                Text("Sets: ${setData.sets.length}"),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    context
+                        .read<WorkoutBloc>()
+                        .add(AddSetEvent(exerciseIndex: exerciseIndex));
+                  },
+                ),
+              ],
+              child: SetList(
+                setData: setData,
+                exerciseIndex: exerciseIndex,
+              )),
+        ]);
       }
     });
   }
@@ -164,7 +193,6 @@ class ExerciseList extends StatelessWidget {
 class ExerciseData extends StatelessWidget {
   final Exercise exercise;
   const ExerciseData({super.key, required this.exercise});
-
   @override
   Widget build(BuildContext context) {
     return Wrap(

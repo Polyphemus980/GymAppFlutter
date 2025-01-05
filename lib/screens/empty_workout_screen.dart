@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/models/sets.dart';
+import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
 
 import '../data/models/exercise.dart';
@@ -10,19 +11,6 @@ class WorkoutScreen extends StatefulWidget {
 
   @override
   State<WorkoutScreen> createState() => _WorkoutScreenState();
-}
-
-class SetData {
-  final Exercise exercise;
-  final List<WorkoutConfigSet> sets;
-  int currentIndex;
-
-  SetData({required this.exercise, required this.sets, this.currentIndex = 0});
-
-  SetData copyWith({Exercise? exercise, List<WorkoutConfigSet>? sets}) {
-    return SetData(
-        exercise: exercise ?? this.exercise, sets: sets ?? this.sets);
-  }
 }
 
 class _WorkoutScreenState extends State<WorkoutScreen> {

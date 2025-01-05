@@ -6,12 +6,15 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+import 'models/completed_set.dart';
+import 'models/completed_workout.dart';
+import 'models/completed_workout_exercise.dart';
 import 'models/exercise.dart';
 import 'models/exercise_muscles.dart';
 import 'models/muscle_group.dart';
-import 'models/sets.dart';
-import 'models/workout.dart';
-import 'models/workout_exercise.dart';
+import 'models/planned_set.dart';
+import 'models/planned_workout.dart';
+import 'models/planned_workout_exercise.dart';
 import 'models/workout_plan.dart';
 
 part 'app_database.g.dart';

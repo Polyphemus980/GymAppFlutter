@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/data/models/sets.dart';
-import 'package:gym_app/screens/empty_workout_screen.dart';
+import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 sealed class WorkoutEvent {}
 
@@ -47,18 +47,26 @@ class InitialState extends WorkoutState {}
 
 class WorkoutInProgress extends WorkoutState {
   final List<SetData> sets;
-  final int currentExerciseIndex;
-  final bool shouldMoveToNext;
   WorkoutInProgress({
     required this.sets,
-    this.shouldMoveToNext = false,
-    this.currentExerciseIndex = 0,
   });
+
+  Map<String, dynamic> toJson() {
+    return {'data': sets.map((set) => set.toJson()).toList()};
+  }
+
+  factory WorkoutInProgress.fromJson(Map<String, dynamic> json) {
+    return WorkoutInProgress(
+      sets: (json['data'] as List)
+          .map((set) => SetData.fromJson(set as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 class WorkoutEnded extends WorkoutState {}
 
-class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
+class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
   final PageController _pageController;
   WorkoutBloc(this._pageController) : super(InitialState()) {
     on<InitializeSetsEvent>(_initializeSets);
@@ -69,7 +77,12 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
   }
 
   _initializeSets(InitializeSetsEvent event, Emitter<WorkoutState> emit) {
-    emit(WorkoutInProgress(sets: event.sets, shouldMoveToNext: false));
+    if (state is WorkoutInProgress &&
+        (state as WorkoutInProgress).sets.isNotEmpty) {
+      return;
+    }
+
+    emit(WorkoutInProgress(sets: event.sets));
   }
 
   _addSet(AddSetEvent event, Emitter<WorkoutState> emit) {
@@ -115,8 +128,6 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
         .completed = true;
     final shouldMove =
         sets[event.exerciseIndex].sets.every((set) => set.completed);
-    final nextIndex =
-        sets.indexWhere((setData) => setData.sets.any((set) => !set.completed));
     if (shouldMove) {
       final nextIndex = sets
           .indexWhere((setData) => setData.sets.any((set) => !set.completed));
@@ -125,22 +136,36 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
         return;
       }
       _pageController.animateToPage(nextIndex,
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
     emit(WorkoutInProgress(sets: sets));
   }
 
-  _moveNextPage(int length) {
-    if (_pageController.page! < length - 1) {
-      _pageController.nextPage(
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  @override
+  WorkoutState? fromJson(Map<String, dynamic> json) {
+    final String type = json['type'];
+    switch (type) {
+      case 'WorkoutInProgress':
+        return WorkoutInProgress.fromJson(json['data']);
+      case 'WorkoutEnded':
+        return WorkoutEnded();
+      default:
+        return InitialState();
     }
   }
 
-  _movePreviousPage() {
-    if (_pageController.page! > 0) {
-      _pageController.previousPage(
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  @override
+  Map<String, dynamic>? toJson(WorkoutState state) {
+    if (state is WorkoutInProgress) {
+      return {
+        'type': 'WorkoutInProgress',
+        'data': state.toJson(),
+      };
+    } else if (state is WorkoutEnded) {
+      return {
+        'type': 'WorkoutEnded',
+      };
     }
+    return null;
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/sets.dart';
+import 'package:gym_app/data/models/workout_config_set.dart';
 
 class SetCard extends StatefulWidget {
   const SetCard({super.key, required this.exercise, required this.onUpdate});

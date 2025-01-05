@@ -15,10 +15,13 @@ import 'package:gym_app/screens/focus_workout_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'data/app_database.dart';
 import 'data/models/muscle_group.dart';
+import 'data/models/set_data.dart';
 
 class ThemeNotifier extends ChangeNotifier {
   final lightTheme = FlexThemeData.light(scheme: FlexScheme.dellGenoa);
@@ -64,14 +67,18 @@ class GlobalProviders extends StatelessWidget {
         ),
         BlocProvider<GlobalWorkoutBloc>(
           create: (BuildContext context) => GlobalWorkoutBloc(),
-        )
+        ),
       ],
       child: const MyApp(),
     );
   }
 }
 
-void main() {
+void main() async {
+  final storage = await HydratedStorage.build(
+    storageDirectory: await getApplicationDocumentsDirectory(),
+  );
+  HydratedBloc.storage = storage;
   runApp(const GlobalProviders());
 }
 
@@ -159,6 +166,22 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton:
+            BlocBuilder<GlobalWorkoutBloc, GlobalWorkoutState>(
+          builder: (BuildContext context, state) {
+            if (state is ShownState) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  context.go('/workout');
+                },
+                label: const Text('Workout'),
+                icon: const Icon(Icons.fitness_center),
+              );
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+        ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
