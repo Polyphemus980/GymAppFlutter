@@ -29,6 +29,8 @@ class CompleteSetEvent extends WorkoutEvent {
   CompleteSetEvent({required this.exerciseIndex});
 }
 
+class EndWorkoutEvent extends WorkoutEvent {}
+
 class EditSetEvent extends WorkoutEvent {
   final int reps;
   final double weight;
@@ -74,6 +76,7 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
     on<RemoveSetEvent>(_removeSet);
     on<CompleteSetEvent>(_completeSet);
     on<EditSetEvent>(_editSet);
+    on<EndWorkoutEvent>(_endWorkout);
   }
 
   _initializeSets(InitializeSetsEvent event, Emitter<WorkoutState> emit) {
@@ -132,13 +135,18 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
       final nextIndex = sets
           .indexWhere((setData) => setData.sets.any((set) => !set.completed));
       if (nextIndex == -1) {
-        emit(WorkoutEnded());
+        add(EndWorkoutEvent());
         return;
       }
       _pageController.animateToPage(nextIndex,
           duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
     emit(WorkoutInProgress(sets: sets));
+  }
+
+  _endWorkout(EndWorkoutEvent event, Emitter<WorkoutState> emit) {
+    clear();
+    emit(WorkoutEnded());
   }
 
   @override

@@ -84,8 +84,6 @@ class FocusWorkoutScreen extends StatelessWidget {
                 ]),
               ),
             );
-          } else if (state is WorkoutInProgress) {
-            return Text("${(state as WorkoutInProgress).sets.toString()}");
           } else if (state is WorkoutEnded) {
             return const Center(child: Text("Workout ended"));
           } else {
