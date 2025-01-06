@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:gym_app/main.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
+import 'package:provider/provider.dart';
 
 import '../data/models/exercise.dart';
 
@@ -40,6 +42,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
+                    Provider.of<TimerNotifier>(context, listen: false)
+                        .startTimer();
                     context.go('/workout/new/start', extra: sets);
                   },
                   child: const Text("Start workout"),

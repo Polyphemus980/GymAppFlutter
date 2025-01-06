@@ -3,14 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/services/page_controller_service.dart';
 import 'package:gym_app/workout_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class FocusWorkoutScreen extends StatelessWidget {
-  FocusWorkoutScreen({super.key, required this.sets});
+import '../main.dart';
+
+class FocusWorkoutScreen extends StatefulWidget {
+  const FocusWorkoutScreen({super.key, required this.sets});
   final List<SetData> sets;
 
-  final PageController _pageController = PageController();
+  @override
+  State<FocusWorkoutScreen> createState() => _FocusWorkoutScreenState();
+}
+
+class _FocusWorkoutScreenState extends State<FocusWorkoutScreen> {
+  late PageController _pageController;
+  final _pageControllerService = getIt.get<PageControllerService>();
 
   _moveNextPage(int length) {
     if (_pageController.page! < length - 1) {
@@ -27,71 +37,80 @@ class FocusWorkoutScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _pageControllerService.setPageController(_pageController);
+    context.read<WorkoutBloc>().add(InitializeSetsEvent(sets: widget.sets));
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    _pageControllerService.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider<WorkoutBloc>(
-        create: (_) =>
-            WorkoutBloc(_pageController)..add(InitializeSetsEvent(sets: sets)),
-        child:
-            BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
-          if (state is WorkoutInProgress && state.sets.isNotEmpty) {
-            return Scaffold(
-              appBar: AppBar(title: Text("Workout started}")),
-              body: KeyboardListener(
-                focusNode: FocusNode(),
-                onKeyEvent: (event) {
-                  if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                    _moveNextPage(state.sets.length);
-                  } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                    _movePreviousPage();
-                  }
-                },
-                child: Column(children: [
-                  SmoothPageIndicator(
-                      controller: _pageController, count: state.sets.length),
-                  SizedBox(height: 16),
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: state.sets.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Stack(children: [
-                          ExerciseList(
-                              exerciseIndex: index, setData: state.sets[index]),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FloatingActionButton(
-                              heroTag: "previousButton$index",
-                              onPressed: () {
-                                _movePreviousPage();
-                              },
-                              child: const Icon(Icons.keyboard_arrow_left),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FloatingActionButton(
-                              heroTag: "nextButton$index",
-                              onPressed: () {
-                                _moveNextPage(state.sets.length);
-                              },
-                              child: const Icon(Icons.keyboard_arrow_right),
-                            ),
-                          )
-                        ]);
-                      },
-                    ),
-                  ),
-                ]),
+    return BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
+      if (state is WorkoutInProgress && state.sets.isNotEmpty) {
+        return Scaffold(
+          appBar: AppBar(title: Text("Workout started}")),
+          body: KeyboardListener(
+            focusNode: FocusNode(),
+            onKeyEvent: (event) {
+              if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                _moveNextPage(state.sets.length);
+              } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                _movePreviousPage();
+              }
+            },
+            child: Column(spacing: 16, children: [
+              SmoothPageIndicator(
+                  controller: _pageController, count: state.sets.length),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: state.sets.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Stack(children: [
+                      ExerciseList(
+                          exerciseIndex: index, setData: state.sets[index]),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: FloatingActionButton(
+                          heroTag: "previousButton$index",
+                          onPressed: () {
+                            _movePreviousPage();
+                          },
+                          child: const Icon(Icons.keyboard_arrow_left),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: FloatingActionButton(
+                          heroTag: "nextButton$index",
+                          onPressed: () {
+                            _moveNextPage(state.sets.length);
+                          },
+                          child: const Icon(Icons.keyboard_arrow_right),
+                        ),
+                      )
+                    ]);
+                  },
+                ),
               ),
-            );
-          } else if (state is WorkoutEnded) {
-            return const Center(child: Text("Workout ended"));
-          } else {
-            return Center(
-              child: Text(state.toString()),
-            );
-          }
-        }));
+            ]),
+          ),
+        );
+      } else if (state is WorkoutEnded) {
+        return const Center(child: Text("Workout ended"));
+      } else {
+        return Center(
+          child: Text(state.toString()),
+        );
+      }
+    });
   }
 }
 
@@ -297,6 +316,7 @@ class SetList extends StatelessWidget {
         height: 75,
         child: ElevatedButton(
           onPressed: () {
+            Provider.of<TimerNotifier>(context, listen: false).resetTimer();
             context
                 .read<WorkoutBloc>()
                 .add(CompleteSetEvent(exerciseIndex: exerciseIndex));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/drift_exercise_repository.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
-import 'package:gym_app/global_workout_bloc.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/empty_workout_screen.dart';
@@ -15,6 +16,8 @@ import 'package:gym_app/screens/focus_workout_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
+import 'package:gym_app/services/page_controller_service.dart';
+import 'package:gym_app/workout_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +36,7 @@ class ThemeNotifier extends ChangeNotifier {
 
   ThemeData get currentTheme => _currentTheme;
 
-  void toggleTheme() {
+  toggleTheme() {
     if (_currentTheme == lightTheme) {
       _currentTheme = darkTheme;
     } else {
@@ -43,12 +46,69 @@ class ThemeNotifier extends ChangeNotifier {
   }
 }
 
+class TimerNotifier extends ChangeNotifier {
+  DateTime? _startedAt;
+  DateTime? _pausedAt;
+  bool _isRunning = false;
+  Timer? _notifyTimer;
+  int get elapsedSeconds {
+    if (_startedAt == null) {
+      return 0;
+    }
+    if (!_isRunning && _pausedAt != null) {
+      return _pausedAt!.difference(_startedAt!).inSeconds;
+    }
+    return DateTime.now().difference(_startedAt!).inSeconds;
+  }
+
+  startTimer() {
+    if (!_isRunning) {
+      if (_startedAt == null) {
+        _startedAt = DateTime.now();
+      } else {
+        _startedAt = _startedAt!.add(DateTime.now().difference(_pausedAt!));
+      }
+      _isRunning = true;
+      _pausedAt = null;
+      _notifyTimer?.cancel();
+      _notifyTimer =
+          Timer.periodic(const Duration(seconds: 1), (_) => notifyListeners());
+      notifyListeners();
+    }
+  }
+
+  resetTimer() {
+    if (!_isRunning) {
+      return;
+    }
+    _startedAt = DateTime.now();
+    _pausedAt = null;
+    notifyListeners();
+  }
+
+  pauseTimer() {
+    if (_isRunning) {
+      _pausedAt = DateTime.now();
+      _isRunning = false;
+      _notifyTimer?.cancel();
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _notifyTimer?.cancel();
+    super.dispose();
+  }
+}
+
 bool setUpEnded = false;
 final getIt = GetIt.instance;
 void setUp() {
   if (setUpEnded) {
     return;
   }
+  getIt.registerSingleton<PageControllerService>(PageControllerService());
   getIt.registerSingleton<AppDatabase>(AppDatabase());
   getIt.registerSingleton<LocalExerciseRepository>(
       DriftExerciseRepository(db: getIt.get<AppDatabase>()));
@@ -65,9 +125,12 @@ class GlobalProviders extends StatelessWidget {
         ChangeNotifierProvider<ThemeNotifier>(
           create: (_) => ThemeNotifier(),
         ),
-        BlocProvider<GlobalWorkoutBloc>(
-          create: (BuildContext context) => GlobalWorkoutBloc(),
-        ),
+        BlocProvider<WorkoutBloc>(
+            create: (BuildContext context) =>
+                WorkoutBloc(getIt.get<PageControllerService>())),
+        ChangeNotifierProvider<TimerNotifier>(
+          create: (_) => TimerNotifier(),
+        )
       ],
       child: const MyApp(),
     );
@@ -75,6 +138,7 @@ class GlobalProviders extends StatelessWidget {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final storage = await HydratedStorage.build(
     storageDirectory: await getApplicationDocumentsDirectory(),
   );
@@ -166,69 +230,63 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton:
-            BlocBuilder<GlobalWorkoutBloc, GlobalWorkoutState>(
-          builder: (BuildContext context, state) {
-            if (state is ShownState) {
-              return FloatingActionButton.extended(
-                onPressed: () {
-                  context.go('/workout');
-                },
-                label: const Text('Workout'),
-                icon: const Icon(Icons.fitness_center),
-              );
-            } else {
-              return SizedBox.shrink();
-            }
-          },
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people),
-              label: 'Social',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center),
-              label: 'Train',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-          selectedItemColor: Theme.of(context)
-              .colorScheme
-              .primary, // Use accentColor from the theme
-          unselectedItemColor: Theme.of(context).colorScheme.secondary,
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-            switch (index) {
-              case 0:
-                context.go('/home');
-              case 1:
-                context.go('/workout');
-              case 2:
-                context.go('/exercise');
-              case 3:
-                context.go('/profile');
-            }
-          },
-        ),
-        body: BlocBuilder<GlobalWorkoutBloc, GlobalWorkoutState>(
-            builder: (context, state) {
-          return Column(
-            children: [
-              Expanded(child: widget.child),
-            ],
-          );
-        }));
+      floatingActionButton: BlocBuilder<WorkoutBloc, WorkoutState>(
+        builder: (BuildContext context, state) {
+          if (state is WorkoutInProgress) {
+            return FloatingActionButton.extended(
+              onPressed: () {
+                context.go('/workout/new/start');
+              },
+              label:
+                  Text('${Provider.of<TimerNotifier>(context).elapsedSeconds}'),
+              icon: const Icon(Icons.fitness_center),
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Social',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: 'Train',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        selectedItemColor: Theme.of(context)
+            .colorScheme
+            .primary, // Use accentColor from the theme
+        unselectedItemColor: Theme.of(context).colorScheme.secondary,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          switch (index) {
+            case 0:
+              context.go('/home');
+            case 1:
+              context.go('/workout');
+            case 2:
+              context.go('/exercise');
+            case 3:
+              context.go('/profile');
+          }
+        },
+      ),
+      body: widget.child,
+    );
   }
 }

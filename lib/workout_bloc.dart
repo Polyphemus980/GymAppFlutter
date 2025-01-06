@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:gym_app/services/page_controller_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 sealed class WorkoutEvent {}
@@ -69,8 +69,8 @@ class WorkoutInProgress extends WorkoutState {
 class WorkoutEnded extends WorkoutState {}
 
 class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
-  final PageController _pageController;
-  WorkoutBloc(this._pageController) : super(InitialState()) {
+  final PageControllerService _pageControllerService;
+  WorkoutBloc(this._pageControllerService) : super(InitialState()) {
     on<InitializeSetsEvent>(_initializeSets);
     on<AddSetEvent>(_addSet);
     on<RemoveSetEvent>(_removeSet);
@@ -125,10 +125,13 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
     }
     final currentState = state as WorkoutInProgress;
     final sets = List<SetData>.from((currentState).sets);
-    sets[event.exerciseIndex]
+    var set = sets[event.exerciseIndex]
         .sets
-        .firstWhere((set) => !set.completed)
-        .completed = true;
+        .where((set) => !set.completed)
+        .firstOrNull;
+    if (set != null) {
+      set.completed = true;
+    }
     final shouldMove =
         sets[event.exerciseIndex].sets.every((set) => set.completed);
     if (shouldMove) {
@@ -138,8 +141,7 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
         add(EndWorkoutEvent());
         return;
       }
-      _pageController.animateToPage(nextIndex,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _pageControllerService.animateToPage(nextIndex);
     }
     emit(WorkoutInProgress(sets: sets));
   }

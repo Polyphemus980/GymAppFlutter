@@ -37,7 +37,9 @@ typedef ExerciseWithMuscleGroups = ({
   PlannedSets
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(_openConnection()) {
+    insertMuscleGroups();
+  }
 
   @override
   int get schemaVersion => 1;
@@ -61,11 +63,36 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  Future<void> insertExerciseMuscles(
-      List<MuscleGroup> muscles, int exerciseId) async {
-    for (final muscle in muscles) {
-      await into(exerciseMuscles).insert(ExerciseMusclesCompanion(
-          exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
+  Future<void> insertMuscleGroup(Insertable<MuscleGroup> muscleGroup) async {
+    await into(muscleGroups).insert(muscleGroup);
+  }
+
+  Future<void> insertMuscleGroups() async {
+    final result = await select(muscleGroups).get();
+    if (result.isNotEmpty) {
+      return;
     }
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Lats")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Upper Back")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Lower Back")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Quads")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Biceps")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Triceps")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Chest")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Front Deltoids")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Rear Deltoids")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Lateral Deltoids")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Core")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Forearms")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Calves")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Glutes")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Traps")));
   }
 }
