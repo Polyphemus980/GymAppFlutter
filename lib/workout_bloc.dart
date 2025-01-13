@@ -1,6 +1,6 @@
+import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
-import 'package:gym_app/services/page_controller_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 sealed class WorkoutEvent {}
@@ -43,6 +43,12 @@ class EditSetEvent extends WorkoutEvent {
       required this.weight});
 }
 
+class ChangePageEvent extends WorkoutEvent {
+  final int page;
+
+  ChangePageEvent({required this.page});
+}
+
 sealed class WorkoutState {}
 
 class InitialState extends WorkoutState {}
@@ -68,9 +74,9 @@ class WorkoutInProgress extends WorkoutState {
 
 class WorkoutEnded extends WorkoutState {}
 
-class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
-  final PageControllerService _pageControllerService;
-  WorkoutBloc(this._pageControllerService) : super(InitialState()) {
+class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
+    with BlocPresentationMixin<WorkoutState, WorkoutEvent> {
+  WorkoutBloc() : super(InitialState()) {
     on<InitializeSetsEvent>(_initializeSets);
     on<AddSetEvent>(_addSet);
     on<RemoveSetEvent>(_removeSet);
@@ -141,14 +147,14 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState> {
         add(EndWorkoutEvent());
         return;
       }
-      _pageControllerService.animateToPage(nextIndex);
+      emitPresentation(ChangePageEvent(page: nextIndex));
     }
     emit(WorkoutInProgress(sets: sets));
   }
 
   _endWorkout(EndWorkoutEvent event, Emitter<WorkoutState> emit) {
-    clear();
     emit(WorkoutEnded());
+    clear();
   }
 
   @override

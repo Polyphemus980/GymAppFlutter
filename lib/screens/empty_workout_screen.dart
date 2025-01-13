@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/main.dart';
+import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -20,61 +21,54 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   List<SetData> sets = [];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Workout"),
-      ),
-      body: Stack(
+    return AppScaffold(
+      title: "Workout",
+      child: Column(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await context.push('/workout/new/select', extra: exercises);
-                    setState(() {});
-                  },
-                  child: const Text("Add exercises"),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Provider.of<TimerNotifier>(context, listen: false)
-                        .startTimer();
-                    context.go('/workout/new/start', extra: sets);
-                  },
-                  child: const Text("Start workout"),
-                ),
-              ),
-              Expanded(
-                child: ReorderableListView.builder(
-                  itemCount: exercises.length,
-                  itemBuilder: (context, index) {
-                    final exercise = exercises[index];
-                    return SetCard(
-                        key: ValueKey(exercise),
-                        exercise: exercise,
-                        onUpdate: (List<WorkoutConfigSet> set) {
-                          while (sets.length <= index) {
-                            sets.add(SetData(exercise: exercise, sets: []));
-                          }
-                          sets[index] = sets[index].copyWith(sets: set);
-                          setState(() {});
-                        });
-                  },
-                  onReorder: (int oldIndex, int newIndex) {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final temp = exercises.removeAt(oldIndex);
-                    exercises.insert(newIndex, temp);
-                  },
-                ),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                await context.push('/workout/new/select', extra: exercises);
+                setState(() {});
+              },
+              child: const Text("Add exercises"),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Provider.of<TimerNotifier>(context, listen: false).startTimer();
+                context.go('/workout/new/start', extra: sets);
+              },
+              child: const Text("Start workout"),
+            ),
+          ),
+          Expanded(
+            child: ReorderableListView.builder(
+              itemCount: exercises.length,
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return SetCard(
+                    key: ValueKey(exercise),
+                    exercise: exercise,
+                    onUpdate: (List<WorkoutConfigSet> set) {
+                      while (sets.length <= index) {
+                        sets.add(SetData(exercise: exercise, sets: []));
+                      }
+                      sets[index] = sets[index].copyWith(sets: set);
+                      setState(() {});
+                    });
+              },
+              onReorder: (int oldIndex, int newIndex) {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final temp = exercises.removeAt(oldIndex);
+                exercises.insert(newIndex, temp);
+              },
+            ),
           ),
         ],
       ),

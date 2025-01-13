@@ -58,7 +58,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     _initializeMuscles();
 
     _exerciseSubscription = exerciseRepository
-        .getExercisesWithFilters(_query, _filters)
+        .watchExercisesWithFilters(_query, _filters)
         .listen((exercises) {
       add(LoadedExerciseEvent(exercises));
     });
@@ -97,7 +97,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     _filters = event.selectedMuscles;
     try {
       final exerciseStream =
-          exerciseRepository.getExercisesWithFilters(_query, _filters);
+          exerciseRepository.watchExercisesWithFilters(_query, _filters);
       await _exerciseSubscription.cancel();
       _exerciseSubscription = exerciseStream.listen(
         (exercises) {
@@ -118,7 +118,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     _query = event.query;
     try {
       final exerciseStream =
-          exerciseRepository.getExercisesWithFilters(_query, _filters);
+          exerciseRepository.watchExercisesWithFilters(_query, _filters);
       await _exerciseSubscription.cancel();
       _exerciseSubscription = exerciseStream.listen(
         (exercises) {

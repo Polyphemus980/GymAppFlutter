@@ -52,6 +52,8 @@ dependencies:
   smooth_page_indicator: ^1.2.0+3
   hydrated_bloc: ^9.1.5
   json_annotation: ^4.9.0
+  flutter_hooks: ^0.20.5
+  bloc_presentation: ^1.0.1
 
 dev_dependencies:
   flutter_test:

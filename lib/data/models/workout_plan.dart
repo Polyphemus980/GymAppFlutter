@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:gym_app/data/models/planned_workout.dart';
 
 class WorkoutPlan {
   WorkoutPlan(
@@ -12,6 +13,8 @@ class WorkoutPlan {
   final String description;
   final DateTime createdAt;
   final DateTime? updatedAt;
+
+  List<PlannedWorkout>? workouts;
 }
 
 @UseRowClass(WorkoutPlan)

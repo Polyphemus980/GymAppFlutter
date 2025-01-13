@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/widgets/app_widgets.dart';
 
 import '../data/models/muscle_group.dart';
 import '../main.dart';
@@ -20,11 +21,9 @@ class _MusclePickerState extends State<MusclePicker> {
   late String ff = "";
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pick muscle groups'),
-      ),
-      body: Column(
+    return AppScaffold(
+      title: 'Pick muscle groups',
+      child: Column(
         children: [
           FutureBuilder(
               future: exerciseRepository.getAllMuscleGroups(),

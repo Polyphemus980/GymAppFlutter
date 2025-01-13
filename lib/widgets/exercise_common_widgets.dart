@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/main.dart';
@@ -38,7 +39,7 @@ class SearchAndFilterRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
-          flex: 2,
+          flex: 3,
           child: SearchBar(
             onChanged: (query) =>
                 context.read<ExerciseBloc>().add(SearchExerciseEvent(query)),
@@ -46,10 +47,18 @@ class SearchAndFilterRow extends StatelessWidget {
           ),
         ),
         Flexible(
-          child: ElevatedButton(
-            onPressed: () => _showFilters(context),
-            child: const Text("Filters"),
-          ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            Flexible(
+              child: IconButton(
+                onPressed: () => _showFilters(context),
+                icon: const Icon(Icons.filter_alt),
+              ),
+            ),
+            Flexible(
+                child: IconButton(
+                    onPressed: () => context.push('/exercise/add'),
+                    icon: const Icon(Icons.add)))
+          ]),
         ),
       ],
     );

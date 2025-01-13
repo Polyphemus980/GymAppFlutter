@@ -1,116 +1,111 @@
+import 'dart:io' show Platform;
+
+import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/services/page_controller_service.dart';
+import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../main.dart';
 
-class FocusWorkoutScreen extends StatefulWidget {
+class FocusWorkoutScreen extends HookWidget {
   const FocusWorkoutScreen({super.key, required this.sets});
   final List<SetData> sets;
 
   @override
-  State<FocusWorkoutScreen> createState() => _FocusWorkoutScreenState();
-}
-
-class _FocusWorkoutScreenState extends State<FocusWorkoutScreen> {
-  late PageController _pageController;
-  final _pageControllerService = getIt.get<PageControllerService>();
-
-  _moveNextPage(int length) {
-    if (_pageController.page! < length - 1) {
-      _pageController.nextPage(
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    }
-  }
-
-  _movePreviousPage() {
-    if (_pageController.page! > 0) {
-      _pageController.previousPage(
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-    _pageControllerService.setPageController(_pageController);
-    context.read<WorkoutBloc>().add(InitializeSetsEvent(sets: widget.sets));
-  }
-
-  @override
-  dispose() {
-    super.dispose();
-    _pageControllerService.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
-      if (state is WorkoutInProgress && state.sets.isNotEmpty) {
-        return Scaffold(
-          appBar: AppBar(title: Text("Workout started}")),
-          body: KeyboardListener(
-            focusNode: FocusNode(),
-            onKeyEvent: (event) {
-              if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                _moveNextPage(state.sets.length);
-              } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                _movePreviousPage();
-              }
-            },
-            child: Column(spacing: 16, children: [
-              SmoothPageIndicator(
-                  controller: _pageController, count: state.sets.length),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: state.sets.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Stack(children: [
-                      ExerciseList(
-                          exerciseIndex: index, setData: state.sets[index]),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: FloatingActionButton(
-                          heroTag: "previousButton$index",
-                          onPressed: () {
-                            _movePreviousPage();
-                          },
-                          child: const Icon(Icons.keyboard_arrow_left),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: FloatingActionButton(
-                          heroTag: "nextButton$index",
-                          onPressed: () {
-                            _moveNextPage(state.sets.length);
-                          },
-                          child: const Icon(Icons.keyboard_arrow_right),
-                        ),
-                      )
-                    ]);
-                  },
+    useEffect(() {
+      context.read<WorkoutBloc>().add(InitializeSetsEvent(sets: sets));
+      return null;
+    }, []);
+    final pageController = usePageController();
+    return BlocPresentationListener<WorkoutBloc, WorkoutEvent>(
+      listener: (context, event) {
+        if (event is ChangePageEvent) {
+          pageController.animateToPage(event.page,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut);
+        }
+      },
+      child: BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
+        if (state is WorkoutInProgress && state.sets.isNotEmpty) {
+          return AppScaffold(
+            title: "Workout",
+            child: KeyboardListener(
+              focusNode: FocusNode(),
+              onKeyEvent: (event) {
+                if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                  pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut);
+                } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                  pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut);
+                }
+              },
+              child: Column(spacing: 16, children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                  child: SmoothPageIndicator(
+                      controller: pageController, count: state.sets.length),
                 ),
-              ),
-            ]),
-          ),
-        );
-      } else if (state is WorkoutEnded) {
-        return const Center(child: Text("Workout ended"));
-      } else {
-        return Center(
-          child: Text(state.toString()),
-        );
-      }
-    });
+                Expanded(
+                  child: PageView.builder(
+                    controller: pageController,
+                    itemCount: state.sets.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Stack(children: [
+                        ExerciseList(
+                            exerciseIndex: index, setData: state.sets[index]),
+                        if (Platform.isWindows)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: FloatingActionButton(
+                              heroTag: "previousButton$index",
+                              onPressed: () {
+                                pageController.previousPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut);
+                              },
+                              child: const Icon(Icons.keyboard_arrow_left),
+                            ),
+                          ),
+                        if (Platform.isWindows)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: FloatingActionButton(
+                              heroTag: "nextButton$index",
+                              onPressed: () {
+                                pageController.nextPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut);
+                              },
+                              child: const Icon(Icons.keyboard_arrow_right),
+                            ),
+                          )
+                      ]);
+                    },
+                  ),
+                ),
+              ]),
+            ),
+          );
+        } else if (state is WorkoutEnded) {
+          return const Center(child: Text("Workout ended"));
+        } else {
+          return Center(
+            child: Text(state.toString()),
+          );
+        }
+      }),
+    );
   }
 }
 
@@ -252,7 +247,7 @@ class WorkoutContainer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16.0),
         boxShadow: const [
           BoxShadow(

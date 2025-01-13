@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/main.dart';
+import 'package:gym_app/widgets/app_widgets.dart';
 
 import '../data/models/muscle_group.dart';
 
@@ -64,17 +65,17 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar:
-            AppBar(title: const Center(child: Text("Add exercise")), actions: [
+    return AppScaffold(
+        title: "Add exercise",
+        actions: [
           _isLoading
               ? const CircularProgressIndicator()
               : ElevatedButton(
                   onPressed: _insertExercise,
                   child: const Text('Save'),
                 ),
-        ]),
-        body: Form(
+        ],
+        child: Form(
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.all(16.0),

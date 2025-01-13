@@ -27,21 +27,34 @@ import 'data/models/muscle_group.dart';
 import 'data/models/set_data.dart';
 
 class ThemeNotifier extends ChangeNotifier {
-  final lightTheme = FlexThemeData.light(scheme: FlexScheme.dellGenoa);
-  final darkTheme = FlexThemeData.dark(scheme: FlexScheme.aquaBlue);
-  //Switched around for now
-  ThemeData _currentTheme = ThemeMode.system != ThemeMode.light
-      ? FlexThemeData.light(scheme: FlexScheme.dellGenoa)
-      : FlexThemeData.dark(scheme: FlexScheme.aquaBlue);
+  final ThemeData lightTheme =
+      FlexThemeData.light(scheme: FlexScheme.dellGenoa);
+  final ThemeData darkTheme = FlexThemeData.dark(
+    scheme: FlexScheme.vesuviusBurn,
+    surfaceMode:
+        FlexSurfaceMode.highScaffoldLowSurface, // Adjust surface blending mode
+    darkIsTrueBlack: false, // Ensures black is not "true black"
+    blendLevel: 50, // Adjust blending level for surfaces and background
+    tones: const FlexTones.light(), // Use lighter tones for backgrounds
+    subThemesData: const FlexSubThemesData(
+      defaultRadius: 8.0, // Customize radius if desired
+    ),
+  );
+
+  ThemeData _currentTheme;
+
+  ThemeNotifier()
+      : _currentTheme = ThemeMode.system != ThemeMode.light
+            ? FlexThemeData.light(scheme: FlexScheme.dellGenoa)
+            : FlexThemeData.dark(
+                scheme: FlexScheme.greyLaw,
+                darkIsTrueBlack: false,
+              );
 
   ThemeData get currentTheme => _currentTheme;
 
-  toggleTheme() {
-    if (_currentTheme == lightTheme) {
-      _currentTheme = darkTheme;
-    } else {
-      _currentTheme = lightTheme;
-    }
+  void toggleTheme() {
+    _currentTheme = (_currentTheme == lightTheme) ? darkTheme : lightTheme;
     notifyListeners();
   }
 }
@@ -126,8 +139,7 @@ class GlobalProviders extends StatelessWidget {
           create: (_) => ThemeNotifier(),
         ),
         BlocProvider<WorkoutBloc>(
-            create: (BuildContext context) =>
-                WorkoutBloc(getIt.get<PageControllerService>())),
+            create: (BuildContext context) => WorkoutBloc()),
         ChangeNotifierProvider<TimerNotifier>(
           create: (_) => TimerNotifier(),
         )
@@ -170,7 +182,7 @@ final _router = GoRouter(initialLocation: '/home', routes: [
     ),
     GoRoute(
         path: '/exercise',
-        builder: (context, state) => const ExerciseScreen(),
+        builder: (context, state) => const ExerciseListScreen(),
         routes: [
           GoRoute(
               path: 'add',

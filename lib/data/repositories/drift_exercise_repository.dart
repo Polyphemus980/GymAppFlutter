@@ -58,7 +58,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   @override
-  Stream<List<Exercise>> getExercisesWithFilters(
+  Stream<List<Exercise>> watchExercisesWithFilters(
       String query, List<MuscleGroup> groups) {
     final exerciseStream = (db.select(db.exercises)
           ..where((exercise) =>
