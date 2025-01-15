@@ -131,14 +131,19 @@ class ExerciseList extends StatelessWidget {
                     height: 0.9 * constraints.maxHeight,
                     actions: [
                       IconButton(
+                        color: Theme.of(context).primaryColor,
                         icon: const Icon(Icons.remove),
                         onPressed: () {
                           context.read<WorkoutBloc>().add(
                               RemoveSetEvent(exerciseIndex: exerciseIndex));
                         },
                       ),
-                      Text("Sets: ${setData.sets.length}"),
+                      Text("Sets: ${setData.sets.length}",
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                          )),
                       IconButton(
+                        color: Theme.of(context).primaryColor,
                         icon: const Icon(Icons.add),
                         onPressed: () {
                           context
@@ -225,7 +230,7 @@ class ExerciseData extends StatelessWidget {
 class WorkoutContainer extends StatelessWidget {
   final Widget child;
 
-  final double height;
+  final double? height;
 
   final double width;
 
@@ -235,7 +240,7 @@ class WorkoutContainer extends StatelessWidget {
       {super.key,
       required this.child,
       required this.width,
-      required this.height,
+      this.height,
       this.title,
       this.actions});
 
@@ -247,8 +252,11 @@ class WorkoutContainer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Provider.of<ThemeNotifier>(context).isLightTheme()
+            ? Colors.white
+            : Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: Theme.of(context).colorScheme.secondary),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -258,16 +266,16 @@ class WorkoutContainer extends StatelessWidget {
         ],
       ),
       child: Column(
+        spacing: 10,
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             if (title != null)
               Flexible(
                 child: Text(
-                  title.toString(),
+                  title!,
                   softWrap: true,
-                  style: width > 300
-                      ? Theme.of(context).textTheme.headlineLarge
-                      : Theme.of(context).textTheme.headlineMedium,
+                  style: TextStyle(
+                      fontSize: 24, color: Theme.of(context).primaryColor),
                 ),
               ),
             if (actions != null)
@@ -317,7 +325,8 @@ class SetList extends StatelessWidget {
                 .add(CompleteSetEvent(exerciseIndex: exerciseIndex));
           },
           style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.amber, backgroundColor: Colors.blue),
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: Theme.of(context).primaryColor),
           child: const Text("Complete set"),
         ),
       )
@@ -352,11 +361,20 @@ class _SetTileState extends State<SetTile> {
   final TextEditingController _repsController = TextEditingController();
 
   @override
+  dispose() {
+    _weightController.dispose();
+    _repsController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      color: widget.isCompleted ? Colors.green.withOpacity(0.1) : null,
+      color: widget.isCompleted
+          ? Colors.green.withValues(alpha: 0.1)
+          : Theme.of(context).primaryColor,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(

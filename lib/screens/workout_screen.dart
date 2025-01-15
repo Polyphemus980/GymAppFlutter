@@ -29,9 +29,38 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
+import 'package:provider/provider.dart';
+
+import '../main.dart';
+import '../workout_bloc.dart';
 
 class WorkoutListScreen extends StatelessWidget {
   const WorkoutListScreen({super.key});
+
+  void displayWorkoutPopUp(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+              title: const Text("Workout in progress"),
+              content: const Text(
+                  "A workout is currently in progress. Do you want to dismiss it and start a new one?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      context.read<WorkoutBloc>().add(EndWorkoutEvent());
+                      context.pop();
+                    },
+                    child: const Text("Dismiss it")),
+                TextButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    child: const Text("Continue current one"))
+              ]);
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +83,11 @@ class WorkoutListScreen extends StatelessWidget {
               const SizedBox(height: 16),
               InkWell(
                 onTap: () {
-                  context.push('/workout/new');
+                  if (context.read<WorkoutBloc>().state is WorkoutInProgress) {
+                    displayWorkoutPopUp(context);
+                  } else {
+                    context.push('/workout/new');
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -63,7 +96,7 @@ class WorkoutListScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: Colors.grey.withValues(alpha: 0.2),
                         spreadRadius: 1,
                         blurRadius: 4,
                         offset: const Offset(0, 2),
@@ -81,7 +114,7 @@ class WorkoutListScreen extends StatelessWidget {
                         child: const Icon(Icons.add, size: 30),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -92,8 +125,8 @@ class WorkoutListScreen extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
+                            SizedBox(height: 4),
+                            Text(
                               'Start with an empty workout and add exercises as you go',
                               style: TextStyle(
                                 color: Colors.grey,
@@ -117,6 +150,32 @@ class WorkoutListScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              InkWell(
+                onTap: () {
+                  context.push('/workout/plan');
+                },
+                child: Container(
+                  //width: double.infinity,
+                  height: 100,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                  child: Center(
+                    child: Text("Add new workout plan",
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onPrimary)),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 16.0,
+              ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -132,7 +191,10 @@ class WorkoutListScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color:
+                              Provider.of<ThemeNotifier>(context).isLightTheme()
+                                  ? Colors.white
+                                  : Colors.grey.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.grey.shade200),
                         ),
@@ -142,7 +204,7 @@ class WorkoutListScreen extends StatelessWidget {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: plan.color.withOpacity(0.2),
+                                color: plan.color.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
@@ -158,23 +220,41 @@ class WorkoutListScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     plan.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                        color:
+                                            Provider.of<ThemeNotifier>(context)
+                                                    .isLightTheme()
+                                                ? Colors.black
+                                                : Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     plan.description,
                                     style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                      color: Provider.of<ThemeNotifier>(context)
+                                              .isLightTheme()
+                                          ? Colors.grey.shade600
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withValues(alpha: 0.6),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     '${plan.workouts} workouts • ${plan.duration}',
                                     style: TextStyle(
-                                      color: Colors.grey.shade500,
+                                      color: Provider.of<ThemeNotifier>(context)
+                                              .isLightTheme()
+                                          ? Colors.grey.shade500
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withValues(alpha: 0.4),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -221,6 +301,30 @@ class WorkoutPlan {
 
 // Sample workout plans data
 final List<WorkoutPlan> workoutPlans = [
+  const WorkoutPlan(
+    name: 'Strength Training',
+    description: 'Build muscle and increase strength',
+    workouts: 12,
+    duration: '8 weeks',
+    icon: Icons.fitness_center,
+    color: Colors.blue,
+  ),
+  const WorkoutPlan(
+    name: 'Strength Training',
+    description: 'Build muscle and increase strength',
+    workouts: 12,
+    duration: '8 weeks',
+    icon: Icons.fitness_center,
+    color: Colors.blue,
+  ),
+  const WorkoutPlan(
+    name: 'Strength Training',
+    description: 'Build muscle and increase strength',
+    workouts: 12,
+    duration: '8 weeks',
+    icon: Icons.fitness_center,
+    color: Colors.blue,
+  ),
   const WorkoutPlan(
     name: 'Strength Training',
     description: 'Build muscle and increase strength',

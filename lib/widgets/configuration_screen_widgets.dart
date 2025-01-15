@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:provider/provider.dart';
+
+import '../main.dart';
 
 class SetCard extends StatefulWidget {
-  const SetCard({super.key, required this.exercise, required this.onUpdate});
-
+  const SetCard(
+      {super.key,
+      required this.index,
+      required this.exercise,
+      required this.onUpdate});
+  final int index;
   final Exercise exercise;
   final Function(List<WorkoutConfigSet>) onUpdate;
   @override
@@ -20,11 +27,13 @@ class _SetCardState extends State<SetCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 24.0, 16.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
-        color: theme.canvasColor,
+        color: Provider.of<ThemeNotifier>(context).isLightTheme()
+            ? Colors.white
+            : Colors.grey.withValues(alpha: 0.1),
         border: Border.all(color: theme.dividerColor, width: 1.0),
       ),
       child: Column(
@@ -98,6 +107,10 @@ class _SetCardState extends State<SetCard> {
                   );
                   widget.onUpdate(sets);
                 }),
+            ReorderableDragStartListener(
+              index: widget.index,
+              child: const Icon(Icons.drag_handle),
+            ),
             IconButton(
               icon: const Icon(Icons.remove),
               onPressed: () {

@@ -18,7 +18,6 @@ class MusclePicker extends StatefulWidget {
 class _MusclePickerState extends State<MusclePicker> {
   final exerciseRepository = getIt.get<LocalExerciseRepository>();
   List<MuscleGroup> muscles = [];
-  late String ff = "";
   @override
   Widget build(BuildContext context) {
     return AppScaffold(

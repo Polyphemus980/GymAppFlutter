@@ -60,14 +60,13 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
                 },
               ),
             ),
-            if (widget.selectedExercises.isNotEmpty)
-              Padding(
-                padding: const EdgeInsetsDirectional.all(16.0),
-                child: FloatingActionButton.extended(
-                    onPressed: () => context.pop(),
-                    label: Text(
-                        "${widget.selectedExercises.length} exercises selected")),
-              ),
+            Padding(
+              padding: const EdgeInsetsDirectional.all(16.0),
+              child: FloatingActionButton.extended(
+                  onPressed: () => context.pop(),
+                  label: Text(
+                      "${widget.selectedExercises.length} exercises selected")),
+            ),
           ]),
         );
       }),

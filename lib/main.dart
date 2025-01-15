@@ -13,10 +13,10 @@ import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/empty_workout_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
+import 'package:gym_app/screens/new_workout_plan_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
-import 'package:gym_app/services/page_controller_service.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,13 +28,13 @@ import 'data/models/set_data.dart';
 
 class ThemeNotifier extends ChangeNotifier {
   final ThemeData lightTheme =
-      FlexThemeData.light(scheme: FlexScheme.dellGenoa);
+      FlexThemeData.light(scheme: FlexScheme.flutterDash);
   final ThemeData darkTheme = FlexThemeData.dark(
     scheme: FlexScheme.vesuviusBurn,
     surfaceMode:
         FlexSurfaceMode.highScaffoldLowSurface, // Adjust surface blending mode
     darkIsTrueBlack: false, // Ensures black is not "true black"
-    blendLevel: 50, // Adjust blending level for surfaces and background
+    blendLevel: 20, // Adjust blending level for surfaces and background
     tones: const FlexTones.light(), // Use lighter tones for backgrounds
     subThemesData: const FlexSubThemesData(
       defaultRadius: 8.0, // Customize radius if desired
@@ -42,17 +42,17 @@ class ThemeNotifier extends ChangeNotifier {
   );
 
   ThemeData _currentTheme;
-
+  bool _isLightTheme() => _currentTheme == lightTheme;
+  bool isLightTheme() => _isLightTheme();
   ThemeNotifier()
       : _currentTheme = ThemeMode.system != ThemeMode.light
-            ? FlexThemeData.light(scheme: FlexScheme.dellGenoa)
+            ? FlexThemeData.light(scheme: FlexScheme.flutterDash)
             : FlexThemeData.dark(
                 scheme: FlexScheme.greyLaw,
                 darkIsTrueBlack: false,
               );
 
   ThemeData get currentTheme => _currentTheme;
-
   void toggleTheme() {
     _currentTheme = (_currentTheme == lightTheme) ? darkTheme : lightTheme;
     notifyListeners();
@@ -121,7 +121,7 @@ void setUp() {
   if (setUpEnded) {
     return;
   }
-  getIt.registerSingleton<PageControllerService>(PageControllerService());
+
   getIt.registerSingleton<AppDatabase>(AppDatabase());
   getIt.registerSingleton<LocalExerciseRepository>(
       DriftExerciseRepository(db: getIt.get<AppDatabase>()));
@@ -202,9 +202,40 @@ final _router = GoRouter(initialLocation: '/home', routes: [
         builder: (context, state) => const WorkoutListScreen(),
         routes: [
           GoRoute(
+              path: 'plan',
+              builder: (context, state) {
+                return const NewWorkoutPlanScreen(
+                  numWeeks: 12,
+                  numDays: 5,
+                );
+              },
+              routes: [
+                GoRoute(
+                    path: 'new',
+                    builder: (context, state) {
+                      final data = state.extra as List<SetData>;
+                      return PreWorkoutScreen(
+                        data: data,
+                        title: "Create workout2",
+                        finishButtonText: "Save Workout",
+                        finishButtonOnTap: (sets) {
+                          context.pop(sets);
+                        },
+                      );
+                    })
+              ]),
+          GoRoute(
               path: 'new',
               builder: (context, state) {
-                return const WorkoutScreen();
+                return PreWorkoutScreen(
+                  title: "Create workout",
+                  finishButtonText: "Start Workout",
+                  finishButtonOnTap: (sets) {
+                    Provider.of<TimerNotifier>(context, listen: false)
+                        .startTimer();
+                    context.go('/start', extra: sets);
+                  },
+                );
               },
               routes: [
                 GoRoute(
@@ -214,17 +245,17 @@ final _router = GoRouter(initialLocation: '/home', routes: [
                       return SelectExerciseScreen(
                           selectedExercises: selectedList);
                     }),
-                GoRoute(
-                    path: 'start',
-                    builder: (context, state) {
-                      final sets = state.extra as List<SetData>? ?? [];
-                      return FocusWorkoutScreen(sets: sets);
-                    })
               ]),
         ]),
     GoRoute(
+        path: '/start',
+        builder: (context, state) {
+          final sets = state.extra as List<SetData>? ?? [];
+          return FocusWorkoutScreen(sets: sets);
+        }),
+    GoRoute(
       path: '/profile',
-      builder: (context, state) => ProfileScreen(),
+      builder: (context, state) => const ProfileScreen(),
     )
   ])
 ]);
@@ -247,14 +278,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
           if (state is WorkoutInProgress) {
             return FloatingActionButton.extended(
               onPressed: () {
-                context.go('/workout/new/start');
+                context.go('/start');
               },
               label:
                   Text('${Provider.of<TimerNotifier>(context).elapsedSeconds}'),
               icon: const Icon(Icons.fitness_center),
             );
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         },
       ),

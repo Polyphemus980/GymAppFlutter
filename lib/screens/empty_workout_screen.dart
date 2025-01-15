@@ -2,75 +2,134 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
-import 'package:gym_app/main.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
-import 'package:provider/provider.dart';
 
 import '../data/models/exercise.dart';
 
-class WorkoutScreen extends StatefulWidget {
-  const WorkoutScreen({super.key});
+class PreWorkoutScreen extends StatefulWidget {
+  const PreWorkoutScreen(
+      {super.key,
+      this.data,
+      required this.title,
+      required this.finishButtonText,
+      required this.finishButtonOnTap});
+  final String title;
+  final String finishButtonText;
+  final List<SetData>? data;
+  final void Function(List<SetData>) finishButtonOnTap;
 
   @override
-  State<WorkoutScreen> createState() => _WorkoutScreenState();
+  State<PreWorkoutScreen> createState() => _PreWorkoutScreenState();
 }
 
-class _WorkoutScreenState extends State<WorkoutScreen> {
-  List<Exercise> exercises = [];
-  List<SetData> sets = [];
+class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
+  late List<Exercise> exercises;
+  late List<SetData> sets;
+
+  @override
+  void initState() {
+    super.initState();
+    sets = widget.data ?? [];
+    exercises = widget.data != null
+        ? widget.data!.map((set) => set.exercise).toList()
+        : [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Workout",
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () async {
+      title: widget.title,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          spacing: 16,
+          children: [
+            Expanded(
+              child: ReorderableListView.builder(
+                buildDefaultDragHandles: false,
+                itemCount: exercises.length,
+                itemBuilder: (context, index) {
+                  final exercise = exercises[index];
+                  return SetCard(
+                      index: index,
+                      key: ValueKey(exercise),
+                      exercise: exercise,
+                      onUpdate: (List<WorkoutConfigSet> set) {
+                        int i = sets.length;
+                        while (sets.length <= index) {
+                          sets.add(SetData(exercise: exercises[i], sets: []));
+                          i++;
+                        }
+                        sets[index] = sets[index].copyWith(sets: set);
+                        setState(() {});
+                      });
+                },
+                onReorder: (int oldIndex, int newIndex) {
+                  if (newIndex > oldIndex) {
+                    newIndex -= 1;
+                  }
+                  final temp = exercises.removeAt(oldIndex);
+                  exercises.insert(newIndex, temp);
+                },
+              ),
+            ),
+            InkWell(
+              onTap: () async {
                 await context.push('/workout/new/select', extra: exercises);
                 setState(() {});
               },
-              child: const Text("Add exercises"),
+              child: Container(
+                //width: double.infinity,
+                height: 75,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.secondary),
+                ),
+                child: Center(
+                  child: Text("Add exercises",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onPrimary)),
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Provider.of<TimerNotifier>(context, listen: false).startTimer();
-                context.go('/workout/new/start', extra: sets);
-              },
-              child: const Text("Start workout"),
-            ),
-          ),
-          Expanded(
-            child: ReorderableListView.builder(
-              itemCount: exercises.length,
-              itemBuilder: (context, index) {
-                final exercise = exercises[index];
-                return SetCard(
-                    key: ValueKey(exercise),
-                    exercise: exercise,
-                    onUpdate: (List<WorkoutConfigSet> set) {
-                      while (sets.length <= index) {
-                        sets.add(SetData(exercise: exercise, sets: []));
-                      }
-                      sets[index] = sets[index].copyWith(sets: set);
-                      setState(() {});
-                    });
-              },
-              onReorder: (int oldIndex, int newIndex) {
-                if (newIndex > oldIndex) {
-                  newIndex -= 1;
+            InkWell(
+              onTap: () {
+                if (sets.isNotEmpty &&
+                    sets.every((set) => set.sets.isNotEmpty)) {
+                  widget.finishButtonOnTap(sets);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          "Each chosen exercise must have at least one set")));
                 }
-                final temp = exercises.removeAt(oldIndex);
-                exercises.insert(newIndex, temp);
               },
+              child: Container(
+                //width: double.infinity,
+                height: 75,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.secondary),
+                ),
+                child: Center(
+                  child: Text(widget.finishButtonText,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onPrimary)),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
