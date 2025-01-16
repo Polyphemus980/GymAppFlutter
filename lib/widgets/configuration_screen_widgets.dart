@@ -10,9 +10,11 @@ class SetCard extends StatefulWidget {
       {super.key,
       required this.index,
       required this.exercise,
-      required this.onUpdate});
+      required this.onUpdate,
+      this.sets});
   final int index;
   final Exercise exercise;
+  final List<WorkoutConfigSet>? sets;
   final Function(List<WorkoutConfigSet>) onUpdate;
   @override
   State<SetCard> createState() {
@@ -21,7 +23,13 @@ class SetCard extends StatefulWidget {
 }
 
 class _SetCardState extends State<SetCard> {
-  final List<WorkoutConfigSet> sets = [];
+  late List<WorkoutConfigSet> sets;
+
+  @override
+  void initState() {
+    super.initState();
+    sets = widget.sets ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {

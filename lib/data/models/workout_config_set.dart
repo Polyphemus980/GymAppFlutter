@@ -2,6 +2,7 @@ import 'package:gym_app/data/models/planned_set.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'workout_config_set.g.dart';
+
 //TODO: This class should be used in the configuration screen as the user may not want to include the weights/reps in there.
 @JsonSerializable()
 class WorkoutConfigSet {
@@ -9,6 +10,8 @@ class WorkoutConfigSet {
   final int setNumber;
   int? repetitions;
   double? weight;
+  double? rpe;
+  double? maxPercentage;
   int? duration;
   bool completed;
 
@@ -18,6 +21,8 @@ class WorkoutConfigSet {
     this.completed = false,
     this.repetitions = 0,
     this.weight,
+    this.maxPercentage,
+    this.rpe,
     this.duration,
   });
 

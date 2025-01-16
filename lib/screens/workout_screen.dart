@@ -159,7 +159,7 @@ class WorkoutListScreen extends StatelessWidget {
                   height: 100,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                         color: Theme.of(context).colorScheme.secondary),
@@ -169,7 +169,9 @@ class WorkoutListScreen extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimary)),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer)),
                   ),
                 ),
               ),

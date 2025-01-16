@@ -52,8 +52,9 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 itemBuilder: (context, index) {
                   final exercise = exercises[index];
                   return SetCard(
+                      sets: sets.length > index ? sets[index].sets : [],
                       index: index,
-                      key: ValueKey(exercise),
+                      key: ValueKey(index),
                       exercise: exercise,
                       onUpdate: (List<WorkoutConfigSet> set) {
                         int i = sets.length;
@@ -84,7 +85,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 height: 75,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                       color: Theme.of(context).colorScheme.secondary),
@@ -94,7 +95,9 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onPrimary)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer)),
                 ),
               ),
             ),
@@ -114,7 +117,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 height: 75,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                       color: Theme.of(context).colorScheme.secondary),
@@ -124,7 +127,9 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onPrimary)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer)),
                 ),
               ),
             ),

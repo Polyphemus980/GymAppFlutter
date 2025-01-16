@@ -159,16 +159,42 @@ class DayCard extends StatelessWidget {
         spacing: 10,
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: sets.length,
-            itemBuilder: (context, index) {
-              return Row(
-                children: [Expanded(child: Text(sets[index].exercise.name))],
-              );
-            },
-          ),
+          // ListView.builder(
+          //   shrinkWrap: true,
+          //   physics: const NeverScrollableScrollPhysics(),
+          //   itemCount: sets.length,
+          //   itemBuilder: (context, index) {
+          //     return Row(
+          //       children: [
+          //         Expanded(child: Text(sets[index].exercise.name)),
+          //         Text(sets[index].sets.length.toString())
+          //       ],
+          //     );
+          //   },
+          // ),
+          if (sets.isNotEmpty)
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: sets.length,
+              separatorBuilder: (context, index) => const Divider(height: 16),
+              itemBuilder: (context, index) {
+                final exercise = sets[index];
+                return PlanExerciseTile(
+                  exercise: exercise,
+                );
+              },
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                "No exercises added yet",
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+              ),
+            ),
           InkWell(
             onTap: () async {
               onAddExercise(index);
@@ -177,10 +203,10 @@ class DayCard extends StatelessWidget {
               width: 200,
               height: 50,
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(12),
-                border:
-                    Border.all(color: Theme.of(context).colorScheme.secondary),
+                border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               child: Center(
                 child: Text(
@@ -188,7 +214,7 @@ class DayCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -322,6 +348,83 @@ class DayContainer extends StatelessWidget {
               Row(mainAxisSize: MainAxisSize.min, children: actions!),
           ]),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class PlanExerciseTile extends StatelessWidget {
+  final SetData exercise;
+  const PlanExerciseTile({super.key, required this.exercise});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  exercise.exercise.name,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  "${exercise.sets.length} sets",
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: exercise.sets.asMap().entries.map((entry) {
+              final setIndex = entry.key;
+              final set = entry.value;
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  "Set ${setIndex + 1}: ${set.weight ?? 0}kg × ${set.repetitions} reps",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              );
+            }).toList(),
+          ),
         ],
       ),
     );
