@@ -101,8 +101,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Center(
                   child: Text("Add exercises",
@@ -133,8 +132,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Center(
                   child: Text(widget.finishButtonText,

@@ -54,7 +54,6 @@ dependencies:
   json_annotation: ^4.9.0
   flutter_hooks: ^0.20.5
   bloc_presentation: ^1.0.1
-  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

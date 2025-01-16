@@ -25,48 +25,11 @@ class SetCard extends StatefulWidget {
 
 class _SetCardState extends State<SetCard> {
   late List<WorkoutConfigSet> sets;
-  final Map<String, TextEditingController> weightControllers = {};
-  final Map<String, TextEditingController> repetitionControllers = {};
 
   @override
   void initState() {
     super.initState();
     sets = widget.sets ?? [];
-    _initializeControllers();
-  }
-
-  @override
-  void didUpdateWidget(SetCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.sets != widget.sets) {
-      sets = widget.sets ?? [];
-      _reinitializeControllers();
-    }
-  }
-
-  void _reinitializeControllers() {
-    for (var controller in weightControllers.values) {
-      controller.dispose();
-    }
-    for (var controller in repetitionControllers.values) {
-      controller.dispose();
-    }
-    weightControllers.clear();
-    repetitionControllers.clear();
-
-    _initializeControllers();
-  }
-
-  void _initializeControllers() {
-    for (var set in sets) {
-      String setId = '${widget.exercise.id}_${set.setNumber}';
-      weightControllers[setId] = TextEditingController(
-        text: set.weight?.toString() ?? '',
-      );
-      repetitionControllers[setId] = TextEditingController(
-        text: set.repetitions?.toString() ?? '',
-      );
-    }
   }
 
   void addSet() {
@@ -77,10 +40,6 @@ class _SetCardState extends State<SetCard> {
         setNumber: sets.length,
       );
       sets.add(newSet);
-
-      String setId = '${newSet.exerciseId}_${newSet.setNumber}';
-      weightControllers[setId] = TextEditingController();
-      repetitionControllers[setId] = TextEditingController();
     });
     widget.onUpdate(sets);
   }
@@ -88,12 +47,7 @@ class _SetCardState extends State<SetCard> {
   void removeSet() {
     if (sets.isNotEmpty) {
       setState(() {
-        var removedSet = sets.removeLast();
-        String setId = '${removedSet.exerciseId}_${removedSet.setNumber}';
-        weightControllers[setId]?.dispose();
-        weightControllers.remove(setId);
-        repetitionControllers[setId]?.dispose();
-        repetitionControllers.remove(setId);
+        sets.removeLast();
       });
       widget.onUpdate(sets);
     }
@@ -189,95 +143,31 @@ class _SetCardState extends State<SetCard> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: sets.length,
                 itemBuilder: (context, index) {
-                  String setId =
-                      '${sets[index].exerciseId}_${sets[index].setNumber}';
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 40,
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundColor: colorScheme.primaryContainer,
-                            child: Text(
-                              "${index + 1}",
-                              style: TextStyle(
-                                color: colorScheme.onPrimaryContainer,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              SizedBox(
-                                width: 100,
-                                child: AppTextFormField(
-                                  labelText: "Weight",
-                                  hintText: "0",
-                                  formatters: [
-                                    WeightInputFormatter(),
-                                    LengthLimitingTextInputFormatter(7),
-                                  ],
-                                  controller: weightControllers[setId],
-                                  width: 80,
-                                  height: 44,
-                                  onChanged: (value) {
-                                    sets[index].weight = double.tryParse(value);
-                                    widget.onUpdate(sets);
-                                  },
-                                  onEditingComplete: () {
-                                    weightControllers[setId]!.text =
-                                        sets[index].weight.toString();
-                                    FocusScope.of(context).unfocus();
-                                  },
-                                ),
-                              ),
-                              SizedBox(
-                                width: 100,
-                                child: AppTextFormField(
-                                  labelText: "Reps",
-                                  hintText: "0",
-                                  formatters: [
-                                    RepsInputFormatter(),
-                                    LengthLimitingTextInputFormatter(7),
-                                  ],
-                                  controller: repetitionControllers[setId],
-                                  width: 80,
-                                  height: 44,
-                                  onChanged: (value) {
-                                    sets[index].repetitions =
-                                        int.tryParse(value);
-                                    widget.onUpdate(sets);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  return SetRow(
+                    key: ValueKey(
+                        '${widget.exercise.id}_${sets[index].setNumber}'),
+                    index: index,
+                    set: sets[index],
+                    onUpdate: (updatedSet) {
+                      sets[index] = updatedSet;
+                      widget.onUpdate(sets);
+                    },
                   );
                 },
               ),
 
-            // Action Buttons
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _ActionButton(
+                  ActionButton(
                     icon: Icons.remove,
                     label: "Remove Set",
                     onPressed: sets.isEmpty ? null : removeSet,
                     colorScheme: colorScheme,
                   ),
-                  _ActionButton(
+                  ActionButton(
                     icon: Icons.add,
                     label: "Add Set",
                     onPressed: addSet,
@@ -293,8 +183,9 @@ class _SetCardState extends State<SetCard> {
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
+class ActionButton extends StatelessWidget {
+  const ActionButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.onPressed,
@@ -325,6 +216,126 @@ class _ActionButton extends StatelessWidget {
           icon: Icon(icon, size: 20),
           label: Text(label),
         ),
+      ),
+    );
+  }
+}
+
+class SetRow extends StatefulWidget {
+  const SetRow({
+    super.key,
+    required this.index,
+    required this.set,
+    required this.onUpdate,
+  });
+
+  final int index;
+  final WorkoutConfigSet set;
+  final Function(WorkoutConfigSet) onUpdate;
+
+  @override
+  State<SetRow> createState() => _SetRowState();
+}
+
+class _SetRowState extends State<SetRow> {
+  late final TextEditingController weightController;
+  late final TextEditingController repsController;
+
+  @override
+  void initState() {
+    super.initState();
+    weightController = TextEditingController(
+      text: widget.set.weight?.toString() ?? '',
+    );
+    repsController = TextEditingController(
+      text: widget.set.repetitions?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    weightController.dispose();
+    repsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 40,
+            child: CircleAvatar(
+              radius: 14,
+              backgroundColor: colorScheme.primaryContainer,
+              child: Text(
+                "${widget.index + 1}",
+                style: TextStyle(
+                  color: colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: AppTextFormField(
+                    labelText: "Weight",
+                    hintText: "0",
+                    formatters: [
+                      WeightInputFormatter(),
+                      LengthLimitingTextInputFormatter(7),
+                    ],
+                    controller: weightController,
+                    width: 80,
+                    height: 45,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        final double? parsedValue = double.tryParse(value);
+                        if (parsedValue != null) {
+                          widget.set.weight = parsedValue;
+                          widget.onUpdate(widget.set);
+                        }
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: AppTextFormField(
+                    labelText: "Reps",
+                    hintText: "0",
+                    formatters: [
+                      RepsInputFormatter(),
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    controller: repsController,
+                    width: 80,
+                    height: 45,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        final int? parsedValue = int.tryParse(value);
+                        if (parsedValue != null) {
+                          widget.set.repetitions = parsedValue;
+                          widget.onUpdate(widget.set);
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

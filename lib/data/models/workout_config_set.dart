@@ -19,7 +19,7 @@ class WorkoutConfigSet {
     required this.exerciseId,
     required this.setNumber,
     this.completed = false,
-    this.repetitions = 0,
+    this.repetitions,
     this.weight,
     this.maxPercentage,
     this.rpe,

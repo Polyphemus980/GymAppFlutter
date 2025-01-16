@@ -92,8 +92,12 @@ class WorkoutListScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withValues(alpha: 0.2),
@@ -108,13 +112,22 @@ class WorkoutListScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondaryContainer
+                              .withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.add, size: 30),
+                        child: Icon(
+                          Icons.add,
+                          size: 30,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                        ),
                       ),
                       const SizedBox(width: 16),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -123,13 +136,18 @@ class WorkoutListScreen extends StatelessWidget {
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               'Start with an empty workout and add exercises as you go',
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                    .withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -155,14 +173,15 @@ class WorkoutListScreen extends StatelessWidget {
                   context.push('/workout/plan');
                 },
                 child: Container(
-                  //width: double.infinity,
                   height: 100,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.secondary),
+                    border: Border.all(color: Colors.grey.shade200),
                   ),
                   child: Center(
                     child: Text("Add new workout plan",

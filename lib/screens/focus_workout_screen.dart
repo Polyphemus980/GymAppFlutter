@@ -379,20 +379,15 @@ class _SetTileState extends State<SetTile> {
         padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 64,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: widget.isCompleted ? Colors.green : Colors.grey.shade300,
-              ),
-              child: Center(
-                child: Text(
-                  (widget.setIndex + 1).toString(),
-                  style: TextStyle(
-                    color: widget.isCompleted ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.bold,
-                  ),
+            CircleAvatar(
+              radius: 16, // Half of the desired diameter (32 / 2)
+              backgroundColor:
+                  widget.isCompleted ? Colors.green : Colors.grey.shade300,
+              child: Text(
+                (widget.setIndex + 1).toString(),
+                style: TextStyle(
+                  color: widget.isCompleted ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -530,7 +525,7 @@ class WeightInputFormatter extends TextInputFormatter {
 
     if (double.tryParse(newValue.text) != null) {
       final number = double.parse(newValue.text);
-      if (number < 0) {
+      if (number < 0 || number > 999) {
         return oldValue;
       }
     } else {
