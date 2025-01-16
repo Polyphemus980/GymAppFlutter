@@ -54,7 +54,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                   return SetCard(
                       sets: sets.length > index ? sets[index].sets : [],
                       index: index,
-                      key: ValueKey(index),
+                      key: ValueKey(exercise),
                       exercise: exercise,
                       onUpdate: (List<WorkoutConfigSet> set) {
                         int i = sets.length;
@@ -67,23 +67,37 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                       });
                 },
                 onReorder: (int oldIndex, int newIndex) {
-                  if (newIndex > oldIndex) {
-                    newIndex -= 1;
-                  }
-                  final temp = exercises.removeAt(oldIndex);
-                  exercises.insert(newIndex, temp);
+                  setState(() {
+                    if (newIndex > oldIndex) {
+                      newIndex -= 1;
+                    }
+                    final tempExercise = exercises.removeAt(oldIndex);
+                    exercises.insert(newIndex, tempExercise);
+
+                    if (sets.length > oldIndex) {
+                      final tempSet = sets.removeAt(oldIndex);
+                      if (newIndex < sets.length) {
+                        sets.insert(newIndex, tempSet);
+                      } else {
+                        sets.add(tempSet);
+                      }
+                    }
+                  });
                 },
               ),
             ),
             InkWell(
               onTap: () async {
                 await context.push('/workout/new/select', extra: exercises);
+                for (int i = sets.length; i < exercises.length; i++) {
+                  sets.add(SetData(exercise: exercises[i], sets: []));
+                }
                 setState(() {});
               },
               child: Container(
                 //width: double.infinity,
-                height: 75,
-                padding: const EdgeInsets.all(16),
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
@@ -114,8 +128,8 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
               },
               child: Container(
                 //width: double.infinity,
-                height: 75,
-                padding: const EdgeInsets.all(16),
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),

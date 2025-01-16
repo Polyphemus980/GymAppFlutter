@@ -371,12 +371,12 @@ class _SetTileState extends State<SetTile> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 1,
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       color: widget.isCompleted
           ? Colors.green.withValues(alpha: 0.1)
           : Theme.of(context).primaryColor,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
         child: Row(
           children: [
             Container(
@@ -396,7 +396,7 @@ class _SetTileState extends State<SetTile> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -405,92 +405,38 @@ class _SetTileState extends State<SetTile> {
                     Icons.fitness_center,
                     size: 20,
                   ),
-                  const SizedBox(width: 4),
                   isEditing
-                      ? SizedBox(
-                          width: 80,
-                          height: 40,
-                          child: TextFormField(
-                            inputFormatters: [
-                              WeightInputFormatter(),
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                            controller: _weightController
-                              ..text = widget.weight.toString(),
-                            style: Theme.of(context).textTheme.titleMedium,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              counter: null,
-                              filled: true,
-                              fillColor: Colors.blue[50],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Colors.blueAccent,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
+                      ? AppTextFormField(
+                          width: 75,
+                          formatters: [
+                            WeightInputFormatter(),
+                            LengthLimitingTextInputFormatter(7)
+                          ],
+                          controller: _weightController
+                            ..text = widget.weight.toString(),
                         )
                       : Text(
-                          widget.weight.toStringAsFixed(1),
+                          widget.weight.toStringAsFixed(2),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                   const Text(' lbs'),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                   const Icon(
                     Icons.repeat,
                     size: 20,
                   ),
-                  const SizedBox(width: 4),
                   isEditing
-                      ? SizedBox(
-                          width: 80,
-                          height: 40,
-                          child: TextFormField(
-                            controller: _repsController
-                              ..text = widget.reps.toString(),
-                            inputFormatters: [
-                              RepsInputFormatter(),
-                              LengthLimitingTextInputFormatter(6),
-                            ],
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            style: Theme.of(context).textTheme.titleMedium,
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              filled: true,
-                              fillColor: Colors.blue[50],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Colors.blueAccent,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
+                      ? AppTextFormField(
+                          width: 40,
+                          controller: _repsController
+                            ..text = widget.reps.toString(),
+                          formatters: [
+                            RepsInputFormatter(),
+                            LengthLimitingTextInputFormatter(3),
+                          ],
                         )
                       : Text(
                           '${widget.reps}',
@@ -514,7 +460,6 @@ class _SetTileState extends State<SetTile> {
                   const Icon(
                     Icons.radio_button_unchecked,
                   ),
-                const SizedBox(width: 8),
                 isEditing
                     ? IconButton(
                         onPressed: () {

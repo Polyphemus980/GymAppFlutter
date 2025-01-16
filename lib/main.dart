@@ -216,7 +216,7 @@ final _router = GoRouter(initialLocation: '/home', routes: [
                       final data = state.extra as List<SetData>;
                       return PreWorkoutScreen(
                         data: data,
-                        title: "Create workout2",
+                        title: "Create workout",
                         finishButtonText: "Save Workout",
                         finishButtonOnTap: (sets) {
                           context.pop(sets);
