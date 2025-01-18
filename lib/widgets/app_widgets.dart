@@ -109,3 +109,46 @@ class AppTextFormField extends StatelessWidget {
     );
   }
 }
+
+class AppInkWellButton extends StatelessWidget {
+  const AppInkWellButton(
+      {super.key,
+      required this.onTap,
+      required this.text,
+      this.width,
+      this.height});
+
+  final VoidCallback onTap;
+  final String text;
+  final double? width;
+  final double? height;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

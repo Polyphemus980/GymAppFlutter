@@ -168,31 +168,12 @@ class WorkoutListScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              InkWell(
+              AppInkWellButton(
                 onTap: () {
                   context.push('/plan');
                 },
-                child: Container(
-                  height: 100,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Center(
-                    child: Text("Add new workout plan",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer)),
-                  ),
-                ),
+                height: 100,
+                text: "Add new workout plan",
               ),
               const SizedBox(
                 height: 16.0,

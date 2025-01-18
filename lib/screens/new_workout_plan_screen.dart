@@ -56,28 +56,50 @@ class DaysPages extends HookWidget {
                   controller: pageController,
                   itemCount: numWeeks,
                   itemBuilder: (BuildContext context, int weekIndex) {
-                    return ListView.builder(
-                      itemCount: state.plan.weeks[weekIndex].days.length,
-                      itemBuilder: (context, dayIndex) {
-                        return DayCard(
-                          sets: state.plan.weeks[weekIndex].days[dayIndex].sets,
-                          index: dayIndex,
-                          onAddExercise: (index) async {
-                            final sets = await context.push('/plan/new',
-                                extra: List<SetData>.from(state
-                                    .plan
-                                    .weeks[weekIndex]
-                                    .days[dayIndex]
-                                    .sets)) as List<SetData>;
-                            context.read<NewWorkoutPlanBloc>().add(
-                                ChangedDayEvent(
-                                    sets: sets,
-                                    weekIndex: weekIndex,
-                                    dayIndex: dayIndex));
+                    return Column(spacing: 10, children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.plan.weeks[weekIndex].days.length,
+                          itemBuilder: (context, dayIndex) {
+                            return DayCard(
+                              sets: state
+                                  .plan.weeks[weekIndex].days[dayIndex].sets,
+                              index: dayIndex,
+                              onAddExercise: (index) async {
+                                final sets = await context.push('/plan/new',
+                                    extra: List<SetData>.from(state
+                                        .plan
+                                        .weeks[weekIndex]
+                                        .days[dayIndex]
+                                        .sets)) as List<SetData>;
+                                context.read<NewWorkoutPlanBloc>().add(
+                                    ChangedDayEvent(
+                                        sets: sets,
+                                        weekIndex: weekIndex,
+                                        dayIndex: dayIndex));
+                              },
+                            );
                           },
-                        );
-                      },
-                    );
+                        ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: AppInkWellButton(
+                              onTap: () {}, height: 75, text: "Copy days")),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: AppInkWellButton(
+                              onTap: () {
+                                if (!state.plan.isFilled()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Every training day must have at least 1 exercise")));
+                                }
+                              },
+                              height: 75,
+                              text: "Finish")),
+                    ]);
                   },
                 );
               } else {
@@ -110,19 +132,6 @@ class DayCard extends StatelessWidget {
         spacing: 10,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ListView.builder(
-          //   shrinkWrap: true,
-          //   physics: const NeverScrollableScrollPhysics(),
-          //   itemCount: sets.length,
-          //   itemBuilder: (context, index) {
-          //     return Row(
-          //       children: [
-          //         Expanded(child: Text(sets[index].exercise.name)),
-          //         Text(sets[index].sets.length.toString())
-          //       ],
-          //     );
-          //   },
-          // ),
           if (sets.isNotEmpty)
             ListView.separated(
               shrinkWrap: true,
@@ -146,30 +155,13 @@ class DayCard extends StatelessWidget {
                     ),
               ),
             ),
-          InkWell(
+          AppInkWellButton(
             onTap: () async {
               onAddExercise(index);
             },
-            child: Container(
-              width: 200,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant),
-              ),
-              child: Center(
-                child: Text(
-                  "Add exercises",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ),
-            ),
+            width: 200,
+            height: 50,
+            text: "Add exercises",
           ),
         ],
       ),

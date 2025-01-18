@@ -66,6 +66,10 @@ class WorkoutPlan {
     return WorkoutPlan(weeks: updatedWeeks);
   }
 
+  bool isFilled() {
+    return weeks.every((week) => week.days.every((day) => day.sets.isNotEmpty));
+  }
+
   int get length => weeks.length;
 }
 

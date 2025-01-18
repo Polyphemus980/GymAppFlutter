@@ -109,7 +109,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 },
               ),
             ),
-            InkWell(
+            AppInkWellButton(
               onTap: () async {
                 await context.push('/new/select', extra: exercises);
                 for (int i = sets.length; i < exercises.length; i++) {
@@ -117,73 +117,41 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 }
                 setState(() {});
               },
-              child: Container(
-                //width: double.infinity,
-                height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Center(
-                  child: Text("Add exercises",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer)),
-                ),
-              ),
+              //width: double.infinity,
+              height: 50,
+
+              text: "Add exercises",
             ),
-            InkWell(
-              onTap: () {
-                if (!(sets.isNotEmpty &&
-                    sets.every((set) => set.sets.isNotEmpty))) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text(
-                          "Each chosen exercise must have at least one set")));
-                  return;
-                }
-                if (widget.isRpe) {
-                  if (validateRpe()) {
-                    if (validateRepRange()) {
-                      adjustSetIndices();
-                      widget.finishButtonOnTap(sets);
+            AppInkWellButton(
+                onTap: () {
+                  if (!(sets.isNotEmpty &&
+                      sets.every((set) => set.sets.isNotEmpty))) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                            "Each chosen exercise must have at least one set")));
+                    return;
+                  }
+                  if (widget.isRpe) {
+                    if (validateRpe()) {
+                      if (validateRepRange()) {
+                        adjustSetIndices();
+                        widget.finishButtonOnTap(sets);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text(
+                                "Each set must have min and max reps filled in correctly")));
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text(
-                              "Each set must have min and max reps filled in correctly")));
+                          content: Text("Each set must have RPE filled in")));
                     }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Each set must have RPE filled in")));
+                    adjustSetIndices();
+                    widget.finishButtonOnTap(sets);
                   }
-                } else {
-                  adjustSetIndices();
-                  widget.finishButtonOnTap(sets);
-                }
-              },
-              child: Container(
+                },
                 height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Center(
-                  child: Text(widget.finishButtonText,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer)),
-                ),
-              ),
-            ),
+                text: widget.finishButtonText),
           ],
         ),
       ),
