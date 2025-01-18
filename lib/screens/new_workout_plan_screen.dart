@@ -419,7 +419,7 @@ class PlanExerciseTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  "Set ${setIndex + 1}: ${set.weight ?? 0}kg × ${set.repetitions} reps",
+                  "Set ${setIndex + 1}: Perform ${set.minRepetitions == set.maxRepetitions ? set.minRepetitions : "${set.minRepetitions} - ${set.maxRepetitions}"} reps ${set.rpe != null ? 'at RPE ${set.rpe}' : ''}",
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               );

@@ -35,32 +35,35 @@ class SearchAndFilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          flex: 3,
-          child: SearchBar(
-            onChanged: (query) =>
-                context.read<ExerciseBloc>().add(SearchExerciseEvent(query)),
-            hintText: 'Search exercises',
-          ),
-        ),
-        Flexible(
-          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Flexible(
-              child: IconButton(
-                onPressed: () => _showFilters(context),
-                icon: const Icon(Icons.filter_alt),
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            flex: 3,
+            child: SearchBar(
+              onChanged: (query) =>
+                  context.read<ExerciseBloc>().add(SearchExerciseEvent(query)),
+              hintText: 'Search exercises',
             ),
-            Flexible(
+          ),
+          Flexible(
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Flexible(
                 child: IconButton(
-                    onPressed: () => context.push('/exercise/add'),
-                    icon: const Icon(Icons.add)))
-          ]),
-        ),
-      ],
+                  onPressed: () => _showFilters(context),
+                  icon: const Icon(Icons.filter_alt),
+                ),
+              ),
+              Flexible(
+                  child: IconButton(
+                      onPressed: () => context.push('/exercise/add'),
+                      icon: const Icon(Icons.add)))
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -86,25 +89,50 @@ class ExerciseList extends StatelessWidget {
             itemCount: exercises.length,
             itemBuilder: (context, index) {
               final exercise = exercises[index];
-              return ListTile(
-                title: Text(exercise.name),
-                subtitle: Text(
-                  exercise.muscles!,
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    exerciseRepository.deleteExercise(exercise.id);
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  titleTextStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  subtitleTextStyle: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer
+                          .withValues(alpha: 0.5)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        12.0), // Radius for rounded corners
+                  ),
+                  tileColor: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withValues(alpha: 0.5),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 8.0),
+                  title: Text(exercise.name),
+                  subtitle: Text(
+                    exercise.muscles!,
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      exerciseRepository.deleteExercise(exercise.id);
+                    },
+                  ),
+                  onTap: () {
+                    if (onTapMethod != null) {
+                      onTapMethod!(exercise);
+                    }
                   },
+                  selected: selectCheckMethod == null
+                      ? false
+                      : selectCheckMethod!(exercise),
+                  selectedTileColor:
+                      Theme.of(context).colorScheme.secondaryContainer,
+                  selectedColor:
+                      Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
-                onTap: () {
-                  if (onTapMethod != null) {
-                    onTapMethod!(exercise);
-                  }
-                },
-                selected: selectCheckMethod == null
-                    ? false
-                    : selectCheckMethod!(exercise),
               );
             },
           );
@@ -138,9 +166,16 @@ class ExerciseFilterModal extends StatelessWidget {
             itemBuilder: (context, index) {
               final muscle = muscles[index];
               return ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                tileColor: Theme.of(context).colorScheme.primaryContainer,
+                textColor: Theme.of(context).colorScheme.onPrimaryContainer,
                 title: Text(muscle.name),
                 selected: filters.contains(muscle),
-                selectedColor: Colors.amber,
+                selectedColor:
+                    Theme.of(context).colorScheme.onSecondaryContainer,
+                selectedTileColor:
+                    Theme.of(context).colorScheme.secondaryContainer,
                 onTap: () {
                   if (filters.contains(muscle)) {
                     filters.remove(muscle);

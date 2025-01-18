@@ -373,111 +373,147 @@ class _SetTileState extends State<SetTile> {
       elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 4),
       color: widget.isCompleted
-          ? Colors.green.withValues(alpha: 0.1)
-          : Theme.of(context).primaryColor,
+          ? Colors.green.withValues(alpha: 0.5)
+          : Theme.of(context).colorScheme.primaryContainer,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-        child: Row(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        child: Column(
           children: [
-            CircleAvatar(
-              radius: 16, // Half of the desired diameter (32 / 2)
-              backgroundColor:
-                  widget.isCompleted ? Colors.green : Colors.grey.shade300,
-              child: Text(
-                (widget.setIndex + 1).toString(),
-                style: TextStyle(
-                  color: widget.isCompleted ? Colors.white : Colors.black87,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.fitness_center,
-                    size: 20,
-                  ),
-                  isEditing
-                      ? AppTextFormField(
-                          width: 75,
-                          formatters: [
-                            WeightInputFormatter(),
-                            LengthLimitingTextInputFormatter(7)
-                          ],
-                          controller: _weightController
-                            ..text = widget.weight.toString(),
-                        )
-                      : Text(
-                          widget.weight.toStringAsFixed(2),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                  const Text(' lbs'),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.repeat,
-                    size: 20,
-                  ),
-                  isEditing
-                      ? AppTextFormField(
-                          width: 40,
-                          controller: _repsController
-                            ..text = widget.reps.toString(),
-                          formatters: [
-                            RepsInputFormatter(),
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                        )
-                      : Text(
-                          '${widget.reps}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                  const Text(' reps')
-                ],
-              ),
-            ),
+            // First row (existing content for actual performance)
             Row(
               children: [
-                if (widget.isCompleted)
-                  const Icon(
-                    Icons.check_circle,
-                    color: Colors.green,
-                  )
-                else
-                  const Icon(
-                    Icons.radio_button_unchecked,
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: widget.isCompleted
+                      ? Colors.green
+                      : Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer
+                          .withValues(alpha: 0.5),
+                  child: Text(
+                    (widget.setIndex + 1).toString(),
+                    style: TextStyle(
+                      color: widget.isCompleted
+                          ? Colors.white
+                          : Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 1),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                isEditing
-                    ? IconButton(
-                        onPressed: () {
-                          context.read<WorkoutBloc>().add(EditSetEvent(
-                              exerciseIndex: widget.exerciseIndex,
-                              setIndex: widget.setIndex,
-                              reps: int.parse(_repsController.text),
-                              weight: double.parse(_weightController.text)));
-                          setState(() {
-                            isEditing = false;
-                          });
-                        },
-                        icon: const Icon(Icons.check),
-                      )
-                    : IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isEditing = true;
-                          });
-                        },
-                        icon: const Icon(Icons.edit),
-                      ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.fitness_center, size: 20),
+                      isEditing
+                          ? AppTextFormField(
+                              width: 75,
+                              formatters: [
+                                WeightInputFormatter(),
+                                LengthLimitingTextInputFormatter(7)
+                              ],
+                              controller: _weightController
+                                ..text = widget.weight.toString(),
+                            )
+                          : Text(
+                              widget.weight.toStringAsFixed(2),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                      const Text(' lbs'),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.repeat, size: 20),
+                      isEditing
+                          ? AppTextFormField(
+                              width: 40,
+                              controller: _repsController
+                                ..text = widget.reps.toString(),
+                              formatters: [
+                                RepsInputFormatter(),
+                                LengthLimitingTextInputFormatter(2),
+                              ],
+                            )
+                          : Text(
+                              '${widget.reps}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                      const Text(' reps'),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    if (widget.isCompleted)
+                      const Icon(Icons.check_circle, color: Colors.green)
+                    else
+                      const Icon(Icons.radio_button_unchecked),
+                    isEditing
+                        ? IconButton(
+                            onPressed: () {
+                              context.read<WorkoutBloc>().add(EditSetEvent(
+                                    exerciseIndex: widget.exerciseIndex,
+                                    setIndex: widget.setIndex,
+                                    reps: int.parse(_repsController.text),
+                                    weight:
+                                        double.parse(_weightController.text),
+                                  ));
+                              setState(() {
+                                isEditing = false;
+                              });
+                            },
+                            icon: const Icon(Icons.check),
+                          )
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isEditing = true;
+                              });
+                            },
+                            icon: const Icon(Icons.edit),
+                          ),
+                  ],
+                ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 40.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Plan: ',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    'RPE ${1}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    '${1}-${5} reps',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

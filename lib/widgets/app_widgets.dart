@@ -54,6 +54,7 @@ class AppTextFormField extends StatelessWidget {
   final double? width;
   final String? labelText;
   final String? hintText;
+  final String? errorText;
   final void Function()? onEditingComplete;
   final void Function(String)? onChanged;
   const AppTextFormField(
@@ -65,7 +66,8 @@ class AppTextFormField extends StatelessWidget {
       this.width,
       this.height,
       this.onChanged,
-      this.onEditingComplete});
+      this.onEditingComplete,
+      this.errorText});
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +84,8 @@ class AppTextFormField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,
+          errorText: errorText,
+          errorStyle: TextStyle(fontSize: 0),
           contentPadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           counter: null,
           filled: true,

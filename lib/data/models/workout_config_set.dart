@@ -7,12 +7,14 @@ part 'workout_config_set.g.dart';
 @JsonSerializable()
 class WorkoutConfigSet {
   final int exerciseId;
-  final int setNumber;
+  int setNumber;
   int? repetitions;
   double? weight;
   double? rpe;
-  double? maxPercentage;
+  int? maxRepetitions;
+  int? minRepetitions;
   int? duration;
+  bool isWeight;
   bool completed;
 
   WorkoutConfigSet({
@@ -21,9 +23,9 @@ class WorkoutConfigSet {
     this.completed = false,
     this.repetitions,
     this.weight,
-    this.maxPercentage,
     this.rpe,
     this.duration,
+    this.isWeight = true,
   });
 
   factory WorkoutConfigSet.fromPlannedSet(PlannedSet plannedSet) {

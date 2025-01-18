@@ -12,8 +12,10 @@ class SetCard extends StatefulWidget {
     required this.index,
     required this.exercise,
     required this.onUpdate,
+    this.isRpe = false,
     this.sets,
   });
+  final bool isRpe;
   final int index;
   final Exercise exercise;
   final List<WorkoutConfigSet>? sets;
@@ -128,7 +130,9 @@ class _SetCardState extends State<SetCard> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text("WEIGHT", style: theme.textTheme.labelSmall),
+                        widget.isRpe
+                            ? Text("RPE", style: theme.textTheme.labelSmall)
+                            : Text("Weight", style: theme.textTheme.labelSmall),
                         Text("REPS", style: theme.textTheme.labelSmall),
                       ],
                     ),
@@ -143,16 +147,27 @@ class _SetCardState extends State<SetCard> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: sets.length,
                 itemBuilder: (context, index) {
-                  return SetRow(
-                    key: ValueKey(
-                        '${widget.exercise.id}_${sets[index].setNumber}'),
-                    index: index,
-                    set: sets[index],
-                    onUpdate: (updatedSet) {
-                      sets[index] = updatedSet;
-                      widget.onUpdate(sets);
-                    },
-                  );
+                  return widget.isRpe
+                      ? RpeSetRow(
+                          key: ValueKey(
+                              'rpe_${widget.exercise.id}_${sets[index].setNumber}'),
+                          index: index,
+                          set: sets[index],
+                          onUpdate: (updatedSet) {
+                            sets[index] = updatedSet;
+                            widget.onUpdate(sets);
+                          },
+                        )
+                      : QuickSetRow(
+                          key: ValueKey(
+                              'weight_${widget.exercise.id}_${sets[index].setNumber}'),
+                          index: index,
+                          set: sets[index],
+                          onUpdate: (updatedSet) {
+                            sets[index] = updatedSet;
+                            widget.onUpdate(sets);
+                          },
+                        );
                 },
               ),
 
@@ -221,8 +236,49 @@ class ActionButton extends StatelessWidget {
   }
 }
 
-class SetRow extends StatefulWidget {
-  const SetRow({
+class BaseSetRow extends StatelessWidget {
+  const BaseSetRow({
+    super.key,
+    required this.index,
+    required this.content,
+  });
+
+  final Widget content;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 40,
+            child: CircleAvatar(
+              radius: 14,
+              backgroundColor: colorScheme.primaryContainer,
+              child: Text(
+                "${index + 1}",
+                style: TextStyle(
+                  color: colorScheme.onPrimaryContainer,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: content,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class QuickSetRow extends StatefulWidget {
+  const QuickSetRow({
     super.key,
     required this.index,
     required this.set,
@@ -234,19 +290,18 @@ class SetRow extends StatefulWidget {
   final Function(WorkoutConfigSet) onUpdate;
 
   @override
-  State<SetRow> createState() => _SetRowState();
+  State<QuickSetRow> createState() => _QuickSetRowState();
 }
 
-class _SetRowState extends State<SetRow> {
+class _QuickSetRowState extends State<QuickSetRow> {
   late final TextEditingController weightController;
   late final TextEditingController repsController;
 
   @override
   void initState() {
     super.initState();
-    weightController = TextEditingController(
-      text: widget.set.weight?.toString() ?? '',
-    );
+    weightController =
+        TextEditingController(text: widget.set.weight?.toString() ?? '');
     repsController = TextEditingController(
       text: widget.set.repetitions?.toString() ?? '',
     );
@@ -261,82 +316,196 @@ class _SetRowState extends State<SetRow> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-      child: Row(
+    return BaseSetRow(
+      index: widget.index,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(
-            width: 40,
-            child: CircleAvatar(
-              radius: 14,
-              backgroundColor: colorScheme.primaryContainer,
-              child: Text(
-                "${widget.index + 1}",
-                style: TextStyle(
-                  color: colorScheme.onPrimaryContainer,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+          AppTextFormField(
+            labelText: "Weight",
+            hintText: "0",
+            formatters: [
+              WeightInputFormatter(),
+              LengthLimitingTextInputFormatter(7)
+            ],
+            controller: weightController,
+            width: 100,
+            height: 45,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                final double? parsedValue = double.tryParse(value);
+                if (parsedValue != null) {
+                  widget.set.weight = parsedValue;
+                  widget.onUpdate(widget.set);
+                }
+              }
+            },
           ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: AppTextFormField(
-                    labelText: "Weight",
-                    hintText: "0",
-                    formatters: [
-                      WeightInputFormatter(),
-                      LengthLimitingTextInputFormatter(7),
-                    ],
-                    controller: weightController,
-                    width: 80,
-                    height: 45,
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        final double? parsedValue = double.tryParse(value);
-                        if (parsedValue != null) {
-                          widget.set.weight = parsedValue;
-                          widget.onUpdate(widget.set);
-                        }
-                      }
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 100,
-                  child: AppTextFormField(
-                    labelText: "Reps",
-                    hintText: "0",
-                    formatters: [
-                      RepsInputFormatter(),
-                      LengthLimitingTextInputFormatter(3),
-                    ],
-                    controller: repsController,
-                    width: 80,
-                    height: 45,
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        final int? parsedValue = int.tryParse(value);
-                        if (parsedValue != null) {
-                          widget.set.repetitions = parsedValue;
-                          widget.onUpdate(widget.set);
-                        }
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
+          AppTextFormField(
+            labelText: "Reps",
+            hintText: "0",
+            formatters: [
+              RepsInputFormatter(),
+              LengthLimitingTextInputFormatter(3),
+            ],
+            controller: repsController,
+            width: 80,
+            height: 45,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                final int? parsedValue = int.tryParse(value);
+                if (parsedValue != null) {
+                  widget.set.repetitions = parsedValue;
+                  widget.onUpdate(widget.set);
+                }
+              }
+            },
           ),
         ],
       ),
     );
+  }
+}
+
+class RpeSetRow extends StatefulWidget {
+  const RpeSetRow({
+    super.key,
+    required this.index,
+    required this.set,
+    required this.onUpdate,
+  });
+
+  final int index;
+  final WorkoutConfigSet set;
+  final Function(WorkoutConfigSet) onUpdate;
+
+  @override
+  State<RpeSetRow> createState() => _RpeSetRowState();
+}
+
+class _RpeSetRowState extends State<RpeSetRow> {
+  late final TextEditingController rpeController;
+  late final TextEditingController minRepsController;
+  late final TextEditingController maxRepsController;
+
+  @override
+  void initState() {
+    super.initState();
+    rpeController =
+        TextEditingController(text: widget.set.rpe?.toString() ?? '');
+    minRepsController = TextEditingController(
+      text: widget.set.minRepetitions?.toString() ?? '',
+    );
+    maxRepsController = TextEditingController(
+      text: widget.set.maxRepetitions?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    rpeController.dispose();
+    minRepsController.dispose();
+    maxRepsController.dispose();
+    super.dispose();
+  }
+
+  bool isValidRepRange(int? min, int? max) {
+    if (min == null || max == null) {
+      return true;
+    } else if (min <= max) {
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseSetRow(
+      index: widget.index,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          AppTextFormField(
+            labelText: "Rpe",
+            hintText: "0",
+            formatters: [
+              RpeInputFormatter(),
+              LengthLimitingTextInputFormatter(3)
+            ],
+            controller: rpeController,
+            width: 100,
+            height: 45,
+            onChanged: (value) {
+              final double? parsedValue = double.tryParse(value);
+              widget.set.rpe = parsedValue;
+              widget.onUpdate(widget.set);
+            },
+          ),
+          AppTextFormField(
+            labelText: "Min",
+            hintText: "0",
+            formatters: [
+              RepsInputFormatter(),
+              LengthLimitingTextInputFormatter(2),
+            ],
+            errorText: isValidRepRange(
+                    widget.set.minRepetitions, widget.set.maxRepetitions)
+                ? null
+                : "",
+            controller: minRepsController,
+            width: 70,
+            height: 45,
+            onChanged: (value) {
+              final int? parsedValue = int.tryParse(value);
+              widget.set.minRepetitions = parsedValue;
+              widget.onUpdate(widget.set);
+            },
+          ),
+          AppTextFormField(
+            labelText: "Max",
+            hintText: "0",
+            formatters: [
+              RepsInputFormatter(),
+              LengthLimitingTextInputFormatter(2),
+            ],
+            controller: maxRepsController,
+            width: 70,
+            height: 45,
+            onChanged: (value) {
+              final int? parsedValue = int.tryParse(value);
+              widget.set.maxRepetitions = parsedValue;
+              widget.onUpdate(widget.set);
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class RpeInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    if (newValue.text == '.' ||
+        (newValue.text.endsWith('.') &&
+            '.'.allMatches(newValue.text).length == 1)) {
+      return newValue;
+    }
+
+    if (double.tryParse(newValue.text) != null) {
+      final number = double.parse(newValue.text);
+      if (number < 0 || number > 10) {
+        return oldValue;
+      }
+    } else {
+      return oldValue;
+    }
+
+    return newValue;
   }
 }

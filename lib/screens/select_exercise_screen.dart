@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/exercise_bloc.dart';
+import 'package:gym_app/widgets/exercise_common_widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/exercise.dart';
 import '../main.dart';
-import '../widgets/exercise_common_widgets.dart';
 
 class SelectExerciseScreen extends StatefulWidget {
   const SelectExerciseScreen({super.key, required this.selectedExercises});

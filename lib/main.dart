@@ -215,6 +215,7 @@ final _router = GoRouter(initialLocation: '/home', routes: [
                     builder: (context, state) {
                       final data = state.extra as List<SetData>;
                       return PreWorkoutScreen(
+                        isRpe: true,
                         data: data,
                         title: "Create workout",
                         finishButtonText: "Save Workout",

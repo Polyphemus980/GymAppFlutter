@@ -3,6 +3,8 @@ import 'package:gym_app/data/models/planned_workout_exercise.dart';
 
 class PlannedSet {
   PlannedSet({
+    this.rpe,
+    this.isWeight = true,
     required this.id,
     required this.workoutExerciseId,
     required this.setNumber,
@@ -14,6 +16,8 @@ class PlannedSet {
   final int setNumber;
   final int repetitions;
   final double? weight;
+  final double? rpe;
+  final bool isWeight;
 }
 
 @UseRowClass(PlannedSet)

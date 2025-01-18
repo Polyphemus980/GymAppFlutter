@@ -13,7 +13,9 @@ class PreWorkoutScreen extends StatefulWidget {
       this.data,
       required this.title,
       required this.finishButtonText,
-      required this.finishButtonOnTap});
+      required this.finishButtonOnTap,
+      this.isRpe = false});
+  final bool isRpe;
   final String title;
   final String finishButtonText;
   final List<SetData>? data;
@@ -26,6 +28,26 @@ class PreWorkoutScreen extends StatefulWidget {
 class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
   late List<Exercise> exercises;
   late List<SetData> sets;
+
+  void adjustSetIndices() {
+    for (int i = 0; i < sets.length; i++) {
+      for (int j = 0; j < sets[i].sets.length; j++) {
+        sets[i].sets[j].setNumber = j;
+      }
+    }
+  }
+
+  bool validateRpe() {
+    return sets
+        .every((exercise) => exercise.sets.every((set) => set.rpe != null));
+  }
+
+  bool validateRepRange() {
+    return sets.every((exercise) => exercise.sets.every((set) =>
+        set.maxRepetitions != null &&
+        set.minRepetitions != null &&
+        set.minRepetitions! <= set.maxRepetitions!));
+  }
 
   @override
   void initState() {
@@ -52,6 +74,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                 itemBuilder: (context, index) {
                   final exercise = exercises[index];
                   return SetCard(
+                      isRpe: widget.isRpe,
                       sets: sets.length > index ? sets[index].sets : [],
                       index: index,
                       key: ValueKey(exercise),
@@ -116,17 +139,30 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
             ),
             InkWell(
               onTap: () {
-                if (sets.isNotEmpty &&
-                    sets.every((set) => set.sets.isNotEmpty)) {
-                  widget.finishButtonOnTap(sets);
-                } else {
+                if (!(sets.isNotEmpty &&
+                    sets.every((set) => set.sets.isNotEmpty))) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text(
                           "Each chosen exercise must have at least one set")));
+                  return;
+                }
+                if (widget.isRpe) {
+                  if (validateRpe()) {
+                    if (validateRepRange()) {
+                      adjustSetIndices();
+                      widget.finishButtonOnTap(sets);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                              "Each set must have min and max reps filled in correctly")));
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Each set must have RPE filled in")));
+                  }
                 }
               },
               child: Container(
-                //width: double.infinity,
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
