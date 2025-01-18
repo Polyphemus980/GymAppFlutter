@@ -70,9 +70,13 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
         actions: [
           _isLoading
               ? const CircularProgressIndicator()
-              : ElevatedButton(
-                  onPressed: _insertExercise,
-                  child: const Text('Save'),
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FilledButton.icon(
+                    onPressed: _insertExercise,
+                    icon: const Icon(Icons.save),
+                    label: const Text('Save'),
+                  ),
                 ),
         ],
         child: Form(
@@ -110,7 +114,7 @@ class AddExerciseScreenState extends State<AddExerciseScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      await context.push('/exercise/add/pick', extra: selected);
+                      await context.push('/add/pick', extra: selected);
 
                       setState(() {
                         text = selected

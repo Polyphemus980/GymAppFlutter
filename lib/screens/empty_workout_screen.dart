@@ -111,7 +111,7 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
             ),
             InkWell(
               onTap: () async {
-                await context.push('/workout/new/select', extra: exercises);
+                await context.push('/new/select', extra: exercises);
                 for (int i = sets.length; i < exercises.length; i++) {
                   sets.add(SetData(exercise: exercises[i], sets: []));
                 }
@@ -160,6 +160,9 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text("Each set must have RPE filled in")));
                   }
+                } else {
+                  adjustSetIndices();
+                  widget.finishButtonOnTap(sets);
                 }
               },
               child: Container(

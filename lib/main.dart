@@ -181,73 +181,13 @@ final _router = GoRouter(initialLocation: '/home', routes: [
       builder: (context, state) => const Placeholder(),
     ),
     GoRoute(
-        path: '/exercise',
-        builder: (context, state) => const ExerciseListScreen(),
-        routes: [
-          GoRoute(
-              path: 'add',
-              builder: (context, state) => const AddExerciseScreen(),
-              routes: [
-                GoRoute(
-                    path: 'pick',
-                    builder: (context, state) {
-                      final selectedOptions =
-                          state.extra as List<MuscleGroup>? ?? [];
-                      return MusclePicker(list: selectedOptions);
-                    })
-              ])
-        ]),
+      path: '/exercise',
+      builder: (context, state) => const ExerciseListScreen(),
+    ),
     GoRoute(
-        path: '/workout',
-        builder: (context, state) => const WorkoutListScreen(),
-        routes: [
-          GoRoute(
-              path: 'plan',
-              builder: (context, state) {
-                return const NewWorkoutPlanScreen(
-                  numWeeks: 12,
-                  numDays: 5,
-                );
-              },
-              routes: [
-                GoRoute(
-                    path: 'new',
-                    builder: (context, state) {
-                      final data = state.extra as List<SetData>;
-                      return PreWorkoutScreen(
-                        isRpe: true,
-                        data: data,
-                        title: "Create workout",
-                        finishButtonText: "Save Workout",
-                        finishButtonOnTap: (sets) {
-                          context.pop(sets);
-                        },
-                      );
-                    })
-              ]),
-          GoRoute(
-              path: 'new',
-              builder: (context, state) {
-                return PreWorkoutScreen(
-                  title: "Create workout",
-                  finishButtonText: "Start Workout",
-                  finishButtonOnTap: (sets) {
-                    Provider.of<TimerNotifier>(context, listen: false)
-                        .startTimer();
-                    context.go('/start', extra: sets);
-                  },
-                );
-              },
-              routes: [
-                GoRoute(
-                    path: 'select',
-                    builder: (context, state) {
-                      final selectedList = state.extra as List<Exercise>? ?? [];
-                      return SelectExerciseScreen(
-                          selectedExercises: selectedList);
-                    }),
-              ]),
-        ]),
+      path: '/workout',
+      builder: (context, state) => const WorkoutListScreen(),
+    ),
     GoRoute(
         path: '/start',
         builder: (context, state) {
@@ -257,8 +197,63 @@ final _router = GoRouter(initialLocation: '/home', routes: [
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
-    )
-  ])
+    ),
+  ]),
+  GoRoute(
+      path: '/add',
+      builder: (context, state) => const AddExerciseScreen(),
+      routes: [
+        GoRoute(
+            path: 'pick',
+            builder: (context, state) {
+              final selectedOptions = state.extra as List<MuscleGroup>? ?? [];
+              return MusclePicker(list: selectedOptions);
+            })
+      ]),
+  GoRoute(
+      path: '/plan',
+      builder: (context, state) {
+        return const NewWorkoutPlanScreen(
+          numWeeks: 12,
+          numDays: 5,
+        );
+      },
+      routes: [
+        GoRoute(
+            path: 'new',
+            builder: (context, state) {
+              final data = state.extra as List<SetData>;
+              return PreWorkoutScreen(
+                isRpe: true,
+                data: data,
+                title: "Create workout",
+                finishButtonText: "Save Workout",
+                finishButtonOnTap: (sets) {
+                  context.pop(sets);
+                },
+              );
+            })
+      ]),
+  GoRoute(
+      path: '/new',
+      builder: (context, state) {
+        return PreWorkoutScreen(
+          title: "Create workout",
+          finishButtonText: "Start Workout",
+          finishButtonOnTap: (sets) {
+            Provider.of<TimerNotifier>(context, listen: false).startTimer();
+            context.go('/start', extra: sets);
+          },
+        );
+      },
+      routes: [
+        GoRoute(
+            path: 'select',
+            builder: (context, state) {
+              final selectedList = state.extra as List<Exercise>? ?? [];
+              return SelectExerciseScreen(selectedExercises: selectedList);
+            }),
+      ]),
 ]);
 
 class BottomNavBar extends StatefulWidget {

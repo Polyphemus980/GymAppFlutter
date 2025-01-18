@@ -86,7 +86,7 @@ class WorkoutListScreen extends StatelessWidget {
                   if (context.read<WorkoutBloc>().state is WorkoutInProgress) {
                     displayWorkoutPopUp(context);
                   } else {
-                    context.push('/workout/new');
+                    context.push('/new');
                   }
                 },
                 child: Container(
@@ -170,7 +170,7 @@ class WorkoutListScreen extends StatelessWidget {
               const SizedBox(height: 16),
               InkWell(
                 onTap: () {
-                  context.push('/workout/plan');
+                  context.push('/plan');
                 },
                 child: Container(
                   height: 100,

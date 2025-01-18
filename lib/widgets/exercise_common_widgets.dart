@@ -58,7 +58,7 @@ class SearchAndFilterRow extends StatelessWidget {
               ),
               Flexible(
                   child: IconButton(
-                      onPressed: () => context.push('/exercise/add'),
+                      onPressed: () => context.push('/add'),
                       icon: const Icon(Icons.add)))
             ]),
           ),

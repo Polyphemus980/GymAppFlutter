@@ -28,55 +28,6 @@ class NewWorkoutPlanScreen extends StatelessWidget {
   }
 }
 
-// class DaysPages extends HookWidget {
-//   final int numWeeks;
-//   const DaysPages({super.key, required this.numWeeks});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final dayNumber = useState(5);
-//     final pageController = usePageController();
-//     final planData = useState<WorkoutPlan>(
-//         WorkoutPlan(numberOfWeeks: numWeeks, daysPerWeek: dayNumber.value));
-//     return AppScaffold(
-//       title: "Make schedule",
-//       child: Column(
-//         children: [
-//           DraggableHorizontalList(
-//             onSelect: (index) {
-//               pageController.animateToPage(index,
-//                   duration: const Duration(milliseconds: 300),
-//                   curve: Curves.easeInOut);
-//             },
-//             numWeeks: numWeeks,
-//           ),
-//           Expanded(
-//               child: PageView.builder(
-//             controller: pageController,
-//             itemCount: numWeeks,
-//             itemBuilder: (BuildContext context, int weekIndex) {
-//               return ListView.builder(
-//                 itemCount: dayNumber.value,
-//                 itemBuilder: (context, dayIndex) {
-//                   return DayCard(
-//                     sets: planData.value.weeks[weekIndex].days[dayIndex].sets,
-//                     index: dayIndex,
-//                     onAddExercise: (index) async {
-//                       await context.push('/workout/plan/new',
-//                           extra: planData
-//                               .value.weeks[weekIndex].days[dayIndex].sets);
-//                       planData.value.weeks = [...planData.value.weeks];
-//                     },
-//                   );
-//                 },
-//               );
-//             },
-//           )),
-//         ],
-//       ),
-//     );
-//   }
-// }
 class DaysPages extends HookWidget {
   final int numWeeks;
   final int numDays;
@@ -112,7 +63,7 @@ class DaysPages extends HookWidget {
                           sets: state.plan.weeks[weekIndex].days[dayIndex].sets,
                           index: dayIndex,
                           onAddExercise: (index) async {
-                            final sets = await context.push('/workout/plan/new',
+                            final sets = await context.push('/plan/new',
                                 extra: List<SetData>.from(state
                                     .plan
                                     .weeks[weekIndex]
