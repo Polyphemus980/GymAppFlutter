@@ -55,10 +55,13 @@ class AppTextFormField extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final String? errorText;
+  final TextStyle? errorStyle;
+  final String? Function(String?)? validator;
   final void Function()? onEditingComplete;
   final void Function(String)? onChanged;
   const AppTextFormField(
       {super.key,
+      this.errorStyle,
       this.labelText,
       this.hintText,
       this.formatters,
@@ -67,26 +70,29 @@ class AppTextFormField extends StatelessWidget {
       this.height,
       this.onChanged,
       this.onEditingComplete,
-      this.errorText});
+      this.errorText,
+      this.validator});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width ?? 80,
-      height: height ?? 40,
+      height: height,
       child: TextFormField(
+        validator: validator,
         onEditingComplete: onEditingComplete,
         inputFormatters: formatters,
         controller: controller,
         style: Theme.of(context).textTheme.titleMedium,
         keyboardType: TextInputType.number,
         onChanged: onChanged,
+        maxLines: null,
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,
           errorText: errorText,
-          errorStyle: TextStyle(fontSize: 0),
-          contentPadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+          errorStyle: errorStyle,
+          contentPadding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
           counter: null,
           filled: true,
           fillColor: Theme.of(context).colorScheme.primaryContainer,

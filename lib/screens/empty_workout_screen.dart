@@ -124,6 +124,11 @@ class _PreWorkoutScreenState extends State<PreWorkoutScreen> {
             ),
             AppInkWellButton(
                 onTap: () {
+                  if (exercises.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Must choose at least one exercise")));
+                    return;
+                  }
                   if (!(sets.isNotEmpty &&
                       sets.every((set) => set.sets.isNotEmpty))) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

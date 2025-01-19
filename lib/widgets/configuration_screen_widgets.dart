@@ -415,6 +415,7 @@ class _RpeSetRowState extends State<RpeSetRow> {
           AppTextFormField(
             labelText: "Rpe",
             hintText: "0",
+            errorStyle: const TextStyle(fontSize: 0),
             formatters: [
               RpeInputFormatter(),
               LengthLimitingTextInputFormatter(3)
@@ -435,6 +436,7 @@ class _RpeSetRowState extends State<RpeSetRow> {
               AppTextFormField(
                 labelText: "Min",
                 hintText: "0",
+                errorStyle: const TextStyle(fontSize: 0),
                 formatters: [
                   RepsInputFormatter(),
                   LengthLimitingTextInputFormatter(2),
@@ -455,6 +457,7 @@ class _RpeSetRowState extends State<RpeSetRow> {
               AppTextFormField(
                 labelText: "Max",
                 hintText: "0",
+                errorStyle: const TextStyle(fontSize: 0),
                 formatters: [
                   RepsInputFormatter(),
                   LengthLimitingTextInputFormatter(2),

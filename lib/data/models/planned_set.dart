@@ -3,21 +3,19 @@ import 'package:gym_app/data/models/planned_workout_exercise.dart';
 
 class PlannedSet {
   PlannedSet({
-    this.rpe,
-    this.isWeight = true,
+    required this.rpe,
     required this.id,
     required this.workoutExerciseId,
     required this.setNumber,
-    required this.repetitions,
-    this.weight,
+    required this.minRepetitions,
+    required this.maxRepetitions,
   });
   final int id;
   final int workoutExerciseId;
   final int setNumber;
-  final int repetitions;
-  final double? weight;
-  final double? rpe;
-  final bool isWeight;
+  final int minRepetitions;
+  final int maxRepetitions;
+  final double rpe;
 }
 
 @UseRowClass(PlannedSet)
@@ -26,6 +24,7 @@ class PlannedSets extends Table {
   IntColumn get workoutExerciseId =>
       integer().references(PlannedWorkoutExercises, #id)();
   IntColumn get setNumber => integer()();
-  IntColumn get repetitions => integer()();
-  RealColumn get weight => real().nullable()();
+  IntColumn get minRepetitions => integer()();
+  IntColumn get maxRepetitions => integer()();
+  RealColumn get rpe => real()();
 }

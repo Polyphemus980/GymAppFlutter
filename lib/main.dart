@@ -13,6 +13,7 @@ import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/empty_workout_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
+import 'package:gym_app/screens/new_workout_plan_form_screen.dart';
 import 'package:gym_app/screens/new_workout_plan_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
@@ -215,29 +216,40 @@ final _router = GoRouter(initialLocation: '/home', routes: [
             })
       ]),
   GoRoute(
-      path: '/plan',
-      builder: (context, state) {
-        return const NewWorkoutPlanScreen(
-          numWeeks: 12,
-          numDays: 1,
-        );
-      },
-      routes: [
-        GoRoute(
-            path: 'new',
-            builder: (context, state) {
-              final data = state.extra as List<SetData>;
-              return PreWorkoutScreen(
-                isRpe: true,
-                data: data,
-                title: "Create workout",
-                finishButtonText: "Save Workout",
-                finishButtonOnTap: (sets) {
-                  context.pop(sets);
-                },
-              );
-            })
-      ]),
+    path: '/plan',
+    builder: (context, state) {
+      return const WorkoutPlanForm();
+    },
+    routes: [
+      GoRoute(
+          path: 'create',
+          builder: (context, state) {
+            Map<String, dynamic> data = state.extra as Map<String, dynamic>;
+            return NewWorkoutPlanScreen(
+              name: data['name']! as String,
+              description: data['description']! as String,
+              numWeeks: data['weeks']! as int,
+              numDays: data['days']! as int,
+            );
+          },
+          routes: [
+            GoRoute(
+                path: 'new',
+                builder: (context, state) {
+                  final data = state.extra as List<SetData>;
+                  return PreWorkoutScreen(
+                    isRpe: true,
+                    data: data,
+                    title: "Create workout",
+                    finishButtonText: "Save Workout",
+                    finishButtonOnTap: (sets) {
+                      context.pop(sets);
+                    },
+                  );
+                })
+          ]),
+    ],
+  ),
   GoRoute(
       path: '/new',
       builder: (context, state) {

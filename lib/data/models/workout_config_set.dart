@@ -24,6 +24,8 @@ class WorkoutConfigSet {
     this.repetitions,
     this.weight,
     this.rpe,
+    this.minRepetitions,
+    this.maxRepetitions,
     this.duration,
     this.isWeight = true,
   });
@@ -33,8 +35,9 @@ class WorkoutConfigSet {
       completed: false,
       exerciseId: plannedSet.workoutExerciseId,
       setNumber: plannedSet.setNumber,
-      repetitions: plannedSet.repetitions,
-      weight: plannedSet.weight,
+      minRepetitions: plannedSet.minRepetitions,
+      maxRepetitions: plannedSet.maxRepetitions,
+      rpe: plannedSet.rpe,
     );
   }
   WorkoutConfigSet copy() {

@@ -48,10 +48,13 @@ class WorkoutWeek {
 
 class WorkoutPlan {
   List<WorkoutWeek> weeks;
-
+  String name;
+  String description;
   WorkoutPlan.empty({
     required int numberOfWeeks,
     required int daysPerWeek,
+    required this.name,
+    required this.description,
   }) : weeks = List.generate(
           numberOfWeeks,
           (_) => WorkoutWeek.empty(daysPerWeek),
@@ -65,7 +68,11 @@ class WorkoutPlan {
     return weeks[weekIndex].days[dayIndex];
   }
 
-  WorkoutPlan({required this.weeks});
+  WorkoutPlan({
+    required this.weeks,
+    required this.name,
+    required this.description,
+  });
 
   WorkoutPlan copyWith({int? weekIndex, int? dayIndex, WorkoutDay? day}) {
     final updatedWeeks = List<WorkoutWeek>.from(weeks);
@@ -75,7 +82,8 @@ class WorkoutPlan {
         day: day,
       );
     }
-    return WorkoutPlan(weeks: updatedWeeks);
+    return WorkoutPlan(
+        weeks: updatedWeeks, name: name, description: description);
   }
 
   WorkoutPlan copyWeeks(int fromIndex, List<int> toIndices) {
@@ -83,7 +91,8 @@ class WorkoutPlan {
     for (int i = 0; i < toIndices.length; i++) {
       updatedWeeks[toIndices[i]] = updatedWeeks[fromIndex].copy();
     }
-    return WorkoutPlan(weeks: updatedWeeks);
+    return WorkoutPlan(
+        weeks: updatedWeeks, name: name, description: description);
   }
 
   bool isFilled() {
@@ -98,8 +107,14 @@ sealed class NewWorkoutPlanEvent {}
 class InitializePlanEvent extends NewWorkoutPlanEvent {
   final int numWeeks;
   final int numDays;
+  final String name;
+  final String description;
 
-  InitializePlanEvent({required this.numDays, required this.numWeeks});
+  InitializePlanEvent(
+      {required this.name,
+      required this.description,
+      required this.numDays,
+      required this.numWeeks});
 }
 
 class CopyWeekEvent extends NewWorkoutPlanEvent {
@@ -118,6 +133,8 @@ class ChangedDayEvent extends NewWorkoutPlanEvent {
       {required this.sets, required this.weekIndex, required this.dayIndex});
 }
 
+class FinishCreationEvent extends NewWorkoutPlanEvent {}
+
 sealed class NewWorkoutPlanState {}
 
 class InitialState extends NewWorkoutPlanState {}
@@ -133,6 +150,7 @@ class NewWorkoutPlanBloc
     on<ChangedDayEvent>(_changeDay);
     on<InitializePlanEvent>(_initializePlan);
     on<CopyWeekEvent>(_copyWeeks);
+    on<FinishCreationEvent>(_finishCreation);
   }
 
   _changeDay(ChangedDayEvent event, Emitter<NewWorkoutPlanState> emit) {
@@ -147,7 +165,10 @@ class NewWorkoutPlanBloc
   _initializePlan(
       InitializePlanEvent event, Emitter<NewWorkoutPlanState> emit) {
     final workoutPlan = WorkoutPlan.empty(
-        numberOfWeeks: event.numWeeks, daysPerWeek: event.numDays);
+        numberOfWeeks: event.numWeeks,
+        daysPerWeek: event.numDays,
+        name: event.name,
+        description: event.description);
     emit(InProgressState(plan: workoutPlan));
   }
 
@@ -157,4 +178,7 @@ class NewWorkoutPlanBloc
         currentState.plan.copyWeeks(event.fromIndex, event.toIndices);
     emit(InProgressState(plan: newPlan));
   }
+
+  _finishCreation(
+      FinishCreationEvent event, Emitter<NewWorkoutPlanState> emit) {}
 }

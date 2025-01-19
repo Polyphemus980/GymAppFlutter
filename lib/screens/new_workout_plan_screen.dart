@@ -12,14 +12,24 @@ import '../main.dart';
 class NewWorkoutPlanScreen extends StatelessWidget {
   final int numWeeks;
   final int numDays;
+  final String name;
+  final String description;
   const NewWorkoutPlanScreen(
-      {super.key, required this.numWeeks, required this.numDays});
+      {super.key,
+      required this.numWeeks,
+      required this.numDays,
+      required this.name,
+      required this.description});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NewWorkoutPlanBloc>(
       create: (_) => NewWorkoutPlanBloc()
-        ..add(InitializePlanEvent(numDays: numDays, numWeeks: numWeeks)),
+        ..add(InitializePlanEvent(
+            numDays: numDays,
+            numWeeks: numWeeks,
+            name: name,
+            description: description)),
       child: DaysPages(
         numWeeks: numWeeks,
         numDays: numDays,
@@ -50,7 +60,7 @@ class DaysPages extends HookWidget {
                   maxChildSize: 1,
                   expand: false,
                   builder: (context, scrollController) {
-                    return CopyModal();
+                    return const CopyModal();
                   }),
             ),
           );
@@ -90,7 +100,8 @@ class DaysPages extends HookWidget {
                                   .plan.weeks[weekIndex].days[dayIndex].sets,
                               index: dayIndex,
                               onAddExercise: (index) async {
-                                final sets = await context.push('/plan/new',
+                                final sets = await context.push(
+                                    '/plan/create/new',
                                     extra: List<SetData>.from(state
                                         .plan
                                         .weeks[weekIndex]
@@ -123,7 +134,11 @@ class DaysPages extends HookWidget {
                                       const SnackBar(
                                           content: Text(
                                               "Every training day must have at least 1 exercise")));
+                                  return;
                                 }
+                                context
+                                    .read<NewWorkoutPlanBloc>()
+                                    .add(FinishCreationEvent());
                               },
                               height: 75,
                               text: "Finish")),
