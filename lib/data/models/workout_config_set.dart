@@ -45,6 +45,8 @@ class WorkoutConfigSet {
         exerciseId: exerciseId,
         setNumber: setNumber,
         repetitions: repetitions,
+        minRepetitions: minRepetitions,
+        maxRepetitions: maxRepetitions,
         weight: weight,
         duration: duration,
         isWeight: isWeight,

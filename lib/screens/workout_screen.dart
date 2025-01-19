@@ -28,6 +28,8 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/data/models/workout_plan.dart';
+import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -35,8 +37,8 @@ import '../main.dart';
 import '../workout_bloc.dart';
 
 class WorkoutListScreen extends StatelessWidget {
-  const WorkoutListScreen({super.key});
-
+  final LocalWorkoutRepository workoutRepository;
+  const WorkoutListScreen({super.key, required this.workoutRepository});
   void displayWorkoutPopUp(BuildContext context) {
     showDialog(
         context: context,
@@ -178,100 +180,26 @@ class WorkoutListScreen extends StatelessWidget {
               const SizedBox(
                 height: 16.0,
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: workoutPlans.length,
-                itemBuilder: (context, index) {
-                  final plan = workoutPlans[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () {
-                        // Handle workout plan selection
+              StreamBuilder(
+                stream: workoutRepository.watchWorkoutPlans(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator(); // Loading state
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}'); // Error state
+                  } else if (!snapshot.hasData) {
+                    return const Text('No data available'); // Empty data state
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final plan = snapshot.data![index];
+                        return PlanCard(plan: plan);
                       },
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color:
-                              Provider.of<ThemeNotifier>(context).isLightTheme()
-                                  ? Colors.white
-                                  : Colors.grey.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: plan.color.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                plan.icon,
-                                color: plan.color,
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    plan.name,
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color:
-                                            Provider.of<ThemeNotifier>(context)
-                                                    .isLightTheme()
-                                                ? Colors.black
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    plan.description,
-                                    style: TextStyle(
-                                      color: Provider.of<ThemeNotifier>(context)
-                                              .isLightTheme()
-                                          ? Colors.grey.shade600
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                              .withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '${plan.workouts} workouts • ${plan.duration}',
-                                    style: TextStyle(
-                                      color: Provider.of<ThemeNotifier>(context)
-                                              .isLightTheme()
-                                          ? Colors.grey.shade500
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                              .withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.chevron_right,
-                              color: Colors.grey.shade400,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                    );
+                  }
                 },
               ),
             ],
@@ -282,73 +210,92 @@ class WorkoutListScreen extends StatelessWidget {
   }
 }
 
-// Model class for workout plans
-class WorkoutPlan {
-  final String name;
-  final String description;
-  final int workouts;
-  final String duration;
-  final IconData icon;
-  final Color color;
+class PlanCard extends StatelessWidget {
+  final WorkoutPlan plan;
+  const PlanCard({super.key, required this.plan});
 
-  const WorkoutPlan({
-    required this.name,
-    required this.description,
-    required this.workouts,
-    required this.duration,
-    required this.icon,
-    required this.color,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () {},
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Provider.of<ThemeNotifier>(context).isLightTheme()
+                ? Colors.white
+                : Colors.grey.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              // Container(
+              //   width: 60,
+              //   height: 60,
+              //   decoration: BoxDecoration(
+              //     color: plan.color.withValues(alpha: 0.2),
+              //     borderRadius: BorderRadius.circular(8),
+              //   ),
+              //   child: Icon(
+              //     plan.,
+              //     size: 30,
+              //   ),
+              // ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plan.name,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Provider.of<ThemeNotifier>(context).isLightTheme()
+                                  ? Colors.black
+                                  : Theme.of(context).colorScheme.onPrimary),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      plan.description,
+                      style: TextStyle(
+                        color:
+                            Provider.of<ThemeNotifier>(context).isLightTheme()
+                                ? Colors.grey.shade600
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onPrimary
+                                    .withValues(alpha: 0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${plan.numWeeks} weeks | ${plan.daysPerWeek} days',
+                      style: TextStyle(
+                        color:
+                            Provider.of<ThemeNotifier>(context).isLightTheme()
+                                ? Colors.grey.shade500
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onPrimary
+                                    .withValues(alpha: 0.4),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade400,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
-
-// Sample workout plans data
-final List<WorkoutPlan> workoutPlans = [
-  const WorkoutPlan(
-    name: 'Strength Training',
-    description: 'Build muscle and increase strength',
-    workouts: 12,
-    duration: '8 weeks',
-    icon: Icons.fitness_center,
-    color: Colors.blue,
-  ),
-  const WorkoutPlan(
-    name: 'Strength Training',
-    description: 'Build muscle and increase strength',
-    workouts: 12,
-    duration: '8 weeks',
-    icon: Icons.fitness_center,
-    color: Colors.blue,
-  ),
-  const WorkoutPlan(
-    name: 'Strength Training',
-    description: 'Build muscle and increase strength',
-    workouts: 12,
-    duration: '8 weeks',
-    icon: Icons.fitness_center,
-    color: Colors.blue,
-  ),
-  const WorkoutPlan(
-    name: 'Strength Training',
-    description: 'Build muscle and increase strength',
-    workouts: 12,
-    duration: '8 weeks',
-    icon: Icons.fitness_center,
-    color: Colors.blue,
-  ),
-  const WorkoutPlan(
-    name: 'Weight Loss',
-    description: 'High-intensity workouts for fat burning',
-    workouts: 15,
-    duration: '6 weeks',
-    icon: Icons.directions_run,
-    color: Colors.green,
-  ),
-  const WorkoutPlan(
-    name: 'Flexibility',
-    description: 'Improve mobility and reduce injury risk',
-    workouts: 10,
-    duration: '4 weeks',
-    icon: Icons.self_improvement,
-    color: Colors.purple,
-  ),
-];

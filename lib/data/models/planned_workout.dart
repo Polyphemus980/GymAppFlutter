@@ -6,7 +6,8 @@ class PlannedWorkout {
   final int id;
   final int workoutPlanId;
   final String? workoutName;
-  final int? dayNumber; // Added for workout plan ordering
+  final int dayNumber;
+  final int weekNumber; // Added for workout plan ordering
   final String? description; // Added for instructions
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -17,7 +18,8 @@ class PlannedWorkout {
     required this.id,
     required this.workoutPlanId,
     this.workoutName,
-    this.dayNumber,
+    required this.dayNumber,
+    required this.weekNumber,
     this.description,
     required this.createdAt,
     this.updatedAt,
@@ -30,7 +32,8 @@ class PlannedWorkouts extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get workoutPlanId => integer().references(WorkoutPlans, #id)();
   TextColumn get workoutName => text().nullable()();
-  IntColumn get dayNumber => integer().nullable()();
+  IntColumn get dayNumber => integer()();
+  IntColumn get weekNumber => integer()();
   TextColumn get description => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().nullable()();

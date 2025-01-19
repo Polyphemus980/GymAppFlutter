@@ -1,4 +1,7 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/repositories/local_workout_repository.dart';
 
 import 'data/models/set_data.dart';
 
@@ -48,11 +51,14 @@ class WorkoutWeek {
 
 class WorkoutPlan {
   List<WorkoutWeek> weeks;
+  final int numberOfWeeks;
+  final int daysPerWeek;
   String name;
   String description;
+
   WorkoutPlan.empty({
-    required int numberOfWeeks,
-    required int daysPerWeek,
+    required this.numberOfWeeks,
+    required this.daysPerWeek,
     required this.name,
     required this.description,
   }) : weeks = List.generate(
@@ -69,6 +75,8 @@ class WorkoutPlan {
   }
 
   WorkoutPlan({
+    required this.daysPerWeek,
+    required this.numberOfWeeks,
     required this.weeks,
     required this.name,
     required this.description,
@@ -83,7 +91,11 @@ class WorkoutPlan {
       );
     }
     return WorkoutPlan(
-        weeks: updatedWeeks, name: name, description: description);
+        weeks: updatedWeeks,
+        name: name,
+        description: description,
+        daysPerWeek: daysPerWeek,
+        numberOfWeeks: numberOfWeeks);
   }
 
   WorkoutPlan copyWeeks(int fromIndex, List<int> toIndices) {
@@ -92,7 +104,11 @@ class WorkoutPlan {
       updatedWeeks[toIndices[i]] = updatedWeeks[fromIndex].copy();
     }
     return WorkoutPlan(
-        weeks: updatedWeeks, name: name, description: description);
+        weeks: updatedWeeks,
+        name: name,
+        description: description,
+        numberOfWeeks: numberOfWeeks,
+        daysPerWeek: daysPerWeek);
   }
 
   bool isFilled() {
@@ -144,9 +160,13 @@ class InProgressState extends NewWorkoutPlanState {
   InProgressState({required this.plan});
 }
 
+class EndedState extends NewWorkoutPlanState {}
+
 class NewWorkoutPlanBloc
     extends Bloc<NewWorkoutPlanEvent, NewWorkoutPlanState> {
-  NewWorkoutPlanBloc() : super(InitialState()) {
+  final LocalWorkoutRepository workoutRepository;
+  NewWorkoutPlanBloc({required this.workoutRepository})
+      : super(InitialState()) {
     on<ChangedDayEvent>(_changeDay);
     on<InitializePlanEvent>(_initializePlan);
     on<CopyWeekEvent>(_copyWeeks);
@@ -180,5 +200,46 @@ class NewWorkoutPlanBloc
   }
 
   _finishCreation(
-      FinishCreationEvent event, Emitter<NewWorkoutPlanState> emit) {}
+      FinishCreationEvent event, Emitter<NewWorkoutPlanState> emit) async {
+    final currentState = state as InProgressState;
+    final plan = currentState.plan;
+    final workoutPlanDB = WorkoutPlansCompanion(
+        description: Value(plan.description),
+        name: Value(plan.name),
+        numWeeks: Value(plan.numberOfWeeks),
+        daysPerWeek: Value(plan.daysPerWeek));
+    final insertedWorkoutPlan =
+        await workoutRepository.addWorkoutPlanReturning(workoutPlanDB);
+    for (var weekEntry in plan.weeks.asMap().entries) {
+      for (var dayEntry in weekEntry.value.days.asMap().entries) {
+        final workoutDB = PlannedWorkoutsCompanion(
+          workoutPlanId: Value(insertedWorkoutPlan.id),
+          dayNumber: Value(dayEntry.key),
+          weekNumber: Value(weekEntry.key),
+        );
+        final insertedWorkout =
+            await workoutRepository.addPlannedWorkoutReturning(workoutDB);
+        for (var setDataEntry in dayEntry.value.sets.asMap().entries) {
+          final workoutExerciseDB = PlannedWorkoutExercisesCompanion(
+            workoutId: Value(insertedWorkout.id),
+            exerciseId: Value(setDataEntry.value.exercise.id),
+            exerciseOrder: Value(setDataEntry.key),
+          );
+          final insertedWorkoutExercise = await workoutRepository
+              .addPlannedWorkoutExerciseReturning(workoutExerciseDB);
+          for (var setEntry in setDataEntry.value.sets.asMap().entries) {
+            final setDB = PlannedSetsCompanion(
+              workoutExerciseId: Value(insertedWorkoutExercise.id),
+              setNumber: Value(setEntry.key),
+              minRepetitions: Value(setEntry.value.minRepetitions!),
+              maxRepetitions: Value(setEntry.value.maxRepetitions!),
+              rpe: Value(setEntry.value.rpe!),
+            );
+            await workoutRepository.addPlannedSet(setDB);
+          }
+        }
+      }
+    }
+    emit(EndedState());
+  }
 }

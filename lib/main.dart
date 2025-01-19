@@ -7,7 +7,9 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/drift_exercise_repository.dart';
+import 'package:gym_app/data/repositories/drift_workout_repository.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/empty_workout_screen.dart';
@@ -130,6 +132,8 @@ void setUp() {
   getIt.registerSingleton<AppDatabase>(AppDatabase());
   getIt.registerSingleton<LocalExerciseRepository>(
       DriftExerciseRepository(db: getIt.get<AppDatabase>()));
+  getIt.registerSingleton<LocalWorkoutRepository>(
+      DriftWorkoutRepository(db: getIt.get<AppDatabase>()));
   setUpEnded = true;
 }
 
@@ -191,7 +195,9 @@ final _router = GoRouter(initialLocation: '/home', routes: [
     ),
     GoRoute(
       path: '/workout',
-      builder: (context, state) => const WorkoutListScreen(),
+      builder: (context, state) => WorkoutListScreen(
+        workoutRepository: getIt.get<LocalWorkoutRepository>(),
+      ),
     ),
     GoRoute(
         path: '/start',

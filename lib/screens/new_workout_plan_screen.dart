@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/new_workout_plan_bloc.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,8 @@ class NewWorkoutPlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NewWorkoutPlanBloc>(
-      create: (_) => NewWorkoutPlanBloc()
+      create: (_) => NewWorkoutPlanBloc(
+          workoutRepository: getIt.get<LocalWorkoutRepository>())
         ..add(InitializePlanEvent(
             numDays: numDays,
             numWeeks: numWeeks,
