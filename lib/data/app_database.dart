@@ -1,14 +1,21 @@
-import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
-import 'package:rxdart/rxdart.dart';
+import 'dart:io';
 
-import 'tables/exercise.dart';
-import 'tables/exercise_muscles.dart';
-import 'tables/muscle_group.dart';
-import 'tables/set.dart';
-import 'tables/workout.dart';
-import 'tables/workout_exercise.dart';
-import 'tables/workout_plan.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/sqlite3.dart';
+
+import 'models/completed_set.dart';
+import 'models/completed_workout.dart';
+import 'models/completed_workout_exercise.dart';
+import 'models/exercise.dart';
+import 'models/exercise_muscles.dart';
+import 'models/muscle_group.dart';
+import 'models/planned_set.dart';
+import 'models/planned_workout.dart';
+import 'models/planned_workout_exercise.dart';
+import 'models/workout_plan.dart';
 
 part 'app_database.g.dart';
 
@@ -18,106 +25,42 @@ typedef ExerciseWithMuscleGroups = ({
 });
 
 @DriftDatabase(tables: [
-  Workouts,
+  PlannedWorkouts,
+  CompletedWorkouts,
   WorkoutPlans,
-  ExerciseSets,
+  CompletedSets,
   Exercises,
-  WorkoutExercises,
+  PlannedWorkoutExercises,
+  CompletedWorkoutExercises,
   MuscleGroups,
-  ExerciseMuscles
+  ExerciseMuscles,
+  PlannedSets
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(_openConnection()) {
+    insertMuscleGroups();
+  }
 
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _openConnection() {
-    return driftDatabase(name: 'my_database');
-  }
+  static LazyDatabase _openConnection() {
+    return LazyDatabase(() async {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, 'app.db'));
 
-  Future<void> insertExercise(Insertable<Exercise> exercise) async {
-    await into(exercises).insert(exercise);
-  }
+      // if (!await file.exists()) {
+      //   final blob = await rootBundle.load('assets/my_database.sqlite');
+      //   final buffer = blob.buffer;
+      //   await file.writeAsBytes(
+      //       buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
+      // }
 
-  Stream<List<Exercise>> getExercises() {
-    final exerciseStream = select(exercises).watch();
-    return exerciseStream.switchMap((exercises) {
-      final idToExercise = {
-        for (var exercise in exercises) exercise.id: exercise
-      };
-      final ids = idToExercise.keys;
-      final muscleQuery = select(exerciseMuscles).join(
-        [
-          innerJoin(muscleGroups,
-              muscleGroups.id.equalsExp(exerciseMuscles.muscleGroupId))
-        ],
-      )..where(exerciseMuscles.exerciseId.isIn(ids));
-      return muscleQuery.watch().map((rows) {
-        final idToMuscles = <int, List<MuscleGroup>>{};
-        for (final row in rows) {
-          final item = row.readTable(muscleGroups);
-          final id = row.readTable(exerciseMuscles).exerciseId;
+      final cachebase = (await getTemporaryDirectory()).path;
+      sqlite3.tempDirectory = cachebase;
 
-          idToMuscles.putIfAbsent(id, () => []).add(item);
-        }
-        final exerciseList = <Exercise>[];
-        for (var id in ids) {
-          final exercise = idToExercise[id]!;
-          exercise.muscleGroups = idToMuscles[id]!;
-          exerciseList.add(exercise);
-        }
-        return exerciseList;
-      });
+      return NativeDatabase.createInBackground(file);
     });
-  }
-
-  Stream<List<Exercise>> getExercisesWithFilters(
-      String query, List<MuscleGroup> groups) {
-    final exerciseStream = (select(exercises)
-          ..where((exercise) =>
-              exercise.name.lower().contains(query.toLowerCase())))
-        .watch();
-    return exerciseStream.switchMap((exercises) {
-      final idToExercise = {
-        for (var exercise in exercises) exercise.id: exercise
-      };
-      final ids = idToExercise.keys;
-      final muscleQuery = (select(exerciseMuscles)).join(
-        [
-          innerJoin(muscleGroups,
-              muscleGroups.id.equalsExp(exerciseMuscles.muscleGroupId))
-        ],
-      )..where(exerciseMuscles.exerciseId.isIn(ids));
-      return muscleQuery.watch().map((rows) {
-        final idToMuscles = <int, List<MuscleGroup>>{};
-        for (final row in rows) {
-          final item = row.readTable(muscleGroups);
-          final id = row.readTable(exerciseMuscles).exerciseId;
-
-          idToMuscles.putIfAbsent(id, () => []).add(item);
-        }
-
-        final exerciseList = <Exercise>[];
-        for (var id in ids) {
-          if (idToMuscles.containsKey(id) &&
-              idToMuscles[id]!.toSet().containsAll(groups.toSet())) {
-            final exercise = idToExercise[id]!;
-            exercise.muscleGroups = idToMuscles[id]!;
-            exerciseList.add(exercise);
-          }
-        }
-        return exerciseList;
-      });
-    });
-  }
-
-  Future<void> insertExerciseMuscles(
-      List<MuscleGroup> muscles, int exerciseId) async {
-    for (final muscle in muscles) {
-      await into(exerciseMuscles).insert(ExerciseMusclesCompanion(
-          exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
-    }
   }
 
   Future<void> insertMuscleGroup(Insertable<MuscleGroup> muscleGroup) async {
@@ -125,27 +68,31 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> insertMuscleGroups() async {
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Back")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Legs")));
+    final result = await select(muscleGroups).get();
+    if (result.isNotEmpty) {
+      return;
+    }
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Lats")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Upper Back")));
+    await insertMuscleGroup(
+        const MuscleGroupsCompanion(name: Value("Lower Back")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Quads")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Biceps")));
     await insertMuscleGroup(
         const MuscleGroupsCompanion(name: Value("Triceps")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Chest")));
     await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Front deltoids")));
+        const MuscleGroupsCompanion(name: Value("Front Deltoids")));
     await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Rear deltoids")));
+        const MuscleGroupsCompanion(name: Value("Rear Deltoids")));
     await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Lateral deltoids")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Forearms")));
-    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Abs")));
+        const MuscleGroupsCompanion(name: Value("Lateral Deltoids")));
+    await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Core")));
     await insertMuscleGroup(
         const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Calves")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Glutes")));
-    await insertMuscleGroup(
-        const MuscleGroupsCompanion(name: Value("Forearms")));
     await insertMuscleGroup(const MuscleGroupsCompanion(name: Value("Traps")));
   }
 }

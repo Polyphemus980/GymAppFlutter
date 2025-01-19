@@ -1,47 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/exercise_bloc.dart';
+import 'package:gym_app/widgets/app_widgets.dart';
+import 'package:gym_app/widgets/exercise_common_widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import '../widgets/exercise_common_widgets.dart';
+
+class ExerciseListScreen extends StatelessWidget {
+  const ExerciseListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+        create: (context) => ExerciseBloc(
+            exerciseRepository: getIt.get<LocalExerciseRepository>()),
+        child: const ExerciseScreen());
+  }
+}
 
 class ExerciseScreen extends StatelessWidget {
   const ExerciseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context);
-    return BlocProvider<ExerciseBloc>(
-      create: (BuildContext context) => ExerciseBloc(db),
-      child: Builder(builder: (context) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Center(child: Text("Exercises")),
-            actions: [
-              ElevatedButton(
-                onPressed: () => context.push('/exercise/add'),
-                child: const Text("Add new"),
-              ),
-              IconButton(
-                icon: const Icon(Icons.dark_mode),
-                onPressed: () {
-                  Provider.of<ThemeNotifier>(context, listen: false)
-                      .toggleTheme();
-                },
-              )
-            ],
+    return AppScaffold(
+      title: "Exercises",
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.dark_mode),
+          onPressed: () {
+            Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+          },
+        )
+      ],
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+        child: Column(children: [
+          SearchAndFilterRow(),
+          Expanded(
+            child: ExerciseList(),
           ),
-          body: const Column(children: [
-            SearchAndFilterRow(),
-            Expanded(
-              child: ExerciseList(),
-            ),
-          ]),
-        );
-      }),
+        ]),
+      ),
     );
   }
 }

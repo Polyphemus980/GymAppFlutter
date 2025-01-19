@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/data/app_database.dart';
-import 'package:gym_app/data/tables/exercise.dart';
-import 'package:gym_app/data/tables/muscle_group.dart';
+import 'package:gym_app/data/models/exercise.dart';
+import 'package:gym_app/data/models/muscle_group.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 sealed class ExerciseEvent {}
@@ -42,13 +42,13 @@ class ExerciseError extends ExerciseState {
 }
 
 class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
-  final AppDatabase db;
+  final LocalExerciseRepository exerciseRepository;
   late List<MuscleGroup> _muscles;
   String _query = '';
   List<MuscleGroup> _filters = [];
   late StreamSubscription<List<Exercise>> _exerciseSubscription;
 
-  ExerciseBloc(this.db) : super(ExerciseLoading()) {
+  ExerciseBloc({required this.exerciseRepository}) : super(ExerciseLoading()) {
     on<FilterExerciseEvent>(
       _onFilter,
     );
@@ -57,7 +57,9 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
     _initializeMuscles();
 
-    _exerciseSubscription = db.getExercises().listen((exercises) {
+    _exerciseSubscription = exerciseRepository
+        .watchExercisesWithFilters(_query, _filters)
+        .listen((exercises) {
       add(LoadedExerciseEvent(exercises));
     });
   }
@@ -71,7 +73,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   }
 
   Future<void> _initializeMuscles() async {
-    _muscles = await db.select(db.muscleGroups).get();
+    _muscles = await exerciseRepository.getAllMuscleGroups();
   }
 
   @override
@@ -94,7 +96,8 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     emit(ExerciseLoading());
     _filters = event.selectedMuscles;
     try {
-      final exerciseStream = db.getExercisesWithFilters(_query, _filters);
+      final exerciseStream =
+          exerciseRepository.watchExercisesWithFilters(_query, _filters);
       await _exerciseSubscription.cancel();
       _exerciseSubscription = exerciseStream.listen(
         (exercises) {
@@ -114,7 +117,8 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     emit(ExerciseLoading());
     _query = event.query;
     try {
-      final exerciseStream = db.getExercisesWithFilters(_query, _filters);
+      final exerciseStream =
+          exerciseRepository.watchExercisesWithFilters(_query, _filters);
       await _exerciseSubscription.cancel();
       _exerciseSubscription = exerciseStream.listen(
         (exercises) {

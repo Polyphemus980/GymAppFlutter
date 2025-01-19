@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/exercise_bloc.dart';
+import 'package:gym_app/widgets/exercise_common_widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../data/tables/exercise.dart';
+import '../data/models/exercise.dart';
 import '../main.dart';
-import '../widgets/exercise_common_widgets.dart';
 
 class SelectExerciseScreen extends StatefulWidget {
-  const SelectExerciseScreen({super.key});
-
+  const SelectExerciseScreen({super.key, required this.selectedExercises});
+  final List<Exercise> selectedExercises;
   @override
   State<SelectExerciseScreen> createState() => _SelectExerciseScreenState();
 }
 
 class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
-  final List<Exercise> selectedExercises = [];
-  get i => selectedExercises.isNotEmpty;
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context);
     return BlocProvider<ExerciseBloc>(
-      create: (BuildContext context) => ExerciseBloc(db),
+      create: (BuildContext context) => ExerciseBloc(
+          exerciseRepository: getIt.get<LocalExerciseRepository>()),
       child: Builder(builder: (context) {
         return Scaffold(
           appBar: AppBar(
@@ -47,29 +45,28 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
             Expanded(
               child: ExerciseList(
                 onTapMethod: (e) {
-                  if (selectedExercises.contains(e)) {
+                  if (widget.selectedExercises.contains(e)) {
                     setState(() {
-                      selectedExercises.remove(e);
+                      widget.selectedExercises.remove(e);
                     });
                   } else {
                     setState(() {
-                      selectedExercises.add(e);
+                      widget.selectedExercises.add(e);
                     });
                   }
                 },
                 selectCheckMethod: (e) {
-                  return selectedExercises.contains(e);
+                  return widget.selectedExercises.contains(e);
                 },
               ),
             ),
-            if (i)
-              Padding(
-                padding: const EdgeInsetsDirectional.all(16.0),
-                child: FloatingActionButton.extended(
-                    onPressed: () => context.pop(),
-                    label:
-                        Text("${selectedExercises.length} exercises selected")),
-              ),
+            Padding(
+              padding: const EdgeInsetsDirectional.all(16.0),
+              child: FloatingActionButton.extended(
+                  onPressed: () => context.pop(),
+                  label: Text(
+                      "${widget.selectedExercises.length} exercises selected")),
+            ),
           ]),
         );
       }),
