@@ -49,7 +49,8 @@ class ThemeNotifier extends ChangeNotifier {
   ThemeNotifier()
       : _currentTheme = ThemeMode.system != ThemeMode.light
             ? FlexThemeData.light(
-                scheme: FlexScheme.bahamaBlue, surfaceTint: Colors.transparent)
+                scheme: FlexScheme.vesuviusBurn,
+                surfaceTint: Colors.transparent)
             : FlexThemeData.dark(
                 scheme: FlexScheme.greyLaw,
                 darkIsTrueBlack: false,
@@ -218,7 +219,7 @@ final _router = GoRouter(initialLocation: '/home', routes: [
       builder: (context, state) {
         return const NewWorkoutPlanScreen(
           numWeeks: 12,
-          numDays: 5,
+          numDays: 1,
         );
       },
       routes: [

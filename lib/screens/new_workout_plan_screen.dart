@@ -45,9 +45,10 @@ class DaysPages extends HookWidget {
               heightFactor: 0.8,
               widthFactor: 1,
               child: DraggableScrollableSheet(
-                  initialChildSize: 1, // The initial size of the bottom sheet
-                  minChildSize: 1, // The minimum size
+                  initialChildSize: 1,
+                  minChildSize: 1,
                   maxChildSize: 1,
+                  expand: false,
                   builder: (context, scrollController) {
                     return CopyModal();
                   }),
@@ -405,90 +406,183 @@ class PlanExerciseTile extends StatelessWidget {
 }
 
 class CopyModal extends HookWidget {
+  const CopyModal({super.key});
+
   @override
   Widget build(BuildContext context) {
     final from = useState(-1);
     final to = useState(<int>[]);
+
     return BlocBuilder<NewWorkoutPlanBloc, NewWorkoutPlanState>(
       builder: (context, state) {
         if (state is InProgressState) {
           return Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-              ),
-              child: Column(spacing: 20, children: [
-                Text("From",
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer)),
-                Wrap(
-                  runSpacing: 8,
-                  spacing: 8,
-                  children:
-                      List<int>.generate(state.plan.weeks.length, (i) => i)
-                          .map((index) {
-                    return FilterChip(
-                      label: Text("$index".padRight(2, ' ')),
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                      selected: from.value == index,
-                      onSelected: state.plan.weeks[index].days
-                              .every((day) => day.sets.isNotEmpty)
-                          ? (bool selected) {
-                              if (!selected) {
-                                from.value = -1;
-                              } else {
-                                from.value = index;
-                                to.value = to.value..remove(index);
-                              }
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Copy Workout Week",
+                      style:
+                          Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Source Week Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Source Week",
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: List<int>.generate(
+                              state.plan.weeks.length, (i) => i).map((index) {
+                            bool isEnabled = state.plan.weeks[index].days
+                                .every((day) => day.sets.isNotEmpty);
+                            return AnimatedScale(
+                              scale: isEnabled ? 1.0 : 0.95,
+                              duration: const Duration(milliseconds: 200),
+                              child: FilterChip(
+                                label: Text(
+                                  "Week ${index + 1}",
+                                  style: TextStyle(
+                                    fontWeight: from.value == index
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: from.value == index
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                  ),
+                                ),
+                                selected: from.value == index,
+                                showCheckmark: false,
+                                selectedColor:
+                                    Theme.of(context).colorScheme.primary,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                onSelected: isEnabled
+                                    ? (bool selected) {
+                                        if (!selected) {
+                                          from.value = -1;
+                                        } else {
+                                          from.value = index;
+                                          to.value = to.value..remove(index);
+                                        }
+                                      }
+                                    : null,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Target Weeks Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Target Weeks",
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: List<int>.generate(
+                              state.plan.weeks.length, (i) => i).map((index) {
+                            return FilterChip(
+                              label: Text(
+                                "Week ${index + 1}",
+                                style: TextStyle(
+                                  fontWeight: to.value.contains(index)
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: to.value.contains(index)
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                              selected: to.value.contains(index),
+                              showCheckmark: false,
+                              selectedColor:
+                                  Theme.of(context).colorScheme.primary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.surface,
+                              onSelected: from.value == index
+                                  ? null
+                                  : (bool selected) {
+                                      if (selected) {
+                                        to.value = [...to.value, index];
+                                      } else {
+                                        to.value = to.value
+                                            .where((i) => index != i)
+                                            .toList();
+                                      }
+                                    },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Copy Button
+                    ElevatedButton.icon(
+                      onPressed: from.value != -1 && to.value.isNotEmpty
+                          ? () {
+                              context.read<NewWorkoutPlanBloc>().add(
+                                    CopyWeekEvent(
+                                        fromIndex: from.value,
+                                        toIndices: to.value),
+                                  );
+                              context.pop();
                             }
                           : null,
-                    );
-                  }).toList(),
+                      icon: const Icon(Icons.copy),
+                      label: const Text('Copy Week'),
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondaryContainer),
+                    ),
+                  ],
                 ),
-                Text("To (multiple allowed)",
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer)),
-                Wrap(
-                  runSpacing: 8,
-                  spacing: 8,
-                  children:
-                      List<int>.generate(state.plan.weeks.length, (i) => i)
-                          .map((index) {
-                    return FilterChip(
-                      label: Text("$index".padRight(3, '  ')),
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                      onSelected: from.value == index
-                          ? null
-                          : (bool selected) {
-                              if (selected) {
-                                to.value = [...to.value, index];
-                              } else {
-                                to.value =
-                                    to.value.where((i) => index != i).toList();
-                              }
-                            },
-                      selected: to.value.contains(index),
-                    );
-                  }).toList(),
-                ),
-                TextButton(
-                    child: const Text("Copy"),
-                    onPressed: () {
-                      if (from.value != -1) {
-                        context.read<NewWorkoutPlanBloc>().add(CopyWeekEvent(
-                            fromIndex: from.value, toIndices: to.value));
-                        context.pop();
-                      }
-                    })
-              ]));
+              ),
+            ),
+          );
         }
         return const SizedBox.shrink();
       },
