@@ -17,6 +17,12 @@ class SetData {
         exercise: exercise ?? this.exercise, sets: sets ?? this.sets);
   }
 
+  SetData copy() {
+    return SetData(
+        exercise: exercise.copy(),
+        sets: sets.map((set) => set.copy()).toList());
+  }
+
   factory SetData.fromJson(Map<String, dynamic> json) =>
       _$SetDataFromJson(json);
   Map<String, dynamic> toJson() => _$SetDataToJson(this);

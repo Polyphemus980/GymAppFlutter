@@ -37,21 +37,35 @@ class WorkoutConfigSet {
       weight: plannedSet.weight,
     );
   }
+  WorkoutConfigSet copy() {
+    return WorkoutConfigSet(
+        exerciseId: exerciseId,
+        setNumber: setNumber,
+        repetitions: repetitions,
+        weight: weight,
+        duration: duration,
+        isWeight: isWeight,
+        rpe: rpe,
+        completed: completed);
+  }
 
   WorkoutConfigSet copyWith(
       {bool? completed,
       int? setNumber,
       int? repetitions,
       double? weight,
-      int? duration}) {
+      int? duration,
+      double? rpe,
+      bool? isWeight}) {
     return WorkoutConfigSet(
-      exerciseId: exerciseId,
-      setNumber: setNumber ?? this.setNumber,
-      repetitions: repetitions ?? this.repetitions,
-      weight: weight ?? this.weight,
-      duration: duration ?? this.duration,
-      completed: completed ?? this.completed,
-    );
+        exerciseId: exerciseId,
+        setNumber: setNumber ?? this.setNumber,
+        repetitions: repetitions ?? this.repetitions,
+        weight: weight ?? this.weight,
+        duration: duration ?? this.duration,
+        completed: completed ?? this.completed,
+        rpe: rpe ?? this.rpe,
+        isWeight: isWeight ?? this.isWeight);
   }
 
   factory WorkoutConfigSet.fromJson(Map<String, dynamic> json) =>

@@ -19,6 +19,14 @@ class Exercise {
   final DateTime? updatedAt;
 
   List<MuscleGroup>? muscleGroups;
+  Exercise copy() {
+    return Exercise(
+        name: name,
+        id: id,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        description: description);
+  }
 
   @override
   bool operator ==(Object other) {

@@ -33,6 +33,29 @@ class DaysPages extends HookWidget {
   final int numDays;
   const DaysPages({super.key, required this.numWeeks, required this.numDays});
 
+  void _showFilters(BuildContext parentContext) {
+    showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: parentContext,
+        isScrollControlled: true,
+        builder: (modalContext) {
+          return BlocProvider.value(
+            value: parentContext.read<NewWorkoutPlanBloc>(),
+            child: FractionallySizedBox(
+              heightFactor: 0.8,
+              widthFactor: 1,
+              child: DraggableScrollableSheet(
+                  initialChildSize: 1, // The initial size of the bottom sheet
+                  minChildSize: 1, // The minimum size
+                  maxChildSize: 1,
+                  builder: (context, scrollController) {
+                    return CopyModal();
+                  }),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController();
@@ -85,7 +108,11 @@ class DaysPages extends HookWidget {
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: AppInkWellButton(
-                              onTap: () {}, height: 75, text: "Copy days")),
+                              onTap: () {
+                                _showFilters(context);
+                              },
+                              height: 75,
+                              text: "Copy days")),
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: AppInkWellButton(
@@ -306,7 +333,10 @@ class PlanExerciseTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outlineVariant,
@@ -370,6 +400,98 @@ class PlanExerciseTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CopyModal extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final from = useState(-1);
+    final to = useState(<int>[]);
+    return BlocBuilder<NewWorkoutPlanBloc, NewWorkoutPlanState>(
+      builder: (context, state) {
+        if (state is InProgressState) {
+          return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+              ),
+              child: Column(spacing: 20, children: [
+                Text("From",
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer)),
+                Wrap(
+                  runSpacing: 8,
+                  spacing: 8,
+                  children:
+                      List<int>.generate(state.plan.weeks.length, (i) => i)
+                          .map((index) {
+                    return FilterChip(
+                      label: Text("$index".padRight(2, ' ')),
+                      backgroundColor:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                      selected: from.value == index,
+                      onSelected: state.plan.weeks[index].days
+                              .every((day) => day.sets.isNotEmpty)
+                          ? (bool selected) {
+                              if (!selected) {
+                                from.value = -1;
+                              } else {
+                                from.value = index;
+                                to.value = to.value..remove(index);
+                              }
+                            }
+                          : null,
+                    );
+                  }).toList(),
+                ),
+                Text("To (multiple allowed)",
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer)),
+                Wrap(
+                  runSpacing: 8,
+                  spacing: 8,
+                  children:
+                      List<int>.generate(state.plan.weeks.length, (i) => i)
+                          .map((index) {
+                    return FilterChip(
+                      label: Text("$index".padRight(3, '  ')),
+                      backgroundColor:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                      onSelected: from.value == index
+                          ? null
+                          : (bool selected) {
+                              if (selected) {
+                                to.value = [...to.value, index];
+                              } else {
+                                to.value =
+                                    to.value.where((i) => index != i).toList();
+                              }
+                            },
+                      selected: to.value.contains(index),
+                    );
+                  }).toList(),
+                ),
+                TextButton(
+                    child: const Text("Copy"),
+                    onPressed: () {
+                      if (from.value != -1) {
+                        context.read<NewWorkoutPlanBloc>().add(CopyWeekEvent(
+                            fromIndex: from.value, toIndices: to.value));
+                        context.pop();
+                      }
+                    })
+              ]));
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

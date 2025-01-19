@@ -72,20 +72,11 @@ class _SetCardState extends State<SetCard> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              colorScheme.surface,
-              colorScheme.surface.withValues(alpha: 0.8),
-            ],
-          ),
-        ),
+            borderRadius: BorderRadius.circular(16),
+            color: colorScheme.primaryContainer.withValues(alpha: 0.5)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Exercise Header
             Container(
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer.withValues(alpha: 0.5),
@@ -118,7 +109,6 @@ class _SetCardState extends State<SetCard> {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Row(
@@ -140,7 +130,6 @@ class _SetCardState extends State<SetCard> {
                 ],
               ),
             ),
-
             if (sets.isNotEmpty)
               ListView.builder(
                 shrinkWrap: true,
@@ -170,7 +159,6 @@ class _SetCardState extends State<SetCard> {
                         );
                 },
               ),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -220,8 +208,7 @@ class ActionButton extends StatelessWidget {
         child: TextButton.icon(
           onPressed: onPressed,
           style: TextButton.styleFrom(
-            backgroundColor:
-                colorScheme.primaryContainer.withValues(alpha: 0.5),
+            backgroundColor: colorScheme.primaryContainer.withValues(alpha: 1),
             foregroundColor: colorScheme.onPrimaryContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -441,41 +428,47 @@ class _RpeSetRowState extends State<RpeSetRow> {
               widget.onUpdate(widget.set);
             },
           ),
-          AppTextFormField(
-            labelText: "Min",
-            hintText: "0",
-            formatters: [
-              RepsInputFormatter(),
-              LengthLimitingTextInputFormatter(2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
+            children: [
+              AppTextFormField(
+                labelText: "Min",
+                hintText: "0",
+                formatters: [
+                  RepsInputFormatter(),
+                  LengthLimitingTextInputFormatter(2),
+                ],
+                errorText: isValidRepRange(
+                        widget.set.minRepetitions, widget.set.maxRepetitions)
+                    ? null
+                    : "",
+                controller: minRepsController,
+                width: 70,
+                height: 45,
+                onChanged: (value) {
+                  final int? parsedValue = int.tryParse(value);
+                  widget.set.minRepetitions = parsedValue;
+                  widget.onUpdate(widget.set);
+                },
+              ),
+              AppTextFormField(
+                labelText: "Max",
+                hintText: "0",
+                formatters: [
+                  RepsInputFormatter(),
+                  LengthLimitingTextInputFormatter(2),
+                ],
+                controller: maxRepsController,
+                width: 70,
+                height: 45,
+                onChanged: (value) {
+                  final int? parsedValue = int.tryParse(value);
+                  widget.set.maxRepetitions = parsedValue;
+                  widget.onUpdate(widget.set);
+                },
+              ),
             ],
-            errorText: isValidRepRange(
-                    widget.set.minRepetitions, widget.set.maxRepetitions)
-                ? null
-                : "",
-            controller: minRepsController,
-            width: 70,
-            height: 45,
-            onChanged: (value) {
-              final int? parsedValue = int.tryParse(value);
-              widget.set.minRepetitions = parsedValue;
-              widget.onUpdate(widget.set);
-            },
-          ),
-          AppTextFormField(
-            labelText: "Max",
-            hintText: "0",
-            formatters: [
-              RepsInputFormatter(),
-              LengthLimitingTextInputFormatter(2),
-            ],
-            controller: maxRepsController,
-            width: 70,
-            height: 45,
-            onChanged: (value) {
-              final int? parsedValue = int.tryParse(value);
-              widget.set.maxRepetitions = parsedValue;
-              widget.onUpdate(widget.set);
-            },
           )
         ],
       ),

@@ -12,6 +12,13 @@ class WorkoutDay {
       sets: sets ?? this.sets,
     );
   }
+
+  WorkoutDay copy() {
+    List<SetData> copiedSets = sets.map((set) => set.copy()).toList();
+    return WorkoutDay(
+      sets: copiedSets, // Create a new list with copied sets
+    );
+  }
 }
 
 class WorkoutWeek {
@@ -25,6 +32,11 @@ class WorkoutWeek {
       updatedDays[index] = day;
     }
     return WorkoutWeek(days: updatedDays);
+  }
+
+  WorkoutWeek copy() {
+    List<WorkoutDay> copiedDays = days.map((day) => day.copy()).toList();
+    return WorkoutWeek(days: copiedDays);
   }
 
   WorkoutWeek.empty(int numberOfDays)
@@ -66,6 +78,14 @@ class WorkoutPlan {
     return WorkoutPlan(weeks: updatedWeeks);
   }
 
+  WorkoutPlan copyWeeks(int fromIndex, List<int> toIndices) {
+    final updatedWeeks = List<WorkoutWeek>.from(weeks);
+    for (int i = 0; i < toIndices.length; i++) {
+      updatedWeeks[toIndices[i]] = updatedWeeks[fromIndex].copy();
+    }
+    return WorkoutPlan(weeks: updatedWeeks);
+  }
+
   bool isFilled() {
     return weeks.every((week) => week.days.every((day) => day.sets.isNotEmpty));
   }
@@ -80,6 +100,13 @@ class InitializePlanEvent extends NewWorkoutPlanEvent {
   final int numDays;
 
   InitializePlanEvent({required this.numDays, required this.numWeeks});
+}
+
+class CopyWeekEvent extends NewWorkoutPlanEvent {
+  final int fromIndex;
+  final List<int> toIndices;
+
+  CopyWeekEvent({required this.fromIndex, required this.toIndices});
 }
 
 class ChangedDayEvent extends NewWorkoutPlanEvent {
@@ -105,6 +132,7 @@ class NewWorkoutPlanBloc
   NewWorkoutPlanBloc() : super(InitialState()) {
     on<ChangedDayEvent>(_changeDay);
     on<InitializePlanEvent>(_initializePlan);
+    on<CopyWeekEvent>(_copyWeeks);
   }
 
   _changeDay(ChangedDayEvent event, Emitter<NewWorkoutPlanState> emit) {
@@ -121,5 +149,12 @@ class NewWorkoutPlanBloc
     final workoutPlan = WorkoutPlan.empty(
         numberOfWeeks: event.numWeeks, daysPerWeek: event.numDays);
     emit(InProgressState(plan: workoutPlan));
+  }
+
+  _copyWeeks(CopyWeekEvent event, Emitter<NewWorkoutPlanState> emit) {
+    final currentState = state as InProgressState;
+    final newPlan =
+        currentState.plan.copyWeeks(event.fromIndex, event.toIndices);
+    emit(InProgressState(plan: newPlan));
   }
 }

@@ -27,17 +27,19 @@ import 'data/models/muscle_group.dart';
 import 'data/models/set_data.dart';
 
 class ThemeNotifier extends ChangeNotifier {
-  final ThemeData lightTheme =
-      FlexThemeData.light(scheme: FlexScheme.flutterDash);
+  final ThemeData lightTheme = FlexThemeData.light(
+      tones: const FlexTones.dark(),
+      scheme: FlexScheme.vesuviusBurn,
+      surfaceTint: Colors.transparent);
+
   final ThemeData darkTheme = FlexThemeData.dark(
     scheme: FlexScheme.vesuviusBurn,
-    surfaceMode:
-        FlexSurfaceMode.highScaffoldLowSurface, // Adjust surface blending mode
-    darkIsTrueBlack: false, // Ensures black is not "true black"
-    blendLevel: 20, // Adjust blending level for surfaces and background
-    tones: const FlexTones.light(), // Use lighter tones for backgrounds
+    surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
+    darkIsTrueBlack: false,
+    blendLevel: 20,
+    tones: const FlexTones.light(),
     subThemesData: const FlexSubThemesData(
-      defaultRadius: 8.0, // Customize radius if desired
+      defaultRadius: 8.0,
     ),
   );
 
@@ -46,7 +48,8 @@ class ThemeNotifier extends ChangeNotifier {
   bool isLightTheme() => _isLightTheme();
   ThemeNotifier()
       : _currentTheme = ThemeMode.system != ThemeMode.light
-            ? FlexThemeData.light(scheme: FlexScheme.flutterDash)
+            ? FlexThemeData.light(
+                scheme: FlexScheme.bahamaBlue, surfaceTint: Colors.transparent)
             : FlexThemeData.dark(
                 scheme: FlexScheme.greyLaw,
                 darkIsTrueBlack: false,

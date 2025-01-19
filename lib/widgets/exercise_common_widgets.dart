@@ -8,8 +8,11 @@ import 'package:gym_app/main.dart';
 import '../exercise_bloc.dart';
 
 class SearchAndFilterRow extends StatelessWidget {
-  void _showFilters(BuildContext parentContext) {
+  void _showCopyModal(BuildContext parentContext) {
     showModalBottomSheet(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
         context: parentContext,
         isScrollControlled: true,
         builder: (modalContext) {
@@ -19,8 +22,8 @@ class SearchAndFilterRow extends StatelessWidget {
               heightFactor: 0.8,
               widthFactor: 1,
               child: DraggableScrollableSheet(
-                  initialChildSize: 1, // The initial size of the bottom sheet
-                  minChildSize: 1, // The minimum size
+                  initialChildSize: 1,
+                  minChildSize: 1,
                   maxChildSize: 1,
                   builder: (context, scrollController) {
                     return ExerciseFilterModal(
@@ -52,7 +55,7 @@ class SearchAndFilterRow extends StatelessWidget {
             child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               Flexible(
                 child: IconButton(
-                  onPressed: () => _showFilters(context),
+                  onPressed: () => _showCopyModal(context),
                   icon: const Icon(Icons.filter_alt),
                 ),
               ),
