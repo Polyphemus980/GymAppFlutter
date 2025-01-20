@@ -26,6 +26,111 @@ class DriftWorkoutRepository extends LocalWorkoutRepository {
       return Rx.combineLatest(workoutStreams, (List<WorkoutPlan> updatedPlans) {
         return updatedPlans;
       });
+    }).startWith([]);
+  }
+
+  @override
+  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails() {
+    final workoutPlanStream = db.select(db.workoutPlans).watch();
+
+    return workoutPlanStream.switchMap((plans) {
+      final planStreams = plans.map((plan) {
+        // Get planned workouts for this plan
+        return (db.select(db.plannedWorkouts)
+              ..where((workout) => workout.workoutPlanId.equals(plan.id)))
+            .watch()
+            .switchMap((workouts) {
+          final exerciseStreams = workouts.map((workout) {
+            return (db.select(db.plannedWorkoutExercises)
+                  ..where((exercise) => exercise.workoutId.equals(workout.id)))
+                .watch()
+                .switchMap((exercises) {
+              final setStreams = exercises.map((exercise) {
+                return (db.select(db.plannedSets)
+                      ..where(
+                          (set) => set.workoutExerciseId.equals(exercise.id)))
+                    .watch()
+                    .map((sets) {
+                  exercise.sets = sets;
+                  return exercise;
+                });
+              });
+
+              return Rx.combineLatest(setStreams,
+                  (List<PlannedWorkoutExercise> exercisesWithSets) {
+                workout.exercises = exercisesWithSets;
+                return workout;
+              });
+            });
+          });
+
+          return Rx.combineLatest(exerciseStreams,
+              (List<PlannedWorkout> workoutsWithExercises) {
+            plan.workouts = workoutsWithExercises;
+            return plan;
+          });
+        });
+      });
+      return Rx.combineLatest(planStreams, (List<WorkoutPlan> plansComplete) {
+        return plansComplete;
+      });
+    }).startWith([]);
+  }
+
+  @override
+  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(int planId) {
+    final workoutPlanStream = (db.select(db.workoutPlans)
+          ..where((plan) => plan.id.equals(planId)))
+        .watchSingleOrNull();
+
+    return workoutPlanStream.switchMap((plan) {
+      if (plan == null) {
+        return Stream.value(null); // Return null if the plan doesn't exist
+      }
+
+      final planStream = (db.select(db.plannedWorkouts)
+            ..where((workout) => workout.workoutPlanId.equals(plan.id)))
+          .watch()
+          .switchMap((workouts) {
+        final exerciseStreams = workouts.map((workout) {
+          return (db.select(db.plannedWorkoutExercises)
+                ..where((exercise) => exercise.workoutId.equals(workout.id)))
+              .watch()
+              .switchMap((exercises) {
+            final setStreams = exercises.map((exercise) {
+              final exerciseStream = (db.select(db.exercises)
+                    ..where((ex) => ex.id.equals(exercise.exerciseId)))
+                  .watchSingleOrNull();
+
+              return exerciseStream.switchMap((exerciseDetails) {
+                return (db.select(db.plannedSets)
+                      ..where(
+                          (set) => set.workoutExerciseId.equals(exercise.id)))
+                    .watch()
+                    .map((sets) {
+                  exercise.sets = sets;
+                  exercise.exercise = exerciseDetails;
+                  return exercise;
+                });
+              });
+            });
+
+            return Rx.combineLatest(setStreams,
+                (List<PlannedWorkoutExercise> exercisesWithSets) {
+              workout.exercises = exercisesWithSets;
+              return workout;
+            });
+          });
+        });
+
+        return Rx.combineLatest(exerciseStreams,
+            (List<PlannedWorkout> workoutsWithExercises) {
+          plan.workouts = workoutsWithExercises;
+          return plan;
+        });
+      });
+
+      return planStream;
     });
   }
 

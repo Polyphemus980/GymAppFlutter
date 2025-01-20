@@ -13,6 +13,7 @@ class PlannedWorkoutExercise {
   final DateTime? updatedAt;
 
   List<PlannedSet>? sets;
+  Exercise? exercise;
 
   PlannedWorkoutExercise({
     required this.id,

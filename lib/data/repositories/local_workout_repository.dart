@@ -6,6 +6,8 @@ import 'package:gym_app/data/models/workout_plan.dart';
 
 abstract class LocalWorkoutRepository {
   Stream<List<WorkoutPlan>> watchWorkoutPlans();
+  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails();
+  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(int planId);
   Future<void> addWorkoutPlan(WorkoutPlansCompanion plan);
   Future<WorkoutPlan> addWorkoutPlanReturning(WorkoutPlansCompanion plan);
   Future<void> addPlannedWorkout(PlannedWorkoutsCompanion plannedWorkout);

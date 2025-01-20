@@ -54,6 +54,7 @@ dependencies:
   json_annotation: ^4.9.0
   flutter_hooks: ^0.20.5
   bloc_presentation: ^1.0.1
+  supabase_flutter: ^2.8.3
 
 dev_dependencies:
   flutter_test:

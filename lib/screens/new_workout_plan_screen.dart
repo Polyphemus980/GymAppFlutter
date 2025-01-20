@@ -92,59 +92,62 @@ class DaysPages extends HookWidget {
                   controller: pageController,
                   itemCount: numWeeks,
                   itemBuilder: (BuildContext context, int weekIndex) {
-                    return Column(spacing: 10, children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.plan.weeks[weekIndex].days.length,
-                          itemBuilder: (context, dayIndex) {
-                            return DayCard(
-                              sets: state
-                                  .plan.weeks[weekIndex].days[dayIndex].sets,
-                              index: dayIndex,
-                              onAddExercise: (index) async {
-                                final sets = await context.push(
-                                    '/plan/create/new',
-                                    extra: List<SetData>.from(state
-                                        .plan
-                                        .weeks[weekIndex]
-                                        .days[dayIndex]
-                                        .sets)) as List<SetData>;
-                                context.read<NewWorkoutPlanBloc>().add(
-                                    ChangedDayEvent(
-                                        sets: sets,
-                                        weekIndex: weekIndex,
-                                        dayIndex: dayIndex));
-                              },
-                            );
-                          },
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(spacing: 10, children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: state.plan.weeks[weekIndex].days.length,
+                            itemBuilder: (context, dayIndex) {
+                              return DayCard(
+                                sets: state
+                                    .plan.weeks[weekIndex].days[dayIndex].sets,
+                                index: dayIndex,
+                                onAddExercise: (index) async {
+                                  final sets = await context.push(
+                                      '/plan/create/new',
+                                      extra: List<SetData>.from(state
+                                          .plan
+                                          .weeks[weekIndex]
+                                          .days[dayIndex]
+                                          .sets)) as List<SetData>;
+                                  context.read<NewWorkoutPlanBloc>().add(
+                                      ChangedDayEvent(
+                                          sets: sets,
+                                          weekIndex: weekIndex,
+                                          dayIndex: dayIndex));
+                                },
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: AppInkWellButton(
-                              onTap: () {
-                                _showFilters(context);
-                              },
-                              height: 75,
-                              text: "Copy days")),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: AppInkWellButton(
-                              onTap: () {
-                                if (!state.plan.isFilled()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Every training day must have at least 1 exercise")));
-                                  return;
-                                }
-                                context
-                                    .read<NewWorkoutPlanBloc>()
-                                    .add(FinishCreationEvent());
-                              },
-                              height: 75,
-                              text: "Finish")),
-                    ]);
+                        Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: AppInkWellButton(
+                                onTap: () {
+                                  _showFilters(context);
+                                },
+                                height: 75,
+                                text: "Copy days")),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: AppInkWellButton(
+                                onTap: () {
+                                  if (!state.plan.isFilled()) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Every training day must have at least 1 exercise")));
+                                    return;
+                                  }
+                                  context
+                                      .read<NewWorkoutPlanBloc>()
+                                      .add(FinishCreationEvent());
+                                },
+                                height: 75,
+                                text: "Finish")),
+                      ]),
+                    );
                   },
                 );
               } else {
@@ -160,13 +163,15 @@ class DaysPages extends HookWidget {
 
 class DayCard extends StatelessWidget {
   final int index;
+  final bool interactable;
   final List<SetData> sets;
-  final void Function(int) onAddExercise;
+  final void Function(int)? onAddExercise;
   const DayCard(
       {super.key,
       required this.sets,
-      required this.onAddExercise,
-      required this.index});
+      this.onAddExercise,
+      required this.index,
+      this.interactable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -200,14 +205,15 @@ class DayCard extends StatelessWidget {
                     ),
               ),
             ),
-          AppInkWellButton(
-            onTap: () async {
-              onAddExercise(index);
-            },
-            width: 200,
-            height: 50,
-            text: "Add exercises",
-          ),
+          if (interactable)
+            AppInkWellButton(
+              onTap: () async {
+                onAddExercise!(index);
+              },
+              width: 200,
+              height: 50,
+              text: "Add exercises",
+            ),
         ],
       ),
     );

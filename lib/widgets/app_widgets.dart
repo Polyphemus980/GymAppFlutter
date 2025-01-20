@@ -130,26 +130,24 @@ class AppInkWellButton extends StatelessWidget {
   final double? height;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
+    return Material(
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
         width: width,
         height: height,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+        child: InkWell(
+          onTap: onTap,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
             ),
           ),
