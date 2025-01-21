@@ -15,6 +15,7 @@ import 'models/muscle_group.dart';
 import 'models/planned_set.dart';
 import 'models/planned_workout.dart';
 import 'models/planned_workout_exercise.dart';
+import 'models/user_preferences.dart';
 import 'models/workout_plan.dart';
 
 part 'app_database.g.dart';
@@ -34,7 +35,8 @@ typedef ExerciseWithMuscleGroups = ({
   CompletedWorkoutExercises,
   MuscleGroups,
   ExerciseMuscles,
-  PlannedSets
+  PlannedSets,
+  UserPreferencesTable
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection()) {

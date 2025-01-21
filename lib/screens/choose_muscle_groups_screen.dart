@@ -149,12 +149,20 @@ class _MusclePickerState extends State<MusclePicker> {
                         builder: (context, value, child) {
                           return Card(
                             margin: const EdgeInsets.only(bottom: 8),
+                            color: value
+                                ? Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.5)
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .secondary
+                                    .withValues(alpha: 0.5),
                             child: ListTile(
                               leading: Icon(
                                 Icons.fitness_center,
                                 color: value
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.grey,
+                                    ? Colors.green
+                                    : Theme.of(context).colorScheme.secondary,
                               ),
                               title: Text(
                                 snapshot.data!.elementAt(index).name,

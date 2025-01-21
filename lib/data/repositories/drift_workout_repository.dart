@@ -6,7 +6,7 @@ import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DriftWorkoutRepository extends LocalWorkoutRepository {
+class DriftWorkoutRepository implements LocalWorkoutRepository {
   final AppDatabase db;
 
   DriftWorkoutRepository({required this.db});

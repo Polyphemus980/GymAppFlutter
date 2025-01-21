@@ -2371,6 +2371,169 @@ class PlannedSetsCompanion extends UpdateCompanion<PlannedSet> {
   }
 }
 
+class $UserPreferencesTableTable extends UserPreferencesTable
+    with TableInfo<$UserPreferencesTableTable, UserPreferences> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserPreferencesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  static const VerificationMeta _isDarkModeMeta =
+      const VerificationMeta('isDarkMode');
+  @override
+  late final GeneratedColumn<bool> isDarkMode = GeneratedColumn<bool>(
+      'is_dark_mode', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_dark_mode" IN (0, 1))'));
+  static const VerificationMeta _isMetricMeta =
+      const VerificationMeta('isMetric');
+  @override
+  late final GeneratedColumn<bool> isMetric = GeneratedColumn<bool>(
+      'is_metric', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_metric" IN (0, 1))'));
+  @override
+  List<GeneratedColumn> get $columns => [userId, isDarkMode, isMetric];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_preferences_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<UserPreferences> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('is_dark_mode')) {
+      context.handle(
+          _isDarkModeMeta,
+          isDarkMode.isAcceptableOrUnknown(
+              data['is_dark_mode']!, _isDarkModeMeta));
+    } else if (isInserting) {
+      context.missing(_isDarkModeMeta);
+    }
+    if (data.containsKey('is_metric')) {
+      context.handle(_isMetricMeta,
+          isMetric.isAcceptableOrUnknown(data['is_metric']!, _isMetricMeta));
+    } else if (isInserting) {
+      context.missing(_isMetricMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  UserPreferences map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserPreferences(
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      isDarkMode: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_dark_mode'])!,
+      isMetric: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_metric'])!,
+    );
+  }
+
+  @override
+  $UserPreferencesTableTable createAlias(String alias) {
+    return $UserPreferencesTableTable(attachedDatabase, alias);
+  }
+}
+
+class UserPreferencesTableCompanion extends UpdateCompanion<UserPreferences> {
+  final Value<String> userId;
+  final Value<bool> isDarkMode;
+  final Value<bool> isMetric;
+  final Value<int> rowid;
+  const UserPreferencesTableCompanion({
+    this.userId = const Value.absent(),
+    this.isDarkMode = const Value.absent(),
+    this.isMetric = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UserPreferencesTableCompanion.insert({
+    required String userId,
+    required bool isDarkMode,
+    required bool isMetric,
+    this.rowid = const Value.absent(),
+  })  : userId = Value(userId),
+        isDarkMode = Value(isDarkMode),
+        isMetric = Value(isMetric);
+  static Insertable<UserPreferences> custom({
+    Expression<String>? userId,
+    Expression<bool>? isDarkMode,
+    Expression<bool>? isMetric,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (isDarkMode != null) 'is_dark_mode': isDarkMode,
+      if (isMetric != null) 'is_metric': isMetric,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UserPreferencesTableCompanion copyWith(
+      {Value<String>? userId,
+      Value<bool>? isDarkMode,
+      Value<bool>? isMetric,
+      Value<int>? rowid}) {
+    return UserPreferencesTableCompanion(
+      userId: userId ?? this.userId,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
+      isMetric: isMetric ?? this.isMetric,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (isDarkMode.present) {
+      map['is_dark_mode'] = Variable<bool>(isDarkMode.value);
+    }
+    if (isMetric.present) {
+      map['is_metric'] = Variable<bool>(isMetric.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserPreferencesTableCompanion(')
+          ..write('userId: $userId, ')
+          ..write('isDarkMode: $isDarkMode, ')
+          ..write('isMetric: $isMetric, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2389,6 +2552,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExerciseMusclesTable exerciseMuscles =
       $ExerciseMusclesTable(this);
   late final $PlannedSetsTable plannedSets = $PlannedSetsTable(this);
+  late final $UserPreferencesTableTable userPreferencesTable =
+      $UserPreferencesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2403,7 +2568,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         plannedWorkoutExercises,
         muscleGroups,
         exerciseMuscles,
-        plannedSets
+        plannedSets,
+        userPreferencesTable
       ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
@@ -6067,6 +6233,154 @@ typedef $$PlannedSetsTableProcessedTableManager = ProcessedTableManager<
     (PlannedSet, $$PlannedSetsTableReferences),
     PlannedSet,
     PrefetchHooks Function({bool workoutExerciseId})>;
+typedef $$UserPreferencesTableTableCreateCompanionBuilder
+    = UserPreferencesTableCompanion Function({
+  required String userId,
+  required bool isDarkMode,
+  required bool isMetric,
+  Value<int> rowid,
+});
+typedef $$UserPreferencesTableTableUpdateCompanionBuilder
+    = UserPreferencesTableCompanion Function({
+  Value<String> userId,
+  Value<bool> isDarkMode,
+  Value<bool> isMetric,
+  Value<int> rowid,
+});
+
+class $$UserPreferencesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTableTable> {
+  $$UserPreferencesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDarkMode => $composableBuilder(
+      column: $table.isDarkMode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isMetric => $composableBuilder(
+      column: $table.isMetric, builder: (column) => ColumnFilters(column));
+}
+
+class $$UserPreferencesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTableTable> {
+  $$UserPreferencesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isDarkMode => $composableBuilder(
+      column: $table.isDarkMode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isMetric => $composableBuilder(
+      column: $table.isMetric, builder: (column) => ColumnOrderings(column));
+}
+
+class $$UserPreferencesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserPreferencesTableTable> {
+  $$UserPreferencesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDarkMode => $composableBuilder(
+      column: $table.isDarkMode, builder: (column) => column);
+
+  GeneratedColumn<bool> get isMetric =>
+      $composableBuilder(column: $table.isMetric, builder: (column) => column);
+}
+
+class $$UserPreferencesTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $UserPreferencesTableTable,
+    UserPreferences,
+    $$UserPreferencesTableTableFilterComposer,
+    $$UserPreferencesTableTableOrderingComposer,
+    $$UserPreferencesTableTableAnnotationComposer,
+    $$UserPreferencesTableTableCreateCompanionBuilder,
+    $$UserPreferencesTableTableUpdateCompanionBuilder,
+    (
+      UserPreferences,
+      BaseReferences<_$AppDatabase, $UserPreferencesTableTable, UserPreferences>
+    ),
+    UserPreferences,
+    PrefetchHooks Function()> {
+  $$UserPreferencesTableTableTableManager(
+      _$AppDatabase db, $UserPreferencesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserPreferencesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserPreferencesTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserPreferencesTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> userId = const Value.absent(),
+            Value<bool> isDarkMode = const Value.absent(),
+            Value<bool> isMetric = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UserPreferencesTableCompanion(
+            userId: userId,
+            isDarkMode: isDarkMode,
+            isMetric: isMetric,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String userId,
+            required bool isDarkMode,
+            required bool isMetric,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UserPreferencesTableCompanion.insert(
+            userId: userId,
+            isDarkMode: isDarkMode,
+            isMetric: isMetric,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$UserPreferencesTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $UserPreferencesTableTable,
+        UserPreferences,
+        $$UserPreferencesTableTableFilterComposer,
+        $$UserPreferencesTableTableOrderingComposer,
+        $$UserPreferencesTableTableAnnotationComposer,
+        $$UserPreferencesTableTableCreateCompanionBuilder,
+        $$UserPreferencesTableTableUpdateCompanionBuilder,
+        (
+          UserPreferences,
+          BaseReferences<_$AppDatabase, $UserPreferencesTableTable,
+              UserPreferences>
+        ),
+        UserPreferences,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6093,4 +6407,6 @@ class $AppDatabaseManager {
       $$ExerciseMusclesTableTableManager(_db, _db.exerciseMuscles);
   $$PlannedSetsTableTableManager get plannedSets =>
       $$PlannedSetsTableTableManager(_db, _db.plannedSets);
+  $$UserPreferencesTableTableTableManager get userPreferencesTable =>
+      $$UserPreferencesTableTableTableManager(_db, _db.userPreferencesTable);
 }

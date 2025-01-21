@@ -7,8 +7,10 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/drift_exercise_repository.dart';
+import 'package:gym_app/data/repositories/drift_preferences_repository.dart';
 import 'package:gym_app/data/repositories/drift_workout_repository.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/screens/add_exercise_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
@@ -52,22 +54,36 @@ class ThemeNotifier extends ChangeNotifier {
   );
 
   ThemeData _currentTheme;
+
   bool _isLightTheme() => _currentTheme == lightTheme;
   bool isLightTheme() => _isLightTheme();
+
   ThemeNotifier()
-      : _currentTheme = ThemeMode.system != ThemeMode.light
+      : _currentTheme = ThemeMode.system == ThemeMode.light
             ? FlexThemeData.light(
                 scheme: FlexScheme.vesuviusBurn,
                 surfaceTint: Colors.transparent)
             : FlexThemeData.dark(
-                scheme: FlexScheme.greyLaw,
+                scheme: FlexScheme.vesuviusBurn,
+                surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
                 darkIsTrueBlack: false,
-              );
+                blendLevel: 20,
+                tones: const FlexTones.light(),
+                subThemesData: const FlexSubThemesData(
+                  defaultRadius: 8.0,
+                ));
 
   ThemeData get currentTheme => _currentTheme;
   void toggleTheme() {
-    _currentTheme = (_currentTheme == lightTheme) ? darkTheme : lightTheme;
+    _currentTheme = _isLightTheme() ? darkTheme : lightTheme;
     notifyListeners();
+  }
+
+  void changeUserTheme(bool userHasDarkTheme) {
+    if ((userHasDarkTheme && _isLightTheme()) ||
+        (!userHasDarkTheme && !_isLightTheme())) {
+      toggleTheme();
+    }
   }
 }
 
@@ -139,6 +155,9 @@ void setUp() {
       DriftExerciseRepository(db: getIt.get<AppDatabase>()));
   getIt.registerSingleton<LocalWorkoutRepository>(
       DriftWorkoutRepository(db: getIt.get<AppDatabase>()));
+  getIt.registerSingleton<LocalPreferencesRepository>(
+    DriftPreferencesRepository(db: getIt.get<AppDatabase>()),
+  );
   setUpEnded = true;
 }
 
