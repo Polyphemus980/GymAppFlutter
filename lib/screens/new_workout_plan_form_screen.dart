@@ -129,7 +129,10 @@ class WorkoutPlanForm extends HookWidget {
               width: double.infinity,
               height: 75,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.navigate_next),
+                icon: Icon(
+                  Icons.navigate_next,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
                 onPressed: () {
                   if (formKey.value.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -138,17 +141,18 @@ class WorkoutPlanForm extends HookWidget {
                               'Configured workout plan: ${nameController.text}')),
                     );
                     context.push('/plan/create', extra: {
-                      'name': nameController.text,
-                      'description': descriptionController.text,
+                      'name': nameController.text.trim(),
+                      'description': descriptionController.text.trim(),
                       'days': daysValue.value!,
                       'weeks': weeksValue.value!
                     });
                   }
                 },
-                label: const Text("Submit"),
+                label: Text("Submit",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary)),
                 style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer),
+                    backgroundColor: Theme.of(context).colorScheme.secondary),
               ),
             )
           ]),

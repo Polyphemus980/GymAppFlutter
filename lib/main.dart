@@ -15,10 +15,12 @@ import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/empty_workout_screen.dart';
 import 'package:gym_app/screens/exercise_list_screen.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
+import 'package:gym_app/screens/login_screen.dart';
 import 'package:gym_app/screens/new_workout_plan_form_screen.dart';
 import 'package:gym_app/screens/new_workout_plan_screen.dart';
 import 'package:gym_app/screens/profile_screen.dart';
 import 'package:gym_app/screens/select_exercise_screen.dart';
+import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:gym_app/screens/workout_plan_display_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
 import 'package:gym_app/workout_bloc.dart';
@@ -27,6 +29,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth_bloc.dart';
 import 'data/app_database.dart';
 import 'data/models/muscle_group.dart';
 import 'data/models/set_data.dart';
@@ -153,7 +156,10 @@ class GlobalProviders extends StatelessWidget {
             create: (BuildContext context) => WorkoutBloc()),
         ChangeNotifierProvider<TimerNotifier>(
           create: (_) => TimerNotifier(),
-        )
+        ),
+        BlocProvider<AuthBloc>(
+            create: (BuildContext context) =>
+                AuthBloc(supabaseClient: Supabase.instance.client.auth))
       ],
       child: const MyApp(),
     );
@@ -192,6 +198,17 @@ class MyApp extends StatelessWidget {
 
 final _router = GoRouter(
     redirect: (context, state) {
+      final authState = context.read<AuthBloc>().state;
+      final publicRoutes = ['/login', '/signup'];
+      if (authState is! Authenticated &&
+          !publicRoutes.contains(state.matchedLocation)) {
+        return '/login';
+      }
+
+      if (authState is Authenticated &&
+          publicRoutes.contains(state.matchedLocation)) {
+        return '/home';
+      }
       return null;
     },
     initialLocation: '/home',
@@ -277,6 +294,14 @@ final _router = GoRouter(
                     })
               ]),
         ],
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
           path: '/new',

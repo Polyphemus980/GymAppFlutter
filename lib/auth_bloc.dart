@@ -15,6 +15,8 @@ class Authenticated extends AuthenticationState {
   Authenticated({required this.user});
 }
 
+class AuthEmailConfirmationRequired extends AuthenticationState {}
+
 class AuthError extends AuthenticationState {
   final String error;
 
@@ -27,6 +29,13 @@ class SignInRequested extends AuthEvent {
   final String email;
   final String password;
   SignInRequested({required this.email, required this.password});
+}
+
+class SignUpRequested extends AuthEvent {
+  final String email;
+  final String password;
+
+  SignUpRequested({required this.email, required this.password});
 }
 
 class SignOutRequested extends AuthEvent {}
@@ -44,11 +53,12 @@ class _AuthStateErrorEvent extends AuthEvent {
 }
 
 class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
-  final SupabaseClient supabaseClient;
+  final GoTrueClient supabaseClient;
   StreamSubscription<AuthState>? _authStateSubscription;
 
   AuthBloc({required this.supabaseClient}) : super(AuthSignedOut()) {
     _handleAuthStateChanges();
+    on<SignUpRequested>(_handleSignUp);
     on<SignInRequested>(_handleSignIn);
     on<SignOutRequested>(_handleSignOut);
     on<_AuthStateChanged>(_handleAuthStateChanged);
@@ -56,14 +66,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
   }
 
   void _handleAuthStateChanges() {
-    _authStateSubscription = supabaseClient.auth.onAuthStateChange.listen(
+    _authStateSubscription = supabaseClient.onAuthStateChange.listen(
       (data) {
-        if (data.event == AuthChangeEvent.signedIn && data.session != null) {
+        if (data.event == AuthChangeEvent.initialSession) {
+          if (data.session != null) {
+            add(_AuthStateChanged(user: data.session!.user));
+          } else {
+            add(_AuthStateChanged(user: null));
+          }
+        } else if (data.event == AuthChangeEvent.signedIn &&
+            data.session != null) {
           add(_AuthStateChanged(user: data.session!.user));
         } else if (data.event == AuthChangeEvent.signedOut) {
           add(_AuthStateChanged(user: null));
         } else {
-          add(_AuthStateErrorEvent(error: "Unexpected authentication state"));
+          add(_AuthStateErrorEvent(error: data.event.name));
         }
       },
       onError: (error) {
@@ -72,16 +89,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     );
   }
 
+  _handleSignUp(
+      SignUpRequested event, Emitter<AuthenticationState> emit) async {
+    emit(AuthLoading());
+    try {
+      final response = await supabaseClient.signUp(
+          password: event.password, email: event.email);
+      if (response.user != null && response.session == null) {
+        emit(AuthEmailConfirmationRequired());
+      }
+    } on AuthException catch (e) {
+      emit(AuthError(error: e.message));
+    }
+  }
+
   _handleSignIn(
       SignInRequested event, Emitter<AuthenticationState> emit) async {
     emit(AuthLoading());
     if (state is Authenticated) {
-      emit(state); // No need to perform additional work
+      emit(state);
       return;
     }
     try {
-      await supabaseClient.auth
-          .signInWithPassword(password: event.password, email: event.email);
+      await supabaseClient.signInWithPassword(
+          password: event.password, email: event.email);
     } on AuthException catch (e) {
       emit(AuthError(error: e.message));
     }
@@ -90,12 +121,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
   _handleSignOut(
       SignOutRequested event, Emitter<AuthenticationState> emit) async {
     if (state is AuthSignedOut) {
-      emit(state); // No need to perform additional work
+      emit(state);
       return;
     }
     emit(AuthLoading());
     try {
-      await supabaseClient.auth.signOut();
+      await supabaseClient.signOut();
     } on AuthException catch (e) {
       emit(AuthError(error: e.message));
     }

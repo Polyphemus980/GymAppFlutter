@@ -55,6 +55,7 @@ class AppTextFormField extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final String? errorText;
+  final bool obscureText;
   final TextStyle? errorStyle;
   final String? Function(String?)? validator;
   final void Function()? onEditingComplete;
@@ -71,7 +72,8 @@ class AppTextFormField extends StatelessWidget {
       this.onChanged,
       this.onEditingComplete,
       this.errorText,
-      this.validator});
+      this.validator,
+      this.obscureText = false});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +88,8 @@ class AppTextFormField extends StatelessWidget {
         style: Theme.of(context).textTheme.titleMedium,
         keyboardType: TextInputType.number,
         onChanged: onChanged,
-        maxLines: null,
+        obscureText: obscureText,
+        maxLines: obscureText ? 1 : null,
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,
