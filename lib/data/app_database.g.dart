@@ -33,6 +33,20 @@ class $WorkoutPlansTable extends WorkoutPlans
           ),
           type: DriftSqlType.string,
           requiredDuringInsert: true);
+  static const VerificationMeta _numWeeksMeta =
+      const VerificationMeta('numWeeks');
+  @override
+  late final GeneratedColumn<int> numWeeks = GeneratedColumn<int>(
+      'num_weeks', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _daysPerWeekMeta =
+      const VerificationMeta('daysPerWeek');
+  @override
+  late final GeneratedColumn<int> daysPerWeek = GeneratedColumn<int>(
+      'days_per_week', aliasedName, false,
+      check: () => ComparableExpr(daysPerWeek).isBiggerOrEqualValue(0),
+      type: DriftSqlType.int,
+      requiredDuringInsert: true);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -49,7 +63,7 @@ class $WorkoutPlansTable extends WorkoutPlans
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, description, name, createdAt, updatedAt];
+      [id, description, name, numWeeks, daysPerWeek, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -77,6 +91,20 @@ class $WorkoutPlansTable extends WorkoutPlans
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('num_weeks')) {
+      context.handle(_numWeeksMeta,
+          numWeeks.isAcceptableOrUnknown(data['num_weeks']!, _numWeeksMeta));
+    } else if (isInserting) {
+      context.missing(_numWeeksMeta);
+    }
+    if (data.containsKey('days_per_week')) {
+      context.handle(
+          _daysPerWeekMeta,
+          daysPerWeek.isAcceptableOrUnknown(
+              data['days_per_week']!, _daysPerWeekMeta));
+    } else if (isInserting) {
+      context.missing(_daysPerWeekMeta);
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -94,6 +122,10 @@ class $WorkoutPlansTable extends WorkoutPlans
   WorkoutPlan map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return WorkoutPlan(
+      numWeeks: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}num_weeks'])!,
+      daysPerWeek: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}days_per_week'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       description: attachedDatabase.typeMapping
@@ -117,12 +149,16 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   final Value<int> id;
   final Value<String> description;
   final Value<String> name;
+  final Value<int> numWeeks;
+  final Value<int> daysPerWeek;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const WorkoutPlansCompanion({
     this.id = const Value.absent(),
     this.description = const Value.absent(),
     this.name = const Value.absent(),
+    this.numWeeks = const Value.absent(),
+    this.daysPerWeek = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -130,14 +166,20 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     this.id = const Value.absent(),
     required String description,
     required String name,
+    required int numWeeks,
+    required int daysPerWeek,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   })  : description = Value(description),
-        name = Value(name);
+        name = Value(name),
+        numWeeks = Value(numWeeks),
+        daysPerWeek = Value(daysPerWeek);
   static Insertable<WorkoutPlan> custom({
     Expression<int>? id,
     Expression<String>? description,
     Expression<String>? name,
+    Expression<int>? numWeeks,
+    Expression<int>? daysPerWeek,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -145,6 +187,8 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
       if (id != null) 'id': id,
       if (description != null) 'description': description,
       if (name != null) 'name': name,
+      if (numWeeks != null) 'num_weeks': numWeeks,
+      if (daysPerWeek != null) 'days_per_week': daysPerWeek,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -154,12 +198,16 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
       {Value<int>? id,
       Value<String>? description,
       Value<String>? name,
+      Value<int>? numWeeks,
+      Value<int>? daysPerWeek,
       Value<DateTime>? createdAt,
       Value<DateTime?>? updatedAt}) {
     return WorkoutPlansCompanion(
       id: id ?? this.id,
       description: description ?? this.description,
       name: name ?? this.name,
+      numWeeks: numWeeks ?? this.numWeeks,
+      daysPerWeek: daysPerWeek ?? this.daysPerWeek,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -177,6 +225,12 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (numWeeks.present) {
+      map['num_weeks'] = Variable<int>(numWeeks.value);
+    }
+    if (daysPerWeek.present) {
+      map['days_per_week'] = Variable<int>(daysPerWeek.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -192,6 +246,8 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
           ..write('id: $id, ')
           ..write('description: $description, ')
           ..write('name: $name, ')
+          ..write('numWeeks: $numWeeks, ')
+          ..write('daysPerWeek: $daysPerWeek, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -233,8 +289,14 @@ class $PlannedWorkoutsTable extends PlannedWorkouts
       const VerificationMeta('dayNumber');
   @override
   late final GeneratedColumn<int> dayNumber = GeneratedColumn<int>(
-      'day_number', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      'day_number', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _weekNumberMeta =
+      const VerificationMeta('weekNumber');
+  @override
+  late final GeneratedColumn<int> weekNumber = GeneratedColumn<int>(
+      'week_number', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -261,6 +323,7 @@ class $PlannedWorkoutsTable extends PlannedWorkouts
         workoutPlanId,
         workoutName,
         dayNumber,
+        weekNumber,
         description,
         createdAt,
         updatedAt
@@ -295,6 +358,16 @@ class $PlannedWorkoutsTable extends PlannedWorkouts
     if (data.containsKey('day_number')) {
       context.handle(_dayNumberMeta,
           dayNumber.isAcceptableOrUnknown(data['day_number']!, _dayNumberMeta));
+    } else if (isInserting) {
+      context.missing(_dayNumberMeta);
+    }
+    if (data.containsKey('week_number')) {
+      context.handle(
+          _weekNumberMeta,
+          weekNumber.isAcceptableOrUnknown(
+              data['week_number']!, _weekNumberMeta));
+    } else if (isInserting) {
+      context.missing(_weekNumberMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -326,7 +399,9 @@ class $PlannedWorkoutsTable extends PlannedWorkouts
       workoutName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}workout_name']),
       dayNumber: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}day_number']),
+          .read(DriftSqlType.int, data['${effectivePrefix}day_number'])!,
+      weekNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}week_number'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       createdAt: attachedDatabase.typeMapping
@@ -346,7 +421,8 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
   final Value<int> id;
   final Value<int> workoutPlanId;
   final Value<String?> workoutName;
-  final Value<int?> dayNumber;
+  final Value<int> dayNumber;
+  final Value<int> weekNumber;
   final Value<String?> description;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -355,6 +431,7 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
     this.workoutPlanId = const Value.absent(),
     this.workoutName = const Value.absent(),
     this.dayNumber = const Value.absent(),
+    this.weekNumber = const Value.absent(),
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -363,16 +440,20 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
     this.id = const Value.absent(),
     required int workoutPlanId,
     this.workoutName = const Value.absent(),
-    this.dayNumber = const Value.absent(),
+    required int dayNumber,
+    required int weekNumber,
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : workoutPlanId = Value(workoutPlanId);
+  })  : workoutPlanId = Value(workoutPlanId),
+        dayNumber = Value(dayNumber),
+        weekNumber = Value(weekNumber);
   static Insertable<PlannedWorkout> custom({
     Expression<int>? id,
     Expression<int>? workoutPlanId,
     Expression<String>? workoutName,
     Expression<int>? dayNumber,
+    Expression<int>? weekNumber,
     Expression<String>? description,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -382,6 +463,7 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
       if (workoutPlanId != null) 'workout_plan_id': workoutPlanId,
       if (workoutName != null) 'workout_name': workoutName,
       if (dayNumber != null) 'day_number': dayNumber,
+      if (weekNumber != null) 'week_number': weekNumber,
       if (description != null) 'description': description,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -392,7 +474,8 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
       {Value<int>? id,
       Value<int>? workoutPlanId,
       Value<String?>? workoutName,
-      Value<int?>? dayNumber,
+      Value<int>? dayNumber,
+      Value<int>? weekNumber,
       Value<String?>? description,
       Value<DateTime>? createdAt,
       Value<DateTime?>? updatedAt}) {
@@ -401,6 +484,7 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
       workoutPlanId: workoutPlanId ?? this.workoutPlanId,
       workoutName: workoutName ?? this.workoutName,
       dayNumber: dayNumber ?? this.dayNumber,
+      weekNumber: weekNumber ?? this.weekNumber,
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -422,6 +506,9 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
     if (dayNumber.present) {
       map['day_number'] = Variable<int>(dayNumber.value);
     }
+    if (weekNumber.present) {
+      map['week_number'] = Variable<int>(weekNumber.value);
+    }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
@@ -441,6 +528,7 @@ class PlannedWorkoutsCompanion extends UpdateCompanion<PlannedWorkout> {
           ..write('workoutPlanId: $workoutPlanId, ')
           ..write('workoutName: $workoutName, ')
           ..write('dayNumber: $dayNumber, ')
+          ..write('weekNumber: $weekNumber, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -2343,6 +2431,8 @@ typedef $$WorkoutPlansTableCreateCompanionBuilder = WorkoutPlansCompanion
   Value<int> id,
   required String description,
   required String name,
+  required int numWeeks,
+  required int daysPerWeek,
   Value<DateTime> createdAt,
   Value<DateTime?> updatedAt,
 });
@@ -2351,6 +2441,8 @@ typedef $$WorkoutPlansTableUpdateCompanionBuilder = WorkoutPlansCompanion
   Value<int> id,
   Value<String> description,
   Value<String> name,
+  Value<int> numWeeks,
+  Value<int> daysPerWeek,
   Value<DateTime> createdAt,
   Value<DateTime?> updatedAt,
 });
@@ -2394,6 +2486,12 @@ class $$WorkoutPlansTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get numWeeks => $composableBuilder(
+      column: $table.numWeeks, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get daysPerWeek => $composableBuilder(
+      column: $table.daysPerWeek, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -2441,6 +2539,12 @@ class $$WorkoutPlansTableOrderingComposer
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get numWeeks => $composableBuilder(
+      column: $table.numWeeks, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get daysPerWeek => $composableBuilder(
+      column: $table.daysPerWeek, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -2465,6 +2569,12 @@ class $$WorkoutPlansTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get numWeeks =>
+      $composableBuilder(column: $table.numWeeks, builder: (column) => column);
+
+  GeneratedColumn<int> get daysPerWeek => $composableBuilder(
+      column: $table.daysPerWeek, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -2520,6 +2630,8 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> description = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<int> numWeeks = const Value.absent(),
+            Value<int> daysPerWeek = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime?> updatedAt = const Value.absent(),
           }) =>
@@ -2527,6 +2639,8 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
             id: id,
             description: description,
             name: name,
+            numWeeks: numWeeks,
+            daysPerWeek: daysPerWeek,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
@@ -2534,6 +2648,8 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required String description,
             required String name,
+            required int numWeeks,
+            required int daysPerWeek,
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime?> updatedAt = const Value.absent(),
           }) =>
@@ -2541,6 +2657,8 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
             id: id,
             description: description,
             name: name,
+            numWeeks: numWeeks,
+            daysPerWeek: daysPerWeek,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
@@ -2595,7 +2713,8 @@ typedef $$PlannedWorkoutsTableCreateCompanionBuilder = PlannedWorkoutsCompanion
   Value<int> id,
   required int workoutPlanId,
   Value<String?> workoutName,
-  Value<int?> dayNumber,
+  required int dayNumber,
+  required int weekNumber,
   Value<String?> description,
   Value<DateTime> createdAt,
   Value<DateTime?> updatedAt,
@@ -2605,7 +2724,8 @@ typedef $$PlannedWorkoutsTableUpdateCompanionBuilder = PlannedWorkoutsCompanion
   Value<int> id,
   Value<int> workoutPlanId,
   Value<String?> workoutName,
-  Value<int?> dayNumber,
+  Value<int> dayNumber,
+  Value<int> weekNumber,
   Value<String?> description,
   Value<DateTime> createdAt,
   Value<DateTime?> updatedAt,
@@ -2683,6 +2803,9 @@ class $$PlannedWorkoutsTableFilterComposer
 
   ColumnFilters<int> get dayNumber => $composableBuilder(
       column: $table.dayNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get weekNumber => $composableBuilder(
+      column: $table.weekNumber, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
@@ -2776,6 +2899,9 @@ class $$PlannedWorkoutsTableOrderingComposer
   ColumnOrderings<int> get dayNumber => $composableBuilder(
       column: $table.dayNumber, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get weekNumber => $composableBuilder(
+      column: $table.weekNumber, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
@@ -2823,6 +2949,9 @@ class $$PlannedWorkoutsTableAnnotationComposer
 
   GeneratedColumn<int> get dayNumber =>
       $composableBuilder(column: $table.dayNumber, builder: (column) => column);
+
+  GeneratedColumn<int> get weekNumber => $composableBuilder(
+      column: $table.weekNumber, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
@@ -2929,7 +3058,8 @@ class $$PlannedWorkoutsTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<int> workoutPlanId = const Value.absent(),
             Value<String?> workoutName = const Value.absent(),
-            Value<int?> dayNumber = const Value.absent(),
+            Value<int> dayNumber = const Value.absent(),
+            Value<int> weekNumber = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime?> updatedAt = const Value.absent(),
@@ -2939,6 +3069,7 @@ class $$PlannedWorkoutsTableTableManager extends RootTableManager<
             workoutPlanId: workoutPlanId,
             workoutName: workoutName,
             dayNumber: dayNumber,
+            weekNumber: weekNumber,
             description: description,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -2947,7 +3078,8 @@ class $$PlannedWorkoutsTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required int workoutPlanId,
             Value<String?> workoutName = const Value.absent(),
-            Value<int?> dayNumber = const Value.absent(),
+            required int dayNumber,
+            required int weekNumber,
             Value<String?> description = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime?> updatedAt = const Value.absent(),
@@ -2957,6 +3089,7 @@ class $$PlannedWorkoutsTableTableManager extends RootTableManager<
             workoutPlanId: workoutPlanId,
             workoutName: workoutName,
             dayNumber: dayNumber,
+            weekNumber: weekNumber,
             description: description,
             createdAt: createdAt,
             updatedAt: updatedAt,

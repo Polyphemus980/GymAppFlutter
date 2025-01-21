@@ -55,6 +55,7 @@ class AppTextFormField extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final String? errorText;
+  final bool obscureText;
   final TextStyle? errorStyle;
   final String? Function(String?)? validator;
   final void Function()? onEditingComplete;
@@ -71,7 +72,8 @@ class AppTextFormField extends StatelessWidget {
       this.onChanged,
       this.onEditingComplete,
       this.errorText,
-      this.validator});
+      this.validator,
+      this.obscureText = false});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +88,8 @@ class AppTextFormField extends StatelessWidget {
         style: Theme.of(context).textTheme.titleMedium,
         keyboardType: TextInputType.number,
         onChanged: onChanged,
-        maxLines: null,
+        obscureText: obscureText,
+        maxLines: obscureText ? 1 : null,
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,
@@ -130,26 +133,24 @@ class AppInkWellButton extends StatelessWidget {
   final double? height;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
+    return Material(
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
         width: width,
         height: height,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+        child: InkWell(
+          onTap: onTap,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
             ),
           ),
