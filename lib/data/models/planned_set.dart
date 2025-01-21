@@ -3,6 +3,7 @@ import 'package:gym_app/data/models/planned_workout_exercise.dart';
 
 class PlannedSet {
   PlannedSet({
+    required this.userId,
     required this.rpe,
     required this.id,
     required this.workoutExerciseId,
@@ -11,6 +12,7 @@ class PlannedSet {
     required this.maxRepetitions,
   });
   final int id;
+  final String userId;
   final int workoutExerciseId;
   final int setNumber;
   final int minRepetitions;
@@ -21,6 +23,7 @@ class PlannedSet {
 @UseRowClass(PlannedSet)
 class PlannedSets extends Table {
   IntColumn get id => integer().autoIncrement()();
+  TextColumn get userId => text()();
   IntColumn get workoutExerciseId =>
       integer().references(PlannedWorkoutExercises, #id)();
   IntColumn get setNumber => integer()();

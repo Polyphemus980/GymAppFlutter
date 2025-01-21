@@ -4,6 +4,8 @@ import 'package:gym_app/data/models/workout_plan.dart';
 
 class PlannedWorkout {
   final int id;
+  final String userId;
+
   final int workoutPlanId;
   final String? workoutName;
   final int dayNumber;
@@ -15,6 +17,7 @@ class PlannedWorkout {
   List<PlannedWorkoutExercise>? exercises;
 
   PlannedWorkout({
+    required this.userId,
     required this.id,
     required this.workoutPlanId,
     this.workoutName,
@@ -30,6 +33,7 @@ class PlannedWorkout {
 @UseRowClass(PlannedWorkout)
 class PlannedWorkouts extends Table {
   IntColumn get id => integer().autoIncrement()();
+  TextColumn get userId => text()();
   IntColumn get workoutPlanId => integer().references(WorkoutPlans, #id)();
   TextColumn get workoutName => text().nullable()();
   IntColumn get dayNumber => integer()();

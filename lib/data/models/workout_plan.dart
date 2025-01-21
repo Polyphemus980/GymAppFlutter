@@ -5,12 +5,14 @@ class WorkoutPlan {
   WorkoutPlan(
       {required this.numWeeks,
       required this.daysPerWeek,
+      required this.userId,
       required this.id,
       required this.description,
       required this.name,
       required this.createdAt,
       this.updatedAt});
   final int id;
+  final String userId;
   final String name;
   final String description;
   final int numWeeks;
@@ -24,6 +26,7 @@ class WorkoutPlan {
 @UseRowClass(WorkoutPlan)
 class WorkoutPlans extends Table {
   IntColumn get id => integer().autoIncrement()();
+  TextColumn get userId => text()();
   TextColumn get description => text()();
   TextColumn get name => text().withLength(min: 1)();
   IntColumn get numWeeks => integer()();

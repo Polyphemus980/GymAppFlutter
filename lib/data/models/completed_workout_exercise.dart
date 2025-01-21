@@ -6,6 +6,7 @@ import 'completed_set.dart';
 
 class CompletedWorkoutExercise {
   final int id;
+  final String userId;
   final int workoutId;
   final int exerciseId;
   final int exerciseOrder;
@@ -17,6 +18,7 @@ class CompletedWorkoutExercise {
 
   CompletedWorkoutExercise({
     required this.id,
+    required this.userId,
     required this.workoutId,
     required this.exerciseId,
     required this.exerciseOrder,
@@ -32,6 +34,7 @@ class CompletedWorkoutExercise {
 @UseRowClass(CompletedWorkoutExercise)
 class CompletedWorkoutExercises extends Table {
   IntColumn get id => integer().autoIncrement()();
+  TextColumn get userId => text()();
   IntColumn get workoutId => integer().references(CompletedWorkouts, #id)();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
   IntColumn get exerciseOrder =>
