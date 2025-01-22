@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/auth_extensions.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';

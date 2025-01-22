@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
 import 'package:gym_app/data/repositories/local_preferences_repository.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
 import '../get_it_dependency_injection.dart';
@@ -39,6 +40,9 @@ class LoginScreen extends StatelessWidget {
           } else {
             preferencesRepository.insertUserPreferences(userId: state.user.id);
           }
+          await getIt
+              .get<OfflineUserDataSingleton>()
+              .addUserIdToStorage(state.user.id);
           context.go('/home');
         }
       },

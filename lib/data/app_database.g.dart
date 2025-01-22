@@ -3068,6 +3068,106 @@ class UserWorkoutPlansTableCompanion
   }
 }
 
+class $OfflineUserDataTableTable extends OfflineUserDataTable
+    with TableInfo<$OfflineUserDataTableTable, OfflineUserData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflineUserDataTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [userId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_user_data_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<OfflineUserData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  OfflineUserData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflineUserData(
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+    );
+  }
+
+  @override
+  $OfflineUserDataTableTable createAlias(String alias) {
+    return $OfflineUserDataTableTable(attachedDatabase, alias);
+  }
+}
+
+class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
+  final Value<String> userId;
+  final Value<int> rowid;
+  const OfflineUserDataTableCompanion({
+    this.userId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflineUserDataTableCompanion.insert({
+    required String userId,
+    this.rowid = const Value.absent(),
+  }) : userId = Value(userId);
+  static Insertable<OfflineUserData> custom({
+    Expression<String>? userId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflineUserDataTableCompanion copyWith(
+      {Value<String>? userId, Value<int>? rowid}) {
+    return OfflineUserDataTableCompanion(
+      userId: userId ?? this.userId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineUserDataTableCompanion(')
+          ..write('userId: $userId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3090,6 +3190,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $UserPreferencesTableTable(this);
   late final $UserWorkoutPlansTableTable userWorkoutPlansTable =
       $UserWorkoutPlansTableTable(this);
+  late final $OfflineUserDataTableTable offlineUserDataTable =
+      $OfflineUserDataTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3106,7 +3208,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         exerciseMuscles,
         plannedSets,
         userPreferencesTable,
-        userWorkoutPlansTable
+        userWorkoutPlansTable,
+        offlineUserDataTable
       ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
@@ -7423,6 +7526,124 @@ typedef $$UserWorkoutPlansTableTableProcessedTableManager
         (UserWorkoutPlansTableData, $$UserWorkoutPlansTableTableReferences),
         UserWorkoutPlansTableData,
         PrefetchHooks Function({bool workoutPlanId})>;
+typedef $$OfflineUserDataTableTableCreateCompanionBuilder
+    = OfflineUserDataTableCompanion Function({
+  required String userId,
+  Value<int> rowid,
+});
+typedef $$OfflineUserDataTableTableUpdateCompanionBuilder
+    = OfflineUserDataTableCompanion Function({
+  Value<String> userId,
+  Value<int> rowid,
+});
+
+class $$OfflineUserDataTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineUserDataTableTable> {
+  $$OfflineUserDataTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+}
+
+class $$OfflineUserDataTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineUserDataTableTable> {
+  $$OfflineUserDataTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+}
+
+class $$OfflineUserDataTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineUserDataTableTable> {
+  $$OfflineUserDataTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+}
+
+class $$OfflineUserDataTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $OfflineUserDataTableTable,
+    OfflineUserData,
+    $$OfflineUserDataTableTableFilterComposer,
+    $$OfflineUserDataTableTableOrderingComposer,
+    $$OfflineUserDataTableTableAnnotationComposer,
+    $$OfflineUserDataTableTableCreateCompanionBuilder,
+    $$OfflineUserDataTableTableUpdateCompanionBuilder,
+    (
+      OfflineUserData,
+      BaseReferences<_$AppDatabase, $OfflineUserDataTableTable, OfflineUserData>
+    ),
+    OfflineUserData,
+    PrefetchHooks Function()> {
+  $$OfflineUserDataTableTableTableManager(
+      _$AppDatabase db, $OfflineUserDataTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflineUserDataTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OfflineUserDataTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OfflineUserDataTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> userId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OfflineUserDataTableCompanion(
+            userId: userId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String userId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OfflineUserDataTableCompanion.insert(
+            userId: userId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$OfflineUserDataTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $OfflineUserDataTableTable,
+        OfflineUserData,
+        $$OfflineUserDataTableTableFilterComposer,
+        $$OfflineUserDataTableTableOrderingComposer,
+        $$OfflineUserDataTableTableAnnotationComposer,
+        $$OfflineUserDataTableTableCreateCompanionBuilder,
+        $$OfflineUserDataTableTableUpdateCompanionBuilder,
+        (
+          OfflineUserData,
+          BaseReferences<_$AppDatabase, $OfflineUserDataTableTable,
+              OfflineUserData>
+        ),
+        OfflineUserData,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7453,4 +7674,6 @@ class $AppDatabaseManager {
       $$UserPreferencesTableTableTableManager(_db, _db.userPreferencesTable);
   $$UserWorkoutPlansTableTableTableManager get userWorkoutPlansTable =>
       $$UserWorkoutPlansTableTableTableManager(_db, _db.userWorkoutPlansTable);
+  $$OfflineUserDataTableTableTableManager get offlineUserDataTable =>
+      $$OfflineUserDataTableTableTableManager(_db, _db.offlineUserDataTable);
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:provider/provider.dart';
@@ -26,20 +28,30 @@ import 'timer_notifier.dart';
 import 'widgets/bottom_nav_bar.dart';
 
 final router = GoRouter(
-    redirect: (context, state) {
-      final authState = context.read<AuthBloc>().state;
-      final publicRoutes = [
-        '/login',
-        '/signup',
-      ];
-      if (authState is! Authenticated &&
-          !publicRoutes.contains(state.matchedLocation)) {
-        return '/login';
+    redirect: (context, state) async {
+      print(context.isOnline);
+      if (!getIt.get<OfflineUserDataSingleton>().hasLoaded) {
+        Future.delayed(Duration(seconds: 2));
       }
+      print(getIt.get<OfflineUserDataSingleton>().hasUser);
+      if (context.isOnline ||
+          (!context.isOnline &&
+              !getIt.get<OfflineUserDataSingleton>().hasUser)) {
+        final authState = context.read<AuthBloc>().state;
+        final publicRoutes = [
+          '/login',
+          '/signup',
+        ];
+        if (authState is! Authenticated &&
+            !publicRoutes.contains(state.matchedLocation)) {
+          return '/login';
+        }
 
-      if (authState is Authenticated &&
-          publicRoutes.contains(state.matchedLocation)) {
-        return '/home';
+        if (authState is Authenticated &&
+            publicRoutes.contains(state.matchedLocation)) {
+          return '/home';
+        }
+        return null;
       }
       return null;
     },

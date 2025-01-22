@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/get_it_dependency_injection.dart';
+import 'package:gym_app/network_connectivity_notifier.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:provider/provider.dart';
 
 import '../timer_notifier.dart';
@@ -26,8 +29,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
               onPressed: () {
                 context.go('/start');
               },
-              label:
-                  Text('${Provider.of<TimerNotifier>(context).elapsedSeconds}'),
+              label: Text(
+                  '${Provider.of<TimerNotifier>(context).elapsedSeconds} + ${getIt.get<OfflineUserDataSingleton>().hasUser}+ ${context.watch<NetworkConnectivityNotifier>().isOnline}'),
               icon: const Icon(Icons.fitness_center),
             );
           } else {

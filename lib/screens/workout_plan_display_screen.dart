@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:gym_app/auth_extensions.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';

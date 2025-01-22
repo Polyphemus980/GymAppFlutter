@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 
 import 'data/app_database.dart';
 import 'data/repositories/drift_exercise_repository.dart';
@@ -10,7 +11,7 @@ import 'data/repositories/local_workout_repository.dart';
 
 bool setUpEnded = false;
 final getIt = GetIt.instance;
-void setUp() {
+Future<void> setUp() async {
   if (setUpEnded) {
     return;
   }
@@ -23,5 +24,8 @@ void setUp() {
   getIt.registerSingleton<LocalPreferencesRepository>(
     DriftPreferencesRepository(db: getIt.get<AppDatabase>()),
   );
+  getIt.registerSingleton<OfflineUserDataSingleton>(
+      OfflineUserDataSingleton(db: getIt.get<AppDatabase>()));
+  await getIt.get<OfflineUserDataSingleton>().initialize();
   setUpEnded = true;
 }

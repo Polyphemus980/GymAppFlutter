@@ -17,9 +17,11 @@ void main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZha2Fsd2h6cW1zcWpocnR1dWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczNzAxMTksImV4cCI6MjA1Mjk0NjExOX0.RKjia0O4ypmgEZKWkhgIEcjFiwgQBt3cujmYotG2lhA',
   );
+
   final storage = await HydratedStorage.build(
     storageDirectory: await getApplicationDocumentsDirectory(),
   );
+  await setUp();
   HydratedBloc.storage = storage;
   runApp(const GlobalProviders(
     child: MyApp(),
@@ -31,7 +33,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    setUp();
     final theme = context.watch<ThemeNotifier>().currentTheme;
     return MaterialApp.router(
       theme: theme,
