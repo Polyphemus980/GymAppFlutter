@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/auth_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/new_workout_plan_bloc.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
-import '../main.dart';
+import '../get_it_dependency_injection.dart';
 
 class NewWorkoutPlanScreen extends StatelessWidget {
   final int numWeeks;
@@ -139,9 +140,9 @@ class DaysPages extends HookWidget {
                                                 "Every training day must have at least 1 exercise")));
                                     return;
                                   }
-                                  context
-                                      .read<NewWorkoutPlanBloc>()
-                                      .add(FinishCreationEvent());
+                                  context.read<NewWorkoutPlanBloc>().add(
+                                      FinishCreationEvent(
+                                          userId: context.currentUserId));
                                 },
                                 height: 75,
                                 text: "Finish")),
@@ -200,7 +201,7 @@ class DayCard extends StatelessWidget {
               child: Text(
                 "No exercises added yet",
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
               ),
             ),

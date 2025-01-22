@@ -51,24 +51,31 @@ class WorkoutPlanDisplayScreen extends HookWidget {
                           .toList();
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ListView.builder(
-                          itemCount: workoutsWeek.length,
-                          itemBuilder: (context, workoutIndex) {
-                            return DayCard(
-                              interactable: false,
-                              index: workoutIndex,
-                              sets: workoutsWeek[workoutIndex]
-                                  .exercises!
-                                  .map((exercise) {
-                                return SetData(
-                                    exercise: exercise.exercise!,
-                                    sets: exercise.sets!.map((set) {
-                                      return WorkoutConfigSet.fromPlannedSet(
-                                          set);
-                                    }).toList());
-                              }).toList(),
-                            );
-                          },
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: workoutsWeek.length,
+                                itemBuilder: (context, workoutIndex) {
+                                  return DayCard(
+                                    interactable: false,
+                                    index: workoutIndex,
+                                    sets: workoutsWeek[workoutIndex]
+                                        .exercises!
+                                        .map((exercise) {
+                                      return SetData(
+                                          exercise: exercise.exercise!,
+                                          sets: exercise.sets!.map((set) {
+                                            return WorkoutConfigSet
+                                                .fromPlannedSet(set);
+                                          }).toList());
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                            ),
+                            AppInkWellButton(onTap: () {}, text: "Join program")
+                          ],
                         ),
                       );
                     },

@@ -20,14 +20,3 @@ extension AuthContext on BuildContext {
     return read<AuthBloc>().state is Authenticated;
   }
 }
-
-extension AuthBlocGetters on AuthBloc {
-  User? get currentUser {
-    final currentState = state;
-    return (currentState is Authenticated) ? currentState.user : null;
-  }
-
-  String? get userId => currentUser?.id;
-
-  bool get isAuthenticated => state is Authenticated;
-}

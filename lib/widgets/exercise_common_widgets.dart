@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
-import 'package:gym_app/main.dart';
 
 import '../exercise_bloc.dart';
+import '../get_it_dependency_injection.dart';
 
 class SearchAndFilterRow extends StatelessWidget {
   void _showCopyModal(BuildContext parentContext) {

@@ -12,7 +12,8 @@ import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../main.dart';
+import '../theme_notifier.dart';
+import '../timer_notifier.dart';
 
 class FocusWorkoutScreen extends HookWidget {
   const FocusWorkoutScreen({super.key, required this.sets});

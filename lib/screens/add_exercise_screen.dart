@@ -3,8 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
-import 'package:gym_app/main.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
+
+import '../get_it_dependency_injection.dart';
 
 class AddExerciseScreen extends HookWidget {
   const AddExerciseScreen({super.key});

@@ -149,7 +149,11 @@ class ChangedDayEvent extends NewWorkoutPlanEvent {
       {required this.sets, required this.weekIndex, required this.dayIndex});
 }
 
-class FinishCreationEvent extends NewWorkoutPlanEvent {}
+class FinishCreationEvent extends NewWorkoutPlanEvent {
+  final String userId;
+
+  FinishCreationEvent({required this.userId});
+}
 
 sealed class NewWorkoutPlanState {}
 
@@ -204,6 +208,7 @@ class NewWorkoutPlanBloc
     final currentState = state as InProgressState;
     final plan = currentState.plan;
     final workoutPlanDB = WorkoutPlansCompanion(
+        userId: Value(event.userId),
         description: Value(plan.description),
         name: Value(plan.name),
         numWeeks: Value(plan.numberOfWeeks),
@@ -213,6 +218,7 @@ class NewWorkoutPlanBloc
     for (var weekEntry in plan.weeks.asMap().entries) {
       for (var dayEntry in weekEntry.value.days.asMap().entries) {
         final workoutDB = PlannedWorkoutsCompanion(
+          userId: Value(event.userId),
           workoutPlanId: Value(insertedWorkoutPlan.id),
           dayNumber: Value(dayEntry.key),
           weekNumber: Value(weekEntry.key),
@@ -221,6 +227,7 @@ class NewWorkoutPlanBloc
             await workoutRepository.addPlannedWorkoutReturning(workoutDB);
         for (var setDataEntry in dayEntry.value.sets.asMap().entries) {
           final workoutExerciseDB = PlannedWorkoutExercisesCompanion(
+            userId: Value(event.userId),
             workoutId: Value(insertedWorkout.id),
             exerciseId: Value(setDataEntry.value.exercise.id),
             exerciseOrder: Value(setDataEntry.key),
@@ -229,6 +236,7 @@ class NewWorkoutPlanBloc
               .addPlannedWorkoutExerciseReturning(workoutExerciseDB);
           for (var setEntry in setDataEntry.value.sets.asMap().entries) {
             final setDB = PlannedSetsCompanion(
+              userId: Value(event.userId),
               workoutExerciseId: Value(insertedWorkoutExercise.id),
               setNumber: Value(setEntry.key),
               minRepetitions: Value(setEntry.value.minRepetitions!),

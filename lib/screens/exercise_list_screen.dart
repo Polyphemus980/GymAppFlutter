@@ -7,7 +7,8 @@ import 'package:gym_app/exercise_bloc.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/widgets/exercise_common_widgets.dart';
 
-import '../main.dart';
+import '../get_it_dependency_injection.dart';
+import '../theme_notifier.dart';
 
 class ExerciseListScreen extends StatelessWidget {
   const ExerciseListScreen({super.key});
