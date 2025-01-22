@@ -19,6 +19,7 @@ import 'screens/new_workout_plan_form_screen.dart';
 import 'screens/new_workout_plan_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/select_exercise_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/workout_plan_display_screen.dart';
 import 'screens/workout_screen.dart';
 import 'timer_notifier.dart';
@@ -27,7 +28,10 @@ import 'widgets/bottom_nav_bar.dart';
 final router = GoRouter(
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
-      final publicRoutes = ['/login', '/signup'];
+      final publicRoutes = [
+        '/login',
+        '/signup',
+      ];
       if (authState is! Authenticated &&
           !publicRoutes.contains(state.matchedLocation)) {
         return '/login';
@@ -39,8 +43,12 @@ final router = GoRouter(
       }
       return null;
     },
-    initialLocation: '/home',
+    initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const SplashScreen(),
+      ),
       ShellRoute(
           builder: (context, state, child) => BottomNavBar(child),
           routes: [

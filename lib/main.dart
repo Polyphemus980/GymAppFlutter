@@ -37,7 +37,6 @@ class MyApp extends StatelessWidget {
       theme: theme,
       themeMode: ThemeMode.system,
       routerConfig: router,
-      title: 'Week 4',
     );
   }
 }

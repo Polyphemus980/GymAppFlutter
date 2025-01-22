@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 sealed class AuthenticationState {}
 
-class AuthSignedOut extends AuthenticationState {}
+class Unauthenticated extends AuthenticationState {}
 
 class AuthLoading extends AuthenticationState {}
 
@@ -56,7 +56,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
   final GoTrueClient supabaseClient;
   StreamSubscription<AuthState>? _authStateSubscription;
 
-  AuthBloc({required this.supabaseClient}) : super(AuthSignedOut()) {
+  AuthBloc({required this.supabaseClient}) : super(Unauthenticated()) {
     _handleAuthStateChanges();
     on<SignUpRequested>(_handleSignUp);
     on<SignInRequested>(_handleSignIn);
@@ -120,7 +120,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
 
   _handleSignOut(
       SignOutRequested event, Emitter<AuthenticationState> emit) async {
-    if (state is AuthSignedOut) {
+    if (state is Unauthenticated) {
       emit(state);
       return;
     }
@@ -137,7 +137,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     if (event.user != null) {
       emit(Authenticated(user: event.user!));
     } else {
-      emit(AuthSignedOut());
+      emit(Unauthenticated());
     }
   }
 
