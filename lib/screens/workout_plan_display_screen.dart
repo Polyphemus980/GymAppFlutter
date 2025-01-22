@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gym_app/auth_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
@@ -8,7 +9,7 @@ import 'package:gym_app/widgets/app_widgets.dart';
 
 class WorkoutPlanDisplayScreen extends HookWidget {
   final LocalWorkoutRepository workoutRepository;
-  final int workoutPlanId;
+  final String workoutPlanId;
   const WorkoutPlanDisplayScreen(
       {super.key,
       required this.workoutRepository,
@@ -20,7 +21,8 @@ class WorkoutPlanDisplayScreen extends HookWidget {
     return AppScaffold(
       title: "Display workout plan",
       child: StreamBuilder(
-        stream: workoutRepository.watchWorkoutPlanWithDetails(workoutPlanId),
+        stream: workoutRepository.watchWorkoutPlanWithDetails(
+            workoutPlanId, context.currentUserId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();

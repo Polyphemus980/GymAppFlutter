@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
+import 'package:uuid/uuid.dart';
 
 class PlannedSet {
   PlannedSet({
@@ -11,9 +12,9 @@ class PlannedSet {
     required this.minRepetitions,
     required this.maxRepetitions,
   });
-  final int id;
+  final String id;
   final String userId;
-  final int workoutExerciseId;
+  final String workoutExerciseId;
   final int setNumber;
   final int minRepetitions;
   final int maxRepetitions;
@@ -22,10 +23,10 @@ class PlannedSet {
 
 @UseRowClass(PlannedSet)
 class PlannedSets extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
-  IntColumn get workoutExerciseId =>
-      integer().references(PlannedWorkoutExercises, #id)();
+  TextColumn get workoutExerciseId =>
+      text().references(PlannedWorkoutExercises, #id)();
   IntColumn get setNumber => integer()();
   IntColumn get minRepetitions => integer()();
   IntColumn get maxRepetitions => integer()();

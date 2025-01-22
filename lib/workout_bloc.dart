@@ -97,9 +97,8 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
   _addSet(AddSetEvent event, Emitter<WorkoutState> emit) {
     if (state is WorkoutInProgress) {
       final sets = List<SetData>.from((state as WorkoutInProgress).sets);
-      sets[event.exerciseIndex].sets.add(WorkoutConfigSet(
-          exerciseId: sets[event.exerciseIndex].exercise.id,
-          setNumber: sets[event.exerciseIndex].sets.length));
+      sets[event.exerciseIndex].sets.add(
+          WorkoutConfigSet(setNumber: sets[event.exerciseIndex].sets.length));
       emit(WorkoutInProgress(sets: sets));
     }
   }

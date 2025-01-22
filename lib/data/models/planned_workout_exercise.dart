@@ -1,13 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_set.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
+import 'package:uuid/uuid.dart';
 
 import 'exercise.dart';
 
 class PlannedWorkoutExercise {
-  final int id;
+  final String id;
   final String userId;
-  final int workoutId;
+  final String workoutId;
   final int exerciseId;
   final int exerciseOrder;
   final DateTime createdAt;
@@ -32,9 +33,9 @@ class PlannedWorkoutExercise {
 
 @UseRowClass(PlannedWorkoutExercise)
 class PlannedWorkoutExercises extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
-  IntColumn get workoutId => integer().references(PlannedWorkouts, #id)();
+  TextColumn get workoutId => text().references(PlannedWorkouts, #id)();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
   IntColumn get exerciseOrder =>
       integer().check(exerciseOrder.isBiggerOrEqualValue(0))();

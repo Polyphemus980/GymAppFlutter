@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
+import 'package:uuid/uuid.dart';
 
 class WorkoutPlan {
   WorkoutPlan(
@@ -11,7 +12,7 @@ class WorkoutPlan {
       required this.name,
       required this.createdAt,
       this.updatedAt});
-  final int id;
+  final String id;
   final String userId;
   final String name;
   final String description;
@@ -25,7 +26,7 @@ class WorkoutPlan {
 
 @UseRowClass(WorkoutPlan)
 class WorkoutPlans extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
   TextColumn get description => text()();
   TextColumn get name => text().withLength(min: 1)();

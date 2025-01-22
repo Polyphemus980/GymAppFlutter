@@ -11,8 +11,10 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
 
   DriftWorkoutRepository({required this.db});
   @override
-  Stream<List<WorkoutPlan>> watchWorkoutPlans() {
-    final workoutPlanStream = db.select(db.workoutPlans).watch();
+  Stream<List<WorkoutPlan>> watchWorkoutPlans(String userId) {
+    final workoutPlanStream = (db.select(db.workoutPlans)
+          ..where((workoutPlan) => workoutPlan.userId.equals(userId)))
+        .watch();
     return workoutPlanStream.switchMap((plans) {
       final workoutStreams = plans.map((plan) {
         return (db.select(db.plannedWorkouts)
@@ -30,12 +32,11 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
   }
 
   @override
-  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails() {
+  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails(String userId) {
     final workoutPlanStream = db.select(db.workoutPlans).watch();
 
     return workoutPlanStream.switchMap((plans) {
       final planStreams = plans.map((plan) {
-        // Get planned workouts for this plan
         return (db.select(db.plannedWorkouts)
               ..where((workout) => workout.workoutPlanId.equals(plan.id)))
             .watch()
@@ -78,7 +79,8 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
   }
 
   @override
-  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(int planId) {
+  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(
+      String planId, String userId) {
     final workoutPlanStream = (db.select(db.workoutPlans)
           ..where((plan) => plan.id.equals(planId)))
         .watchSingleOrNull();

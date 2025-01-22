@@ -276,8 +276,9 @@ final _router = GoRouter(
           path: '/display/:id',
           builder: (context, state) {
             return WorkoutPlanDisplayScreen(
-                workoutRepository: getIt.get<LocalWorkoutRepository>(),
-                workoutPlanId: int.parse(state.pathParameters['id']!));
+              workoutRepository: getIt.get<LocalWorkoutRepository>(),
+              workoutPlanId: state.pathParameters['id']!,
+            );
           }),
       GoRoute(
         path: '/plan',

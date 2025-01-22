@@ -1,11 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/completed_workout_exercise.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
+import 'package:uuid/uuid.dart';
 
 class CompletedWorkout {
-  final int id;
+  final String id;
   final String userId;
-  final int? plannedWorkoutId;
+  final String? plannedWorkoutId;
   final String? workoutName;
   final DateTime workoutDate;
   final DateTime? startTime; // Added for precise timing
@@ -35,10 +36,10 @@ class CompletedWorkout {
 
 @UseRowClass(CompletedWorkout)
 class CompletedWorkouts extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
-  IntColumn get plannedWorkoutId =>
-      integer().nullable().references(PlannedWorkouts, #id)();
+  TextColumn get plannedWorkoutId =>
+      text().nullable().references(PlannedWorkouts, #id)();
   TextColumn get workoutName => text().nullable()();
   DateTimeColumn get workoutDate =>
       dateTime().withDefault(currentDateAndTime)();

@@ -1,12 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
+import 'package:uuid/uuid.dart';
 
 class PlannedWorkout {
-  final int id;
+  final String id;
   final String userId;
 
-  final int workoutPlanId;
+  final String workoutPlanId;
   final String? workoutName;
   final int dayNumber;
   final int weekNumber; // Added for workout plan ordering
@@ -32,9 +33,9 @@ class PlannedWorkout {
 
 @UseRowClass(PlannedWorkout)
 class PlannedWorkouts extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
-  IntColumn get workoutPlanId => integer().references(WorkoutPlans, #id)();
+  TextColumn get workoutPlanId => text().references(WorkoutPlans, #id)();
   TextColumn get workoutName => text().nullable()();
   IntColumn get dayNumber => integer()();
   IntColumn get weekNumber => integer()();

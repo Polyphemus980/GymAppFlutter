@@ -6,7 +6,6 @@ part 'workout_config_set.g.dart';
 //TODO: This class should be used in the configuration screen as the user may not want to include the weights/reps in there.
 @JsonSerializable()
 class WorkoutConfigSet {
-  final int exerciseId;
   int setNumber;
   int? repetitions;
   double? weight;
@@ -18,7 +17,6 @@ class WorkoutConfigSet {
   bool completed;
 
   WorkoutConfigSet({
-    required this.exerciseId,
     required this.setNumber,
     this.completed = false,
     this.repetitions,
@@ -33,7 +31,6 @@ class WorkoutConfigSet {
   factory WorkoutConfigSet.fromPlannedSet(PlannedSet plannedSet) {
     return WorkoutConfigSet(
       completed: false,
-      exerciseId: plannedSet.workoutExerciseId,
       setNumber: plannedSet.setNumber,
       minRepetitions: plannedSet.minRepetitions,
       maxRepetitions: plannedSet.maxRepetitions,
@@ -42,7 +39,6 @@ class WorkoutConfigSet {
   }
   WorkoutConfigSet copy() {
     return WorkoutConfigSet(
-        exerciseId: exerciseId,
         setNumber: setNumber,
         repetitions: repetitions,
         minRepetitions: minRepetitions,
@@ -63,7 +59,6 @@ class WorkoutConfigSet {
       double? rpe,
       bool? isWeight}) {
     return WorkoutConfigSet(
-        exerciseId: exerciseId,
         setNumber: setNumber ?? this.setNumber,
         repetitions: repetitions ?? this.repetitions,
         weight: weight ?? this.weight,

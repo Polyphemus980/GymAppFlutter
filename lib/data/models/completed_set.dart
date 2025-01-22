@@ -1,11 +1,12 @@
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 import 'completed_workout_exercise.dart';
 
 class CompletedSet {
-  final int id;
+  final String id;
   final String userId;
-  final int workoutExerciseId;
+  final String workoutExerciseId;
   final int setNumber;
   final int repetitions;
   final int? durationSeconds;
@@ -30,10 +31,10 @@ class CompletedSet {
 
 @UseRowClass(CompletedSet)
 class CompletedSets extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
-  IntColumn get workoutExerciseId =>
-      integer().references(CompletedWorkoutExercises, #id)();
+  TextColumn get workoutExerciseId =>
+      text().references(CompletedWorkoutExercises, #id)();
   IntColumn get setNumber => integer()();
   IntColumn get repetitions => integer()();
   IntColumn get durationSeconds => integer().nullable()();
