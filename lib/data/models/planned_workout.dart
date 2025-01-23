@@ -1,12 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
 part 'planned_workout.g.dart';
 
-@JsonSerializable()
+@json.JsonSerializable()
 class PlannedWorkout {
   final String id;
   final String userId;
@@ -17,11 +17,15 @@ class PlannedWorkout {
   final int weekNumber; // Added for workout plan ordering
   final String? description; // Added for instructions
   final DateTime createdAt;
+  final bool dirty;
+
   final DateTime? updatedAt;
 
+  @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<PlannedWorkoutExercise>? exercises;
 
   PlannedWorkout({
+    required this.dirty,
     required this.userId,
     required this.id,
     required this.workoutPlanId,
@@ -47,6 +51,7 @@ class PlannedWorkouts extends Table {
   TextColumn get workoutName => text().nullable()();
   IntColumn get dayNumber => integer()();
   IntColumn get weekNumber => integer()();
+  BoolColumn get dirty => boolean()();
   TextColumn get description => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().nullable()();

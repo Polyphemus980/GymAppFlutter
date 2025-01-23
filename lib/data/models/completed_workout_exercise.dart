@@ -1,14 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/completed_workout.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
 import 'completed_set.dart';
 
 part 'completed_workout_exercise.g.dart';
 
-@JsonSerializable()
+@json.JsonSerializable()
 class CompletedWorkoutExercise {
   final String id;
   final String userId;
@@ -18,10 +18,12 @@ class CompletedWorkoutExercise {
   final DateTime createdAt;
   final String? notes;
   final DateTime? updatedAt;
-
+  final bool dirty;
+  @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<CompletedSet>? sets;
 
   CompletedWorkoutExercise({
+    required this.dirty,
     required this.id,
     required this.userId,
     required this.workoutId,
@@ -45,6 +47,7 @@ class CompletedWorkoutExercise {
 class CompletedWorkoutExercises extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get userId => text()();
+  BoolColumn get dirty => boolean()();
   TextColumn get workoutId => text().references(CompletedWorkouts, #id)();
   TextColumn get exerciseId => text().references(Exercises, #id)();
   IntColumn get exerciseOrder =>

@@ -8,6 +8,7 @@ part of 'user_preferences.dart';
 
 UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
     UserPreferences(
+      dirty: json['dirty'] as bool,
       userId: json['userId'] as String,
       isDarkMode: json['isDarkMode'] as bool,
       isMetric: json['isMetric'] as bool,
@@ -18,4 +19,5 @@ Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
       'userId': instance.userId,
       'isDarkMode': instance.isDarkMode,
       'isMetric': instance.isMetric,
+      'dirty': instance.dirty,
     };

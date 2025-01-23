@@ -7,8 +7,10 @@ part of 'exercise.dart';
 // **************************************************************************
 
 Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
+      dirty: json['dirty'] as bool,
       description: json['description'] as String?,
       name: json['name'] as String,
+      userId: json['userId'] as String,
       id: json['id'] as String,
       startPositionImagePath: json['startPositionImagePath'] as String?,
       endPositionImagePath: json['endPositionImagePath'] as String?,
@@ -16,17 +18,16 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-    )..muscleGroups = (json['muscleGroups'] as List<dynamic>?)
-        ?.map((e) => MuscleGroup.fromJson(e as Map<String, dynamic>))
-        .toList();
+    );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'id': instance.id,
+      'userId': instance.userId,
       'name': instance.name,
       'description': instance.description,
       'startPositionImagePath': instance.startPositionImagePath,
       'endPositionImagePath': instance.endPositionImagePath,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
-      'muscleGroups': instance.muscleGroups,
+      'dirty': instance.dirty,
     };

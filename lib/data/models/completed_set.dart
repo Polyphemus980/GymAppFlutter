@@ -14,11 +14,13 @@ class CompletedSet {
   final int setNumber;
   final int repetitions;
   final int? durationSeconds;
+  final bool dirty;
   final double? weight;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   CompletedSet({
+    required this.dirty,
     required this.userId,
     required this.id,
     required this.workoutExerciseId,
@@ -42,6 +44,7 @@ class CompletedSets extends Table {
   TextColumn get workoutExerciseId =>
       text().references(CompletedWorkoutExercises, #id)();
   IntColumn get setNumber => integer()();
+  BoolColumn get dirty => boolean()();
   IntColumn get repetitions => integer()();
   IntColumn get durationSeconds => integer().nullable()();
   RealColumn get weight => real().nullable()();

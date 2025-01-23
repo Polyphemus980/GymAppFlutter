@@ -18,12 +18,8 @@ PlannedWorkoutExercise _$PlannedWorkoutExerciseFromJson(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-      sets: (json['sets'] as List<dynamic>?)
-          ?.map((e) => PlannedSet.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    )..exercise = json['exercise'] == null
-        ? null
-        : Exercise.fromJson(json['exercise'] as Map<String, dynamic>);
+      dirty: json['dirty'] as bool,
+    );
 
 Map<String, dynamic> _$PlannedWorkoutExerciseToJson(
         PlannedWorkoutExercise instance) =>
@@ -35,6 +31,5 @@ Map<String, dynamic> _$PlannedWorkoutExerciseToJson(
       'exerciseOrder': instance.exerciseOrder,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
-      'sets': instance.sets,
-      'exercise': instance.exercise,
+      'dirty': instance.dirty,
     };

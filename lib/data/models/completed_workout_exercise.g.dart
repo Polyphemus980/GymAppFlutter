@@ -9,6 +9,7 @@ part of 'completed_workout_exercise.dart';
 CompletedWorkoutExercise _$CompletedWorkoutExerciseFromJson(
         Map<String, dynamic> json) =>
     CompletedWorkoutExercise(
+      dirty: json['dirty'] as bool,
       id: json['id'] as String,
       userId: json['userId'] as String,
       workoutId: json['workoutId'] as String,
@@ -19,9 +20,6 @@ CompletedWorkoutExercise _$CompletedWorkoutExerciseFromJson(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-      sets: (json['sets'] as List<dynamic>?)
-          ?.map((e) => CompletedSet.fromJson(e as Map<String, dynamic>))
-          .toList(),
     );
 
 Map<String, dynamic> _$CompletedWorkoutExerciseToJson(
@@ -35,5 +33,5 @@ Map<String, dynamic> _$CompletedWorkoutExerciseToJson(
       'createdAt': instance.createdAt.toIso8601String(),
       'notes': instance.notes,
       'updatedAt': instance.updatedAt?.toIso8601String(),
-      'sets': instance.sets,
+      'dirty': instance.dirty,
     };

@@ -7,6 +7,7 @@ part of 'completed_set.dart';
 // **************************************************************************
 
 CompletedSet _$CompletedSetFromJson(Map<String, dynamic> json) => CompletedSet(
+      dirty: json['dirty'] as bool,
       userId: json['userId'] as String,
       id: json['id'] as String,
       workoutExerciseId: json['workoutExerciseId'] as String,
@@ -30,6 +31,7 @@ Map<String, dynamic> _$CompletedSetToJson(CompletedSet instance) =>
       'setNumber': instance.setNumber,
       'repetitions': instance.repetitions,
       'durationSeconds': instance.durationSeconds,
+      'dirty': instance.dirty,
       'weight': instance.weight,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

@@ -1,14 +1,15 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
 part 'workout_plan.g.dart';
 
-@JsonSerializable()
+@json.JsonSerializable()
 class WorkoutPlan {
   WorkoutPlan(
-      {required this.numWeeks,
+      {required this.dirty,
+      required this.numWeeks,
       required this.daysPerWeek,
       required this.userId,
       required this.id,
@@ -24,7 +25,9 @@ class WorkoutPlan {
   final int daysPerWeek;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final bool dirty;
 
+  @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<PlannedWorkout>? workouts;
 
   factory WorkoutPlan.fromJson(Map<String, dynamic> json) =>
@@ -39,6 +42,7 @@ class WorkoutPlans extends Table {
   TextColumn get description => text()();
   TextColumn get name => text().withLength(min: 1)();
   IntColumn get numWeeks => integer()();
+  BoolColumn get dirty => boolean()();
   IntColumn get daysPerWeek => integer()
       .check(daysPerWeek.isBiggerOrEqualValue(0))
       .check(daysPerWeek.isSmallerOrEqualValue(7))();

@@ -7,6 +7,7 @@ part of 'planned_set.dart';
 // **************************************************************************
 
 PlannedSet _$PlannedSetFromJson(Map<String, dynamic> json) => PlannedSet(
+      dirty: json['dirty'] as bool,
       userId: json['userId'] as String,
       rpe: (json['rpe'] as num).toDouble(),
       id: json['id'] as String,
@@ -25,4 +26,5 @@ Map<String, dynamic> _$PlannedSetToJson(PlannedSet instance) =>
       'minRepetitions': instance.minRepetitions,
       'maxRepetitions': instance.maxRepetitions,
       'rpe': instance.rpe,
+      'dirty': instance.dirty,
     };

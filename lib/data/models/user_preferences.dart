@@ -8,9 +8,12 @@ class UserPreferences {
   final String userId;
   final bool isDarkMode;
   final bool isMetric;
-
+  final bool dirty;
   UserPreferences(
-      {required this.userId, required this.isDarkMode, required this.isMetric});
+      {required this.dirty,
+      required this.userId,
+      required this.isDarkMode,
+      required this.isMetric});
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>
       _$UserPreferencesFromJson(json);
@@ -20,6 +23,7 @@ class UserPreferences {
 @UseRowClass(UserPreferences)
 class UserPreferencesTable extends Table {
   TextColumn get userId => text().unique()();
+  BoolColumn get dirty => boolean()();
   BoolColumn get isDarkMode => boolean()();
   BoolColumn get isMetric => boolean()();
 }

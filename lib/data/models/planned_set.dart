@@ -8,6 +8,7 @@ part 'planned_set.g.dart';
 @JsonSerializable()
 class PlannedSet {
   PlannedSet({
+    required this.dirty,
     required this.userId,
     required this.rpe,
     required this.id,
@@ -23,6 +24,7 @@ class PlannedSet {
   final int minRepetitions;
   final int maxRepetitions;
   final double rpe;
+  final bool dirty;
 
   factory PlannedSet.fromJson(Map<String, dynamic> json) =>
       _$PlannedSetFromJson(json);
@@ -35,6 +37,7 @@ class PlannedSets extends Table {
   TextColumn get userId => text()();
   TextColumn get workoutExerciseId =>
       text().references(PlannedWorkoutExercises, #id)();
+  BoolColumn get dirty => boolean()();
   IntColumn get setNumber => integer()();
   IntColumn get minRepetitions => integer()();
   IntColumn get maxRepetitions => integer()();
