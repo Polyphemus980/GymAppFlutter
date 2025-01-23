@@ -1,5 +1,8 @@
 import 'package:get_it/get_it.dart';
+import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
+import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/app_database.dart';
 import 'data/repositories/drift_exercise_repository.dart';
@@ -26,6 +29,10 @@ Future<void> setUp() async {
   );
   getIt.registerSingleton<OfflineUserDataSingleton>(
       OfflineUserDataSingleton(db: getIt.get<AppDatabase>()));
+  getIt.registerSingleton<SyncExerciseRepository>(SyncExerciseRepository(
+      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
+  getIt.registerSingleton<SyncWorkoutRepository>(SyncWorkoutRepository(
+      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
   await getIt.get<OfflineUserDataSingleton>().initialize();
   setUpEnded = true;
 }

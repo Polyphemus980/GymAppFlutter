@@ -31,9 +31,9 @@ class WorkoutConfigSet {
   factory WorkoutConfigSet.fromPlannedSet(PlannedSet plannedSet) {
     return WorkoutConfigSet(
       completed: false,
-      setNumber: plannedSet.setNumber,
-      minRepetitions: plannedSet.minRepetitions,
-      maxRepetitions: plannedSet.maxRepetitions,
+      setNumber: plannedSet.set_number,
+      minRepetitions: plannedSet.min_repetitions,
+      maxRepetitions: plannedSet.max_repetitions,
       rpe: plannedSet.rpe,
     );
   }

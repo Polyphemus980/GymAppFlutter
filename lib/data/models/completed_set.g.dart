@@ -8,31 +8,31 @@ part of 'completed_set.dart';
 
 CompletedSet _$CompletedSetFromJson(Map<String, dynamic> json) => CompletedSet(
       dirty: json['dirty'] as bool,
-      userId: json['userId'] as String,
+      user_id: json['user_id'] as String,
       id: json['id'] as String,
-      workoutExerciseId: json['workoutExerciseId'] as String,
-      setNumber: (json['setNumber'] as num).toInt(),
+      workout_exercise_id: json['workout_exercise_id'] as String,
+      set_number: (json['set_number'] as num).toInt(),
       repetitions: (json['repetitions'] as num).toInt(),
-      durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
+      duration_seconds: (json['duration_seconds'] as num?)?.toInt(),
       weight: (json['weight'] as num?)?.toDouble(),
-      createdAt: json['createdAt'] == null
+      created_at: json['created_at'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+          : DateTime.parse(json['created_at'] as String),
+      updated_at: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$CompletedSetToJson(CompletedSet instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'workoutExerciseId': instance.workoutExerciseId,
-      'setNumber': instance.setNumber,
+      'user_id': instance.user_id,
+      'workout_exercise_id': instance.workout_exercise_id,
+      'set_number': instance.set_number,
       'repetitions': instance.repetitions,
-      'durationSeconds': instance.durationSeconds,
+      'duration_seconds': instance.duration_seconds,
       'dirty': instance.dirty,
       'weight': instance.weight,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.created_at?.toIso8601String(),
+      'updated_at': instance.updated_at?.toIso8601String(),
     };

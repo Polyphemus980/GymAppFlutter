@@ -7,24 +7,25 @@ part 'workout_plan.g.dart';
 
 @json.JsonSerializable()
 class WorkoutPlan {
-  WorkoutPlan(
-      {required this.dirty,
-      required this.numWeeks,
-      required this.daysPerWeek,
-      required this.userId,
-      required this.id,
-      required this.description,
-      required this.name,
-      required this.createdAt,
-      this.updatedAt});
+  WorkoutPlan({
+    required this.dirty,
+    required this.num_weeks,
+    required this.days_per_week,
+    required this.user_id,
+    required this.id,
+    required this.description,
+    required this.name,
+    required this.created_at,
+    this.updated_at,
+  });
   final String id;
-  final String userId;
+  final String user_id;
   final String name;
   final String description;
-  final int numWeeks;
-  final int daysPerWeek;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
+  final int num_weeks;
+  final int days_per_week;
+  final DateTime created_at;
+  final DateTime? updated_at;
   final bool dirty;
 
   @json.JsonKey(includeFromJson: false, includeToJson: false)
@@ -38,14 +39,14 @@ class WorkoutPlan {
 @UseRowClass(WorkoutPlan)
 class WorkoutPlans extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
+  TextColumn get user_id => text()();
   TextColumn get description => text()();
   TextColumn get name => text().withLength(min: 1)();
-  IntColumn get numWeeks => integer()();
+  IntColumn get num_weeks => integer()();
   BoolColumn get dirty => boolean()();
-  IntColumn get daysPerWeek => integer()
-      .check(daysPerWeek.isBiggerOrEqualValue(0))
-      .check(daysPerWeek.isSmallerOrEqualValue(7))();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  IntColumn get days_per_week => integer()
+      .check(days_per_week.isBiggerOrEqualValue(0))
+      .check(days_per_week.isSmallerOrEqualValue(7))();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
 }

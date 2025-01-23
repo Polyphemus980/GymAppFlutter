@@ -11,7 +11,7 @@ class DriftPreferencesRepository implements LocalPreferencesRepository {
   @override
   Future<UserPreferences?> getUserPreferences(String userId) async {
     final userPrefs = await (db.select(db.userPreferencesTable)
-          ..where((userPrefs) => userPrefs.userId.equals(userId)))
+          ..where((userPrefs) => userPrefs.user_id.equals(userId)))
         .getSingleOrNull();
     return userPrefs;
   }
@@ -22,9 +22,10 @@ class DriftPreferencesRepository implements LocalPreferencesRepository {
       bool isMetric = true,
       bool isDarkMode = true}) async {
     await db.into(db.userPreferencesTable).insert(UserPreferencesTableCompanion(
-          userId: Value(userId),
-          isMetric: Value(isMetric),
-          isDarkMode: Value(isDarkMode),
+          user_id: Value(userId),
+          is_metric: Value(isMetric),
+          is_dark_mode: Value(isDarkMode),
+          dirty: const Value(false),
         ));
   }
 
@@ -32,10 +33,11 @@ class DriftPreferencesRepository implements LocalPreferencesRepository {
   Future<void> updateUserPreferences(
       {required String userId, bool? isMetric, bool? isDarkMode}) async {
     await (db.userPreferencesTable.update()
-          ..where((userPrefs) => userPrefs.userId.equals(userId)))
+          ..where((userPrefs) => userPrefs.user_id.equals(userId)))
         .write(UserPreferencesTableCompanion(
-      isMetric: isMetric == null ? const Value.absent() : Value(isMetric),
-      isDarkMode: isDarkMode == null ? const Value.absent() : Value(isDarkMode),
+      is_metric: isMetric == null ? const Value.absent() : Value(isMetric),
+      is_dark_mode:
+          isDarkMode == null ? const Value.absent() : Value(isDarkMode),
     ));
   }
 }

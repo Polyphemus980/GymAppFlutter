@@ -11,6 +11,7 @@ import 'auth_bloc.dart';
 import 'data/models/exercise.dart';
 import 'data/models/muscle_group.dart';
 import 'data/repositories/local_workout_repository.dart';
+import 'data/repositories/sync_exercise_repository.dart';
 import 'get_it_dependency_injection.dart';
 import 'screens/add_exercise_screen.dart';
 import 'screens/empty_workout_screen.dart';
@@ -86,7 +87,9 @@ final router = GoRouter(
           ]),
       GoRoute(
           path: '/add',
-          builder: (context, state) => const AddExerciseScreen(),
+          builder: (context, state) => AddExerciseScreen(
+                syncExerciseRepository: getIt.get<SyncExerciseRepository>(),
+              ),
           routes: [
             GoRoute(
                 path: 'pick',

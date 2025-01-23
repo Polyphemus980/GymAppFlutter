@@ -9,15 +9,15 @@ part of 'user_preferences.dart';
 UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
     UserPreferences(
       dirty: json['dirty'] as bool,
-      userId: json['userId'] as String,
-      isDarkMode: json['isDarkMode'] as bool,
-      isMetric: json['isMetric'] as bool,
+      user_id: json['user_id'] as String,
+      is_dark_mode: json['is_dark_mode'] as bool,
+      is_metric: json['is_metric'] as bool,
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
     <String, dynamic>{
-      'userId': instance.userId,
-      'isDarkMode': instance.isDarkMode,
-      'isMetric': instance.isMetric,
+      'user_id': instance.user_id,
+      'is_dark_mode': instance.is_dark_mode,
+      'is_metric': instance.is_metric,
       'dirty': instance.dirty,
     };

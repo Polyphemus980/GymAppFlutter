@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/repositories/local_workout_repository.dart';
+import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/new_workout_plan_bloc.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
@@ -26,7 +26,7 @@ class NewWorkoutPlanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<NewWorkoutPlanBloc>(
       create: (_) => NewWorkoutPlanBloc(
-          workoutRepository: getIt.get<LocalWorkoutRepository>())
+          syncWorkoutRepository: getIt.get<SyncWorkoutRepository>())
         ..add(InitializePlanEvent(
             numDays: numDays,
             numWeeks: numWeeks,
@@ -142,6 +142,7 @@ class DaysPages extends HookWidget {
                                   }
                                   context.read<NewWorkoutPlanBloc>().add(
                                       FinishCreationEvent(
+                                          isOnline: context.isOnline,
                                           userId: context.currentUserId));
                                 },
                                 height: 75,

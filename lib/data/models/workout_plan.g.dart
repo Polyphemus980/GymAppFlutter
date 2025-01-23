@@ -8,27 +8,27 @@ part of 'workout_plan.dart';
 
 WorkoutPlan _$WorkoutPlanFromJson(Map<String, dynamic> json) => WorkoutPlan(
       dirty: json['dirty'] as bool,
-      numWeeks: (json['numWeeks'] as num).toInt(),
-      daysPerWeek: (json['daysPerWeek'] as num).toInt(),
-      userId: json['userId'] as String,
+      num_weeks: (json['num_weeks'] as num).toInt(),
+      days_per_week: (json['days_per_week'] as num).toInt(),
+      user_id: json['user_id'] as String,
       id: json['id'] as String,
       description: json['description'] as String,
       name: json['name'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      created_at: DateTime.parse(json['created_at'] as String),
+      updated_at: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$WorkoutPlanToJson(WorkoutPlan instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
+      'user_id': instance.user_id,
       'name': instance.name,
       'description': instance.description,
-      'numWeeks': instance.numWeeks,
-      'daysPerWeek': instance.daysPerWeek,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'num_weeks': instance.num_weeks,
+      'days_per_week': instance.days_per_week,
+      'created_at': instance.created_at.toIso8601String(),
+      'updated_at': instance.updated_at?.toIso8601String(),
       'dirty': instance.dirty,
     };

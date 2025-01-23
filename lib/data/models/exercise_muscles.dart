@@ -9,9 +9,11 @@ part 'exercise_muscles.g.dart';
 @JsonSerializable()
 class ExerciseMuscle {
   ExerciseMuscle(
-      {required this.dirty, required this.exerciseId, required this.muscleId});
-  final int exerciseId;
-  final int muscleId;
+      {required this.dirty,
+      required this.exercise_id,
+      required this.muscle_group_id});
+  final int exercise_id;
+  final int muscle_group_id;
   final bool dirty;
   factory ExerciseMuscle.fromJson(Map<String, dynamic> json) =>
       _$ExerciseMuscleFromJson(json);
@@ -20,11 +22,11 @@ class ExerciseMuscle {
 
 class ExerciseMuscles extends Table {
   BoolColumn get dirty => boolean()();
-  TextColumn get exerciseId =>
+  TextColumn get exercise_id =>
       text().references(Exercises, #id, onDelete: KeyAction.cascade)();
-  IntColumn get muscleGroupId =>
+  IntColumn get muscle_group_id =>
       integer().references(MuscleGroups, #id, onDelete: KeyAction.cascade)();
 
   @override
-  Set<Column> get primaryKey => {exerciseId, muscleGroupId};
+  Set<Column> get primaryKey => {exercise_id, muscle_group_id};
 }

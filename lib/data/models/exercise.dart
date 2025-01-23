@@ -7,38 +7,43 @@ part 'exercise.g.dart';
 
 @json.JsonSerializable()
 class Exercise {
-  Exercise(
-      {required this.dirty,
-      this.description,
-      required this.name,
-      required this.userId,
-      required this.id,
-      this.startPositionImagePath,
-      this.endPositionImagePath,
-      required this.createdAt,
-      this.updatedAt});
+  Exercise({
+    required this.dirty,
+    this.description,
+    required this.name,
+    required this.user_id,
+    required this.id,
+    this.start_position_image_path,
+    this.end_position_image_path,
+    required this.created_at,
+    this.updated_at,
+  });
+
   final String id;
-  final String userId;
+  final String user_id;
   final String name;
   final String? description;
-  final String? startPositionImagePath;
-  final String? endPositionImagePath;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
+  final String? start_position_image_path;
+  final String? end_position_image_path;
+  final DateTime created_at;
+  final DateTime? updated_at;
   final bool dirty;
+
   @json.JsonKey(includeFromJson: false, includeToJson: false)
-  List<MuscleGroup>? muscleGroups;
+  List<MuscleGroup>? muscle_groups;
+
   Exercise copy() {
     return Exercise(
-        name: name,
-        id: id,
-        userId: userId,
-        dirty: dirty,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        startPositionImagePath: startPositionImagePath,
-        endPositionImagePath: endPositionImagePath,
-        description: description);
+      name: name,
+      id: id,
+      user_id: user_id,
+      dirty: dirty,
+      created_at: created_at,
+      updated_at: updated_at,
+      start_position_image_path: start_position_image_path,
+      end_position_image_path: end_position_image_path,
+      description: description,
+    );
   }
 
   @override
@@ -48,32 +53,33 @@ class Exercise {
 
     return other.id == id &&
         other.name == name &&
-        other.userId == userId &&
+        other.user_id == user_id &&
         other.description == description &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.created_at == created_at &&
+        other.updated_at == updated_at;
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, name, description, userId, createdAt, updatedAt);
+      Object.hash(id, name, description, user_id, created_at, updated_at);
 
-  String? get muscles => muscleGroups!.map((m) => m.name).join(", ");
+  String? get muscles => muscle_groups?.map((m) => m.name).join(", ");
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);
+
   Map<String, dynamic> toJson() => _$ExerciseToJson(this);
 }
 
 @UseRowClass(Exercise)
 class Exercises extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
+  TextColumn get user_id => text()();
   BoolColumn get dirty => boolean()();
   TextColumn get name => text().withLength(min: 1)();
   TextColumn get description => text().nullable()();
-  TextColumn get startPositionImagePath => text().nullable()();
-  TextColumn get endPositionImagePath => text().nullable()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  TextColumn get start_position_image_path => text().nullable()();
+  TextColumn get end_position_image_path => text().nullable()();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
 }

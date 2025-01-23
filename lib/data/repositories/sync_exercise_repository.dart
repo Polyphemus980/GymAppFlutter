@@ -8,19 +8,20 @@ class SyncExerciseRepository {
   final AppDatabase db;
   final SupabaseClient supabaseClient;
   SyncExerciseRepository({required this.db, required this.supabaseClient});
+
   Future<void> addExerciseSync(String userId, String name, String description,
       List<MuscleGroup> muscles, bool isOnline) async {
     final insertedExercise = await db.into(db.exercises).insertReturning(
         ExercisesCompanion(
-            userId: Value(userId),
+            user_id: Value(userId),
             name: Value(name),
             description: Value(description),
             dirty: Value(!isOnline)));
 
     final exerciseMuscles = muscles
         .map((muscle) => ExerciseMusclesCompanion(
-              exerciseId: Value(insertedExercise.id),
-              muscleGroupId: Value(muscle.id),
+              exercise_id: Value(insertedExercise.id),
+              muscle_group_id: Value(muscle.id),
               dirty: Value(!isOnline),
             ))
         .toList();
@@ -34,15 +35,40 @@ class SyncExerciseRepository {
         await supabaseClient
             .from('exercises')
             .insert(insertedExercise.toJson());
+
+        final exerciseMuscles = muscles
+            .map((muscle) => {
+                  'exercise_id': insertedExercise.id,
+                  'muscle_group_id': muscle.id,
+                  'dirty': !isOnline,
+                })
+            .toList();
+        await supabaseClient.from('exercise_muscles').insert(exerciseMuscles);
       } catch (e) {
         debugPrint('$e');
         await (db.update(db.exercises)
               ..where((ex) => ex.id.equals(insertedExercise.id)))
             .write(const ExercisesCompanion(dirty: Value(true)));
         await (db.update(db.exerciseMuscles)
-              ..where((ex) => ex.exerciseId.equals(insertedExercise.id)))
+              ..where((ex) => ex.exercise_id.equals(insertedExercise.id)))
             .write(const ExerciseMusclesCompanion(dirty: Value(true)));
       }
+    }
+  }
+
+  Future<void> removeExerciseSync(String exerciseId, bool isOnline) async {
+    if (isOnline) {
+      db.transaction(() async {
+        await (db.delete(db.exercises)..where((ex) => ex.id.equals(exerciseId)))
+            .go();
+
+        await supabaseClient
+            .from('exercises')
+            .delete()
+            .eq('exerciseId', exerciseId);
+      });
+    } else {
+      debugPrint('No removing while offline :) \n');
     }
   }
 }

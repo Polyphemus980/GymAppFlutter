@@ -10,36 +10,36 @@ CompletedWorkout _$CompletedWorkoutFromJson(Map<String, dynamic> json) =>
     CompletedWorkout(
       dirty: json['dirty'] as bool,
       id: json['id'] as String,
-      userId: json['userId'] as String,
-      plannedWorkoutId: json['plannedWorkoutId'] as String?,
-      workoutName: json['workoutName'] as String?,
-      workoutDate: DateTime.parse(json['workoutDate'] as String),
-      startTime: json['startTime'] == null
+      user_id: json['user_id'] as String,
+      planned_workout_id: json['planned_workout_id'] as String?,
+      workout_name: json['workout_name'] as String?,
+      workout_date: DateTime.parse(json['workout_date'] as String),
+      start_time: json['start_time'] == null
           ? null
-          : DateTime.parse(json['startTime'] as String),
-      endTime: json['endTime'] == null
+          : DateTime.parse(json['start_time'] as String),
+      end_time: json['end_time'] == null
           ? null
-          : DateTime.parse(json['endTime'] as String),
-      totalDuration: (json['totalDuration'] as num?)?.toInt(),
+          : DateTime.parse(json['end_time'] as String),
+      total_duration: (json['total_duration'] as num?)?.toInt(),
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      created_at: DateTime.parse(json['created_at'] as String),
+      updated_at: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$CompletedWorkoutToJson(CompletedWorkout instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'plannedWorkoutId': instance.plannedWorkoutId,
-      'workoutName': instance.workoutName,
-      'workoutDate': instance.workoutDate.toIso8601String(),
-      'startTime': instance.startTime?.toIso8601String(),
-      'endTime': instance.endTime?.toIso8601String(),
-      'totalDuration': instance.totalDuration,
+      'user_id': instance.user_id,
+      'planned_workout_id': instance.planned_workout_id,
+      'workout_name': instance.workout_name,
+      'workout_date': instance.workout_date.toIso8601String(),
+      'start_time': instance.start_time?.toIso8601String(),
+      'end_time': instance.end_time?.toIso8601String(),
+      'total_duration': instance.total_duration,
       'notes': instance.notes,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.created_at.toIso8601String(),
+      'updated_at': instance.updated_at?.toIso8601String(),
       'dirty': instance.dirty,
     };

@@ -10,14 +10,14 @@ PlannedWorkoutExercise _$PlannedWorkoutExerciseFromJson(
         Map<String, dynamic> json) =>
     PlannedWorkoutExercise(
       id: json['id'] as String,
-      userId: json['userId'] as String,
-      workoutId: json['workoutId'] as String,
-      exerciseId: json['exerciseId'] as String,
-      exerciseOrder: (json['exerciseOrder'] as num).toInt(),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      user_id: json['user_id'] as String,
+      workout_id: json['workout_id'] as String,
+      exercise_id: json['exercise_id'] as String,
+      exercise_order: (json['exercise_order'] as num).toInt(),
+      created_at: DateTime.parse(json['created_at'] as String),
+      updated_at: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
       dirty: json['dirty'] as bool,
     );
 
@@ -25,11 +25,11 @@ Map<String, dynamic> _$PlannedWorkoutExerciseToJson(
         PlannedWorkoutExercise instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'workoutId': instance.workoutId,
-      'exerciseId': instance.exerciseId,
-      'exerciseOrder': instance.exerciseOrder,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'user_id': instance.user_id,
+      'workout_id': instance.workout_id,
+      'exercise_id': instance.exercise_id,
+      'exercise_order': instance.exercise_order,
+      'created_at': instance.created_at.toIso8601String(),
+      'updated_at': instance.updated_at?.toIso8601String(),
       'dirty': instance.dirty,
     };

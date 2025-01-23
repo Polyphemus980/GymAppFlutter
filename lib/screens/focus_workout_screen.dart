@@ -219,7 +219,7 @@ class ExerciseData extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       spacing: 8,
       runSpacing: 8,
-      children: exercise.muscleGroups!.map((muscle) {
+      children: exercise.muscle_groups!.map((muscle) {
         return Chip(
           label: Text(muscle.name),
         );

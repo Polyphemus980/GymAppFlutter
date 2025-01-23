@@ -9,45 +9,47 @@ part 'completed_set.g.dart';
 @JsonSerializable()
 class CompletedSet {
   final String id;
-  final String userId;
-  final String workoutExerciseId;
-  final int setNumber;
+  final String user_id;
+  final String workout_exercise_id;
+  final int set_number;
   final int repetitions;
-  final int? durationSeconds;
+  final int? duration_seconds;
   final bool dirty;
   final double? weight;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final DateTime? created_at;
+  final DateTime? updated_at;
 
   CompletedSet({
     required this.dirty,
-    required this.userId,
+    required this.user_id,
     required this.id,
-    required this.workoutExerciseId,
-    required this.setNumber,
+    required this.workout_exercise_id,
+    required this.set_number,
     required this.repetitions,
-    this.durationSeconds,
+    this.duration_seconds,
     this.weight,
-    this.createdAt,
-    this.updatedAt,
+    this.created_at,
+    this.updated_at,
   });
+
   factory CompletedSet.fromJson(Map<String, dynamic> json) =>
       _$CompletedSetFromJson(json);
   Map<String, dynamic> toJson() => _$CompletedSetToJson(this);
+
   double? get volume => weight != null ? weight! * repetitions : null;
 }
 
 @UseRowClass(CompletedSet)
 class CompletedSets extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
-  TextColumn get workoutExerciseId =>
+  TextColumn get user_id => text()();
+  TextColumn get workout_exercise_id =>
       text().references(CompletedWorkoutExercises, #id)();
-  IntColumn get setNumber => integer()();
+  IntColumn get set_number => integer()();
   BoolColumn get dirty => boolean()();
   IntColumn get repetitions => integer()();
-  IntColumn get durationSeconds => integer().nullable()();
+  IntColumn get duration_seconds => integer().nullable()();
   RealColumn get weight => real().nullable()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
 }

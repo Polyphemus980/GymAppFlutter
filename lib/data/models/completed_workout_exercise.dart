@@ -11,13 +11,13 @@ part 'completed_workout_exercise.g.dart';
 @json.JsonSerializable()
 class CompletedWorkoutExercise {
   final String id;
-  final String userId;
-  final String workoutId;
-  final String exerciseId;
-  final int exerciseOrder;
-  final DateTime createdAt;
+  final String user_id;
+  final String workout_id;
+  final String exercise_id;
+  final int exercise_order;
+  final DateTime created_at;
   final String? notes;
-  final DateTime? updatedAt;
+  final DateTime? updated_at;
   final bool dirty;
   @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<CompletedSet>? sets;
@@ -25,17 +25,17 @@ class CompletedWorkoutExercise {
   CompletedWorkoutExercise({
     required this.dirty,
     required this.id,
-    required this.userId,
-    required this.workoutId,
-    required this.exerciseId,
-    required this.exerciseOrder,
-    required this.createdAt,
+    required this.user_id,
+    required this.workout_id,
+    required this.exercise_id,
+    required this.exercise_order,
+    required this.created_at,
     this.notes,
-    this.updatedAt,
+    this.updated_at,
     this.sets,
   });
 
-  int get totalSets => sets?.length ?? 0;
+  int get total_sets => sets?.length ?? 0;
 
   factory CompletedWorkoutExercise.fromJson(Map<String, dynamic> json) =>
       _$CompletedWorkoutExerciseFromJson(json);
@@ -46,13 +46,13 @@ class CompletedWorkoutExercise {
 @UseRowClass(CompletedWorkoutExercise)
 class CompletedWorkoutExercises extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
+  TextColumn get user_id => text()();
   BoolColumn get dirty => boolean()();
-  TextColumn get workoutId => text().references(CompletedWorkouts, #id)();
-  TextColumn get exerciseId => text().references(Exercises, #id)();
-  IntColumn get exerciseOrder =>
-      integer().check(exerciseOrder.isBiggerOrEqualValue(0))();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  TextColumn get workout_id => text().references(CompletedWorkouts, #id)();
+  TextColumn get exercise_id => text().references(Exercises, #id)();
+  IntColumn get exercise_order =>
+      integer().check(exercise_order.isBiggerOrEqualValue(0))();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
   TextColumn get notes => text().nullable()();
 }

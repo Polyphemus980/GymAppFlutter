@@ -258,12 +258,12 @@ class PlanCard extends StatelessWidget {
                     children: [
                       PlanInfoChip(
                         icon: Icons.calendar_today,
-                        text: '${plan.numWeeks} weeks',
+                        text: '${plan.num_weeks} weeks',
                       ),
                       const SizedBox(width: 12),
                       PlanInfoChip(
                           icon: Icons.schedule,
-                          text: '${plan.daysPerWeek} days/week'),
+                          text: '${plan.days_per_week} days/week'),
                     ],
                   ),
                 ],

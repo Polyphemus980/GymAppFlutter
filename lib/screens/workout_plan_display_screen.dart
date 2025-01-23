@@ -39,15 +39,15 @@ class WorkoutPlanDisplayScreen extends HookWidget {
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut);
                   },
-                  numWeeks: plan.numWeeks,
+                  numWeeks: plan.num_weeks,
                 ),
                 Expanded(
                   child: PageView.builder(
                     controller: pageController,
-                    itemCount: plan.numWeeks,
+                    itemCount: plan.num_weeks,
                     itemBuilder: (context, weekIndex) {
                       final workoutsWeek = plan.workouts!
-                          .where((workout) => workout.weekNumber == weekIndex)
+                          .where((workout) => workout.week_number == weekIndex)
                           .toList();
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),

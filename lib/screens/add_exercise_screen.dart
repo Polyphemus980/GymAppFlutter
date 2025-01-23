@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
-import 'package:gym_app/data/repositories/local_exercise_repository.dart';
+import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
-import '../get_it_dependency_injection.dart';
-
 class AddExerciseScreen extends HookWidget {
-  const AddExerciseScreen({super.key});
+  final SyncExerciseRepository syncExerciseRepository;
+  const AddExerciseScreen({super.key, required this.syncExerciseRepository});
 
   Future<void> _insertExercise(String name, String description,
       List<MuscleGroup> muscles, BuildContext context) async {
-    final repository = getIt.get<LocalExerciseRepository>();
     try {
-      repository.addExercise(name, description, muscles);
+      await syncExerciseRepository.addExerciseSync(
+          context.currentUserId, name, description, muscles, context.isOnline);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Exercise '$name' added successfully!")),
       );
@@ -32,6 +32,7 @@ class AddExerciseScreen extends HookWidget {
     final descriptionController = useTextEditingController();
     final musclesController = useTextEditingController();
     final selectedMuscles = useState(<MuscleGroup>[]);
+    final isLoading = useState(false);
     return AppScaffold(
         title: 'Add exercise',
         child: Form(
@@ -92,29 +93,36 @@ class AddExerciseScreen extends HookWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 75,
-                    child: ElevatedButton.icon(
-                      icon: Icon(
-                        Icons.save,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                      onPressed: () async {
-                        if (formKey.value.currentState!.validate()) {
-                          await _insertExercise(
-                              nameController.text.trim(),
-                              descriptionController.text.trim(),
-                              selectedMuscles.value,
-                              context);
-                          context.pop();
-                        }
-                      },
-                      label: Text("Add",
-                          style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.onSecondary)),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondary),
-                    ),
+                    child: isLoading.value
+                        ? ElevatedButton(
+                            onPressed: () {},
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          )
+                        : ElevatedButton.icon(
+                            icon: Icon(
+                              Icons.save,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                            onPressed: () async {
+                              if (formKey.value.currentState!.validate()) {
+                                await _insertExercise(
+                                    nameController.text.trim(),
+                                    descriptionController.text.trim(),
+                                    selectedMuscles.value,
+                                    context);
+                                context.pop();
+                              }
+                            },
+                            label: Text("Add",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary),
+                          ),
                   )
                 ]))));
   }

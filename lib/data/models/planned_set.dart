@@ -9,20 +9,20 @@ part 'planned_set.g.dart';
 class PlannedSet {
   PlannedSet({
     required this.dirty,
-    required this.userId,
+    required this.user_id,
     required this.rpe,
     required this.id,
-    required this.workoutExerciseId,
-    required this.setNumber,
-    required this.minRepetitions,
-    required this.maxRepetitions,
+    required this.workout_exercise_id,
+    required this.set_number,
+    required this.min_repetitions,
+    required this.max_repetitions,
   });
   final String id;
-  final String userId;
-  final String workoutExerciseId;
-  final int setNumber;
-  final int minRepetitions;
-  final int maxRepetitions;
+  final String user_id;
+  final String workout_exercise_id;
+  final int set_number;
+  final int min_repetitions;
+  final int max_repetitions;
   final double rpe;
   final bool dirty;
 
@@ -34,12 +34,12 @@ class PlannedSet {
 @UseRowClass(PlannedSet)
 class PlannedSets extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
-  TextColumn get workoutExerciseId =>
+  TextColumn get user_id => text()();
+  TextColumn get workout_exercise_id =>
       text().references(PlannedWorkoutExercises, #id)();
   BoolColumn get dirty => boolean()();
-  IntColumn get setNumber => integer()();
-  IntColumn get minRepetitions => integer()();
-  IntColumn get maxRepetitions => integer()();
+  IntColumn get set_number => integer()();
+  IntColumn get min_repetitions => integer()();
+  IntColumn get max_repetitions => integer()();
   RealColumn get rpe => real()();
 }

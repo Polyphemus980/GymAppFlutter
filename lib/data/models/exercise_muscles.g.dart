@@ -9,13 +9,13 @@ part of 'exercise_muscles.dart';
 ExerciseMuscle _$ExerciseMuscleFromJson(Map<String, dynamic> json) =>
     ExerciseMuscle(
       dirty: json['dirty'] as bool,
-      exerciseId: (json['exerciseId'] as num).toInt(),
-      muscleId: (json['muscleId'] as num).toInt(),
+      exercise_id: (json['exercise_id'] as num).toInt(),
+      muscle_group_id: (json['muscle_group_id'] as num).toInt(),
     );
 
 Map<String, dynamic> _$ExerciseMuscleToJson(ExerciseMuscle instance) =>
     <String, dynamic>{
-      'exerciseId': instance.exerciseId,
-      'muscleId': instance.muscleId,
+      'exercise_id': instance.exercise_id,
+      'muscle_group_id': instance.muscle_group_id,
       'dirty': instance.dirty,
     };

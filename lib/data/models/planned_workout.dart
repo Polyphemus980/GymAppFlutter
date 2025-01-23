@@ -9,32 +9,30 @@ part 'planned_workout.g.dart';
 @json.JsonSerializable()
 class PlannedWorkout {
   final String id;
-  final String userId;
-
-  final String workoutPlanId;
-  final String? workoutName;
-  final int dayNumber;
-  final int weekNumber; // Added for workout plan ordering
+  final String user_id;
+  final String workout_plan_id;
+  final String? workout_name;
+  final int day_number;
+  final int week_number; // Added for workout plan ordering
   final String? description; // Added for instructions
-  final DateTime createdAt;
+  final DateTime created_at;
   final bool dirty;
-
-  final DateTime? updatedAt;
+  final DateTime? updated_at;
 
   @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<PlannedWorkoutExercise>? exercises;
 
   PlannedWorkout({
     required this.dirty,
-    required this.userId,
+    required this.user_id,
     required this.id,
-    required this.workoutPlanId,
-    this.workoutName,
-    required this.dayNumber,
-    required this.weekNumber,
+    required this.workout_plan_id,
+    this.workout_name,
+    required this.day_number,
+    required this.week_number,
     this.description,
-    required this.createdAt,
-    this.updatedAt,
+    required this.created_at,
+    this.updated_at,
     this.exercises,
   });
 
@@ -46,13 +44,13 @@ class PlannedWorkout {
 @UseRowClass(PlannedWorkout)
 class PlannedWorkouts extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get userId => text()();
-  TextColumn get workoutPlanId => text().references(WorkoutPlans, #id)();
-  TextColumn get workoutName => text().nullable()();
-  IntColumn get dayNumber => integer()();
-  IntColumn get weekNumber => integer()();
+  TextColumn get user_id => text()();
+  TextColumn get workout_plan_id => text().references(WorkoutPlans, #id)();
+  TextColumn get workout_name => text().nullable()();
+  IntColumn get day_number => integer()();
+  IntColumn get week_number => integer()();
   BoolColumn get dirty => boolean()();
   TextColumn get description => text().nullable()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
 }
