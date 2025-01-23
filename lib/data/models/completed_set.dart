@@ -1,8 +1,12 @@
 import 'package:drift/drift.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import 'completed_workout_exercise.dart';
 
+part 'completed_set.g.dart';
+
+@JsonSerializable()
 class CompletedSet {
   final String id;
   final String userId;
@@ -25,7 +29,9 @@ class CompletedSet {
     this.createdAt,
     this.updatedAt,
   });
-
+  factory CompletedSet.fromJson(Map<String, dynamic> json) =>
+      _$CompletedSetFromJson(json);
+  Map<String, dynamic> toJson() => _$CompletedSetToJson(this);
   double? get volume => weight != null ? weight! * repetitions : null;
 }
 
