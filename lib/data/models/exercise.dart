@@ -3,6 +3,8 @@ import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
+import 'dirty_table.dart';
+
 part 'exercise.g.dart';
 
 @json.JsonSerializable()
@@ -72,10 +74,9 @@ class Exercise {
 }
 
 @UseRowClass(Exercise)
-class Exercises extends Table {
+class Exercises extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text().nullable()();
-  BoolColumn get dirty => boolean()();
   TextColumn get name => text().withLength(min: 1)();
   TextColumn get description => text().nullable()();
   TextColumn get start_position_image_path => text().nullable()();
@@ -85,4 +86,7 @@ class Exercises extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }

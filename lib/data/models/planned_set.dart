@@ -3,6 +3,8 @@ import 'package:gym_app/data/models/planned_workout_exercise.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import 'dirty_table.dart';
+
 part 'planned_set.g.dart';
 
 @JsonSerializable()
@@ -32,16 +34,19 @@ class PlannedSet {
 }
 
 @UseRowClass(PlannedSet)
-class PlannedSets extends Table {
+class PlannedSets extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text()();
   TextColumn get workout_exercise_id =>
       text().references(PlannedWorkoutExercises, #id)();
-  BoolColumn get dirty => boolean()();
+
   IntColumn get set_number => integer()();
   IntColumn get min_repetitions => integer()();
   IntColumn get max_repetitions => integer()();
   RealColumn get rpe => real()();
   @override
   Set<Column> get primaryKey => {id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }

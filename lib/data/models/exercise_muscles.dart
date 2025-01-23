@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'dirty_table.dart';
 import 'exercise.dart';
 import 'muscle_group.dart';
 
@@ -20,8 +21,7 @@ class ExerciseMuscle {
   Map<String, dynamic> toJson() => _$ExerciseMuscleToJson(this);
 }
 
-class ExerciseMuscles extends Table {
-  BoolColumn get dirty => boolean()();
+class ExerciseMuscles extends Table implements DirtyTable {
   TextColumn get exercise_id =>
       text().references(Exercises, #id, onDelete: KeyAction.cascade)();
   IntColumn get muscle_group_id =>
@@ -29,4 +29,7 @@ class ExerciseMuscles extends Table {
 
   @override
   Set<Column> get primaryKey => {exercise_id, muscle_group_id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }

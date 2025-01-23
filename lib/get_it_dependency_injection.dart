@@ -36,7 +36,10 @@ Future<void> setUp() async {
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
   getIt.registerSingleton<SynchronizationCenter>(SynchronizationCenter(
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
-  await getIt.get<SynchronizationCenter>().syncRemoteToLocal(DateTime(1970));
+  // await getIt
+  //     .get<SynchronizationCenter>()
+  //     .syncFromRemoteToLocal(DateTime(1970));
+  //await getIt.get<SynchronizationCenter>().syncFromLocalToRemote();
   await getIt.get<OfflineUserDataSingleton>().initialize();
   setUpEnded = true;
 }

@@ -4,6 +4,8 @@ import 'package:gym_app/data/models/planned_workout.dart';
 import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
+import 'dirty_table.dart';
+
 part 'completed_workout.g.dart';
 
 @json.JsonSerializable()
@@ -45,7 +47,7 @@ class CompletedWorkout {
 }
 
 @UseRowClass(CompletedWorkout)
-class CompletedWorkouts extends Table {
+class CompletedWorkouts extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text()();
   TextColumn get planned_workout_id =>
@@ -55,7 +57,6 @@ class CompletedWorkouts extends Table {
       dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get start_time => dateTime().nullable()();
   DateTimeColumn get end_time => dateTime().nullable()();
-  BoolColumn get dirty => boolean()();
   IntColumn get total_duration =>
       integer().nullable().check(total_duration.isBiggerThanValue(0))();
   TextColumn get notes => text().nullable()();
@@ -64,4 +65,7 @@ class CompletedWorkouts extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }

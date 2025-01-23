@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'dirty_table.dart';
+
 part 'user_preferences.g.dart';
 
 @JsonSerializable()
@@ -23,12 +25,14 @@ class UserPreferences {
 }
 
 @UseRowClass(UserPreferences)
-class UserPreferencesTable extends Table {
+class UserPreferencesTable extends Table implements DirtyTable {
   TextColumn get user_id => text()();
-  BoolColumn get dirty => boolean()();
   BoolColumn get is_dark_mode => boolean()();
   BoolColumn get is_metric => boolean()();
 
   @override
   Set<Column> get primaryKey => {user_id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }

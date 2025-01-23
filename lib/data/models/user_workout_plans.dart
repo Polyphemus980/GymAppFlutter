@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'dirty_table.dart';
+
 part 'user_workout_plans.g.dart';
 
 @JsonSerializable()
@@ -21,12 +23,13 @@ class UserWorkoutPlans {
   Map<String, dynamic> toJson() => _$UserWorkoutPlansToJson(this);
 }
 
-class UserWorkoutPlansTable extends Table {
+class UserWorkoutPlansTable extends Table implements DirtyTable {
   TextColumn get user_id => text()();
   TextColumn get workout_plan_id =>
       text().references(WorkoutPlans, #id, onDelete: KeyAction.cascade)();
-  BoolColumn get dirty => boolean()();
 
   @override
   Set<Column> get primaryKey => {user_id};
+  @override
+  BoolColumn get dirty => boolean()();
 }

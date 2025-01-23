@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import 'completed_workout_exercise.dart';
+import 'dirty_table.dart';
 
 part 'completed_set.g.dart';
 
@@ -40,13 +41,12 @@ class CompletedSet {
 }
 
 @UseRowClass(CompletedSet)
-class CompletedSets extends Table {
+class CompletedSets extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text()();
   TextColumn get workout_exercise_id =>
       text().references(CompletedWorkoutExercises, #id)();
   IntColumn get set_number => integer()();
-  BoolColumn get dirty => boolean()();
   IntColumn get repetitions => integer()();
   IntColumn get duration_seconds => integer().nullable()();
   RealColumn get weight => real().nullable()();
@@ -55,4 +55,6 @@ class CompletedSets extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+  @override
+  BoolColumn get dirty => boolean()();
 }

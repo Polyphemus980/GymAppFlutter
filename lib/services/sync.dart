@@ -13,6 +13,8 @@ import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/models/dirty_table.dart';
+
 class SynchronizationCenter {
   final SupabaseClient supabaseClient;
   final AppDatabase db;
@@ -97,7 +99,7 @@ class SynchronizationCenter {
   late Map<String, Insertable<dynamic> Function(Map<String, dynamic>)>
       tableToInsertableMethods;
 
-  Future<void> syncRemoteToLocal(DateTime lastSynced) async {
+  Future<void> syncFromRemoteToLocal(DateTime lastSynced) async {
     for (final table in tables) {
       final rows = await supabaseClient.from(table).select();
       //.gt('updated_at', lastSynced);
@@ -109,6 +111,20 @@ class SynchronizationCenter {
           batch.insertAllOnConflictUpdate(tableToDaoMap[table], rowCompanions);
         });
       }
+    }
+  }
+
+  Future<void> syncFromLocalToRemote() async {
+    for (final table in tables) {
+      final dirtyRecords = await (db.select(tableToDaoMap[table])
+            ..where((tbl) {
+              final dirtyColumn = (tbl as DirtyTable).dirty;
+              return dirtyColumn.equals(true);
+            }))
+          .get();
+      final dirtyRecordsJson =
+          dirtyRecords.map((record) => record.toJson()).toList();
+      await supabaseClient.from(table).upsert(dirtyRecordsJson);
     }
   }
 }

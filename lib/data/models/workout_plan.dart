@@ -3,6 +3,8 @@ import 'package:gym_app/data/models/planned_workout.dart';
 import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
+import 'dirty_table.dart';
+
 part 'workout_plan.g.dart';
 
 @json.JsonSerializable()
@@ -37,13 +39,13 @@ class WorkoutPlan {
 }
 
 @UseRowClass(WorkoutPlan)
-class WorkoutPlans extends Table {
+class WorkoutPlans extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text()();
   TextColumn get description => text()();
   TextColumn get name => text().withLength(min: 1)();
   IntColumn get num_weeks => integer()();
-  BoolColumn get dirty => boolean()();
+
   IntColumn get days_per_week => integer()
       .check(days_per_week.isBiggerOrEqualValue(0))
       .check(days_per_week.isSmallerOrEqualValue(7))();
@@ -51,4 +53,6 @@ class WorkoutPlans extends Table {
   DateTimeColumn get updated_at => dateTime().nullable()();
   @override
   Set<Column> get primaryKey => {id};
+  @override
+  BoolColumn get dirty => boolean()();
 }

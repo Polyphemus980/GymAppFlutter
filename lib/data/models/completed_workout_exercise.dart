@@ -5,6 +5,7 @@ import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:uuid/uuid.dart';
 
 import 'completed_set.dart';
+import 'dirty_table.dart';
 
 part 'completed_workout_exercise.g.dart';
 
@@ -44,10 +45,9 @@ class CompletedWorkoutExercise {
 }
 
 @UseRowClass(CompletedWorkoutExercise)
-class CompletedWorkoutExercises extends Table {
+class CompletedWorkoutExercises extends Table implements DirtyTable {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get user_id => text()();
-  BoolColumn get dirty => boolean()();
   TextColumn get workout_id => text().references(CompletedWorkouts, #id)();
   TextColumn get exercise_id => text().references(Exercises, #id)();
   IntColumn get exercise_order =>
@@ -58,4 +58,7 @@ class CompletedWorkoutExercises extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+
+  @override
+  BoolColumn get dirty => boolean()();
 }
