@@ -12,9 +12,9 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           context.read<AuthBloc>().add(SignOutRequested());
-          getIt.get<OfflineUserDataSingleton>().deleteUserIdFromStorage();
+          await getIt.get<OfflineUserDataSingleton>().deleteUserIdFromStorage();
           context.go('/login');
         },
         child: const Text("Sign out"),

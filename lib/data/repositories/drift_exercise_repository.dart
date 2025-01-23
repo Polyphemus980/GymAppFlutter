@@ -19,7 +19,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   Future<void> _insertExerciseMuscles(
-      List<MuscleGroup> muscles, int exerciseId) async {
+      List<MuscleGroup> muscles, String exerciseId) async {
     for (final muscle in muscles) {
       await db.into(db.exerciseMuscles).insert(ExerciseMusclesCompanion(
           exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
@@ -27,7 +27,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   @override
-  Future<void> deleteExercise(int id) async {
+  Future<void> deleteExercise(String id) async {
     await (db.delete(db.exercises)..where((exercise) => exercise.id.equals(id)))
         .go();
   }
@@ -39,7 +39,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   @override
-  Future<Exercise?> getExerciseById(int id) async {
+  Future<Exercise?> getExerciseById(String id) async {
     final exercise = await (db.select(db.exercises)
           ..where((exercise) => exercise.id.equals(id)))
         .getSingleOrNull();
@@ -76,7 +76,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
         ],
       )..where(db.exerciseMuscles.exerciseId.isIn(ids));
       return muscleQuery.watch().map((rows) {
-        final idToMuscles = <int, List<MuscleGroup>>{};
+        final idToMuscles = <String, List<MuscleGroup>>{};
         for (final row in rows) {
           final item = row.readTable(db.muscleGroups);
           final id = row.readTable(db.exerciseMuscles).exerciseId;

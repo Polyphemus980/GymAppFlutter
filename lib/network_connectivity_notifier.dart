@@ -30,7 +30,6 @@ class NetworkConnectivityNotifier extends ChangeNotifier {
 
   void _updateConnectionStatus(List<ConnectivityResult> result) {
     _isOnline = !result.contains(ConnectivityResult.none);
-    print("is online : $_isOnline");
     notifyListeners();
   }
 }

@@ -1,7 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+part 'planned_set.g.dart';
+
+@JsonSerializable()
 class PlannedSet {
   PlannedSet({
     required this.userId,
@@ -19,6 +23,10 @@ class PlannedSet {
   final int minRepetitions;
   final int maxRepetitions;
   final double rpe;
+
+  factory PlannedSet.fromJson(Map<String, dynamic> json) =>
+      _$PlannedSetFromJson(json);
+  Map<String, dynamic> toJson() => _$PlannedSetToJson(this);
 }
 
 @UseRowClass(PlannedSet)

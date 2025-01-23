@@ -1,5 +1,9 @@
 import 'package:drift/drift.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'user_preferences.g.dart';
+
+@JsonSerializable()
 class UserPreferences {
   final String userId;
   final bool isDarkMode;
@@ -7,6 +11,10 @@ class UserPreferences {
 
   UserPreferences(
       {required this.userId, required this.isDarkMode, required this.isMetric});
+
+  factory UserPreferences.fromJson(Map<String, dynamic> json) =>
+      _$UserPreferencesFromJson(json);
+  Map<String, dynamic> toJson() => _$UserPreferencesToJson(this);
 }
 
 @UseRowClass(UserPreferences)

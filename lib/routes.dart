@@ -29,11 +29,6 @@ import 'widgets/bottom_nav_bar.dart';
 
 final router = GoRouter(
     redirect: (context, state) async {
-      print(context.isOnline);
-      if (!getIt.get<OfflineUserDataSingleton>().hasLoaded) {
-        Future.delayed(Duration(seconds: 2));
-      }
-      print(getIt.get<OfflineUserDataSingleton>().hasUser);
       if (context.isOnline ||
           (!context.isOnline &&
               !getIt.get<OfflineUserDataSingleton>().hasUser)) {

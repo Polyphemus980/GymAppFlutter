@@ -9,7 +9,7 @@ part of 'exercise.dart';
 Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
       description: json['description'] as String?,
       name: json['name'] as String,
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       startPositionImagePath: json['startPositionImagePath'] as String?,
       endPositionImagePath: json['endPositionImagePath'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),

@@ -1,17 +1,25 @@
 import 'package:drift/drift.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'exercise.dart';
 import 'muscle_group.dart';
 
+part 'exercise_muscles.g.dart';
+
+@JsonSerializable()
 class ExerciseMuscle {
   ExerciseMuscle({required this.exerciseId, required this.muscleId});
   final int exerciseId;
   final int muscleId;
+
+  factory ExerciseMuscle.fromJson(Map<String, dynamic> json) =>
+      _$ExerciseMuscleFromJson(json);
+  Map<String, dynamic> toJson() => _$ExerciseMuscleToJson(this);
 }
 
 class ExerciseMuscles extends Table {
-  IntColumn get exerciseId =>
-      integer().references(Exercises, #id, onDelete: KeyAction.cascade)();
+  TextColumn get exerciseId =>
+      text().references(Exercises, #id, onDelete: KeyAction.cascade)();
   IntColumn get muscleGroupId =>
       integer().references(MuscleGroups, #id, onDelete: KeyAction.cascade)();
 

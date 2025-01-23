@@ -1,8 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/completed_workout_exercise.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+part 'completed_workout.g.dart';
+
+@JsonSerializable()
 class CompletedWorkout {
   final String id;
   final String userId;
@@ -32,6 +36,9 @@ class CompletedWorkout {
     this.updatedAt,
     this.exercises,
   });
+  factory CompletedWorkout.fromJson(Map<String, dynamic> json) =>
+      _$CompletedWorkoutFromJson(json);
+  Map<String, dynamic> toJson() => _$CompletedWorkoutToJson(this);
 }
 
 @UseRowClass(CompletedWorkout)

@@ -1,11 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'exercise.g.dart';
 
-// Exercises will not be replicated across devices as most of them are from assets
-// and storing only the custom ones would take too much time.
 @JsonSerializable()
 class Exercise {
   Exercise(
@@ -16,7 +15,7 @@ class Exercise {
       this.endPositionImagePath,
       required this.createdAt,
       this.updatedAt});
-  final int id;
+  final String id;
   final String name;
   final String? description;
   final String? startPositionImagePath;
@@ -60,7 +59,7 @@ class Exercise {
 
 @UseRowClass(Exercise)
 class Exercises extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
   TextColumn get name => text().withLength(min: 1)();
   TextColumn get description => text().nullable()();
   TextColumn get startPositionImagePath => text().nullable()();
