@@ -18,18 +18,15 @@ class SyncWorkoutRepository {
   Future<void> addWorkoutPlanSyncSplit(
       WorkoutPlanHelper plan, String userId, bool isOnline) async {
     bool stopSupabaseInserting = false;
-    debugPrint("koks: ${isOnline.toString()}");
 
     db.transaction(() async {
       final insertedPlan = await _insertWorkoutPlan(plan, userId, isOnline);
 
       if (isOnline && !stopSupabaseInserting) {
         try {
-          debugPrint("here 1");
           await supabaseClient
               .from('workout_plans')
               .insert(insertedPlan.toJson());
-          debugPrint("here 2");
         } catch (err) {
           stopSupabaseInserting = true;
           debugPrint("$err");
