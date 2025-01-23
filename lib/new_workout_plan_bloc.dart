@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 
@@ -93,7 +94,8 @@ class NewWorkoutPlanBloc
       FinishCreationEvent event, Emitter<NewWorkoutPlanState> emit) async {
     final currentState = state as InProgressState;
     final plan = currentState.plan;
-    syncWorkoutRepository.addWorkoutPlanSyncSplit(
+    debugPrint("Here ${event.isOnline.toString()}");
+    await syncWorkoutRepository.addWorkoutPlanSyncSplit(
         plan, event.userId, event.isOnline);
     emit(EndedState());
   }

@@ -53,4 +53,7 @@ class PlannedWorkouts extends Table {
   TextColumn get description => text().nullable()();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

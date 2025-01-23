@@ -16,7 +16,7 @@ class CompletedSet {
   final int? duration_seconds;
   final bool dirty;
   final double? weight;
-  final DateTime? created_at;
+  final DateTime created_at;
   final DateTime? updated_at;
 
   CompletedSet({
@@ -28,7 +28,7 @@ class CompletedSet {
     required this.repetitions,
     this.duration_seconds,
     this.weight,
-    this.created_at,
+    required this.created_at,
     this.updated_at,
   });
 
@@ -52,4 +52,7 @@ class CompletedSets extends Table {
   RealColumn get weight => real().nullable()();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

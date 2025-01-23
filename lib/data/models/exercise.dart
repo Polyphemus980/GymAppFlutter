@@ -11,7 +11,7 @@ class Exercise {
     required this.dirty,
     this.description,
     required this.name,
-    required this.user_id,
+    this.user_id,
     required this.id,
     this.start_position_image_path,
     this.end_position_image_path,
@@ -20,7 +20,7 @@ class Exercise {
   });
 
   final String id;
-  final String user_id;
+  final String? user_id;
   final String name;
   final String? description;
   final String? start_position_image_path;
@@ -74,7 +74,7 @@ class Exercise {
 @UseRowClass(Exercise)
 class Exercises extends Table {
   TextColumn get id => text().clientDefault(() => const Uuid().v4())();
-  TextColumn get user_id => text()();
+  TextColumn get user_id => text().nullable()();
   BoolColumn get dirty => boolean()();
   TextColumn get name => text().withLength(min: 1)();
   TextColumn get description => text().nullable()();
@@ -82,4 +82,7 @@ class Exercises extends Table {
   TextColumn get end_position_image_path => text().nullable()();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

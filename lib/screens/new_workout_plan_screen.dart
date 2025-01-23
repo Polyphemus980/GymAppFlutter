@@ -133,13 +133,14 @@ class DaysPages extends HookWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: AppInkWellButton(
                                 onTap: () {
-                                  if (!state.plan.isFilled()) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Every training day must have at least 1 exercise")));
-                                    return;
-                                  }
+                                  // if (!state.plan.isFilled()) {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //       const SnackBar(
+                                  //           content: Text(
+                                  //               "Every training day must have at least 1 exercise")));
+                                  //   return;
+                                  // }
+
                                   context.read<NewWorkoutPlanBloc>().add(
                                       FinishCreationEvent(
                                           isOnline: context.isOnline,

@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:gym_app/services/sync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/app_database.dart';
@@ -33,6 +34,9 @@ Future<void> setUp() async {
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
   getIt.registerSingleton<SyncWorkoutRepository>(SyncWorkoutRepository(
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
+  getIt.registerSingleton<SynchronizationCenter>(SynchronizationCenter(
+      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
+  await getIt.get<SynchronizationCenter>().syncRemoteToLocal(DateTime(1970));
   await getIt.get<OfflineUserDataSingleton>().initialize();
   setUpEnded = true;
 }

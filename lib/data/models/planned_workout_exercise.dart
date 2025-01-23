@@ -55,4 +55,6 @@ class PlannedWorkoutExercises extends Table {
   BoolColumn get dirty => boolean()();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
+  @override
+  Set<Column> get primaryKey => {id};
 }

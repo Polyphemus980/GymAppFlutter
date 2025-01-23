@@ -24,8 +24,11 @@ class UserPreferences {
 
 @UseRowClass(UserPreferences)
 class UserPreferencesTable extends Table {
-  TextColumn get user_id => text().unique()();
+  TextColumn get user_id => text()();
   BoolColumn get dirty => boolean()();
   BoolColumn get is_dark_mode => boolean()();
   BoolColumn get is_metric => boolean()();
+
+  @override
+  Set<Column> get primaryKey => {user_id};
 }

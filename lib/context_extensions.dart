@@ -4,6 +4,9 @@ import 'package:gym_app/auth_bloc.dart';
 import 'package:gym_app/network_connectivity_notifier.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'get_it_dependency_injection.dart';
+import 'offline_user_data_singleton.dart';
+
 extension BuildContextExtensions on BuildContext {
   User get currentUser {
     final authState = read<AuthBloc>().state;
@@ -14,7 +17,7 @@ extension BuildContextExtensions on BuildContext {
   }
 
   String get currentUserId {
-    return currentUser.id;
+    return getIt.get<OfflineUserDataSingleton>().userId!;
   }
 
   bool get isAuthenticated {

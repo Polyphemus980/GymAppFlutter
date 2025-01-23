@@ -10,7 +10,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
       dirty: json['dirty'] as bool,
       description: json['description'] as String?,
       name: json['name'] as String,
-      user_id: json['user_id'] as String,
+      user_id: json['user_id'] as String?,
       id: json['id'] as String,
       start_position_image_path: json['start_position_image_path'] as String?,
       end_position_image_path: json['end_position_image_path'] as String?,

@@ -55,4 +55,7 @@ class CompletedWorkoutExercises extends Table {
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
   TextColumn get notes => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

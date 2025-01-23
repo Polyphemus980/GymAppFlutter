@@ -49,4 +49,6 @@ class WorkoutPlans extends Table {
       .check(days_per_week.isSmallerOrEqualValue(7))();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
+  @override
+  Set<Column> get primaryKey => {id};
 }

@@ -42,4 +42,6 @@ class PlannedSets extends Table {
   IntColumn get min_repetitions => integer()();
   IntColumn get max_repetitions => integer()();
   RealColumn get rpe => real()();
+  @override
+  Set<Column> get primaryKey => {id};
 }

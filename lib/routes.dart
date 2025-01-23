@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
@@ -30,9 +29,7 @@ import 'widgets/bottom_nav_bar.dart';
 
 final router = GoRouter(
     redirect: (context, state) async {
-      if (context.isOnline ||
-          (!context.isOnline &&
-              !getIt.get<OfflineUserDataSingleton>().hasUser)) {
+      if (!getIt.get<OfflineUserDataSingleton>().hasUser) {
         final authState = context.read<AuthBloc>().state;
         final publicRoutes = [
           '/login',

@@ -154,7 +154,7 @@ class $WorkoutPlansTable extends WorkoutPlans
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   WorkoutPlan map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -495,7 +495,7 @@ class $PlannedWorkoutsTable extends PlannedWorkouts
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   PlannedWorkout map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -867,7 +867,7 @@ class $CompletedWorkoutsTable extends CompletedWorkouts
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   CompletedWorkout map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1096,8 +1096,8 @@ class $ExercisesTable extends Exercises
       const VerificationMeta('user_id');
   @override
   late final GeneratedColumn<String> user_id = GeneratedColumn<String>(
-      'user_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'user_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
   @override
   late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
@@ -1175,8 +1175,6 @@ class $ExercisesTable extends Exercises
     if (data.containsKey('user_id')) {
       context.handle(_user_idMeta,
           user_id.isAcceptableOrUnknown(data['user_id']!, _user_idMeta));
-    } else if (isInserting) {
-      context.missing(_user_idMeta);
     }
     if (data.containsKey('dirty')) {
       context.handle(
@@ -1225,7 +1223,7 @@ class $ExercisesTable extends Exercises
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Exercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1237,7 +1235,7 @@ class $ExercisesTable extends Exercises
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       user_id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id']),
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       start_position_image_path: attachedDatabase.typeMapping.read(
@@ -1261,7 +1259,7 @@ class $ExercisesTable extends Exercises
 
 class ExercisesCompanion extends UpdateCompanion<Exercise> {
   final Value<String> id;
-  final Value<String> user_id;
+  final Value<String?> user_id;
   final Value<bool> dirty;
   final Value<String> name;
   final Value<String?> description;
@@ -1284,7 +1282,7 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
   });
   ExercisesCompanion.insert({
     this.id = const Value.absent(),
-    required String user_id,
+    this.user_id = const Value.absent(),
     required bool dirty,
     required String name,
     this.description = const Value.absent(),
@@ -1293,8 +1291,7 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
     this.created_at = const Value.absent(),
     this.updated_at = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : user_id = Value(user_id),
-        dirty = Value(dirty),
+  })  : dirty = Value(dirty),
         name = Value(name);
   static Insertable<Exercise> custom({
     Expression<String>? id,
@@ -1326,7 +1323,7 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
 
   ExercisesCompanion copyWith(
       {Value<String>? id,
-      Value<String>? user_id,
+      Value<String?>? user_id,
       Value<bool>? dirty,
       Value<String>? name,
       Value<String?>? description,
@@ -1561,7 +1558,7 @@ class $CompletedWorkoutExercisesTable extends CompletedWorkoutExercises
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   CompletedWorkoutExercise map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -1900,7 +1897,7 @@ class $CompletedSetsTable extends CompletedSets
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   CompletedSet map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2234,7 +2231,7 @@ class $PlannedWorkoutExercisesTable extends PlannedWorkoutExercises
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   PlannedWorkoutExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2901,7 +2898,7 @@ class $PlannedSetsTable extends PlannedSets
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   PlannedSet map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3078,9 +3075,7 @@ class $UserPreferencesTableTable extends UserPreferencesTable
   @override
   late final GeneratedColumn<String> user_id = GeneratedColumn<String>(
       'user_id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
   @override
   late final GeneratedColumn<bool> dirty = GeneratedColumn<bool>(
@@ -3150,7 +3145,7 @@ class $UserPreferencesTableTable extends UserPreferencesTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {user_id};
   @override
   UserPreferences map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3326,7 +3321,7 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {user_id};
   @override
   UserWorkoutPlansTableData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -4120,7 +4115,7 @@ final class $$PlannedWorkoutsTableReferences extends BaseReferences<
 
   $$WorkoutPlansTableProcessedTableManager get workout_plan_id {
     final manager = $$WorkoutPlansTableTableManager($_db, $_db.workoutPlans)
-        .filter((f) => f.id($_item.workout_plan_id));
+        .filter((f) => f.id($_item.workout_plan_id!));
     final item = $_typedResult.readTableOrNull(_workout_plan_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -5070,7 +5065,7 @@ typedef $$CompletedWorkoutsTableProcessedTableManager = ProcessedTableManager<
         {bool planned_workout_id, bool completedWorkoutExercisesRefs})>;
 typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
   Value<String> id,
-  required String user_id,
+  Value<String?> user_id,
   required bool dirty,
   required String name,
   Value<String?> description,
@@ -5082,7 +5077,7 @@ typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
 });
 typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<String> id,
-  Value<String> user_id,
+  Value<String?> user_id,
   Value<bool> dirty,
   Value<String> name,
   Value<String?> description,
@@ -5431,7 +5426,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
               $$ExercisesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> user_id = const Value.absent(),
+            Value<String?> user_id = const Value.absent(),
             Value<bool> dirty = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
@@ -5455,7 +5450,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            required String user_id,
+            Value<String?> user_id = const Value.absent(),
             required bool dirty,
             required String name,
             Value<String?> description = const Value.absent(),
@@ -5594,7 +5589,7 @@ final class $$CompletedWorkoutExercisesTableReferences extends BaseReferences<
   $$CompletedWorkoutsTableProcessedTableManager get workout_id {
     final manager =
         $$CompletedWorkoutsTableTableManager($_db, $_db.completedWorkouts)
-            .filter((f) => f.id($_item.workout_id));
+            .filter((f) => f.id($_item.workout_id!));
     final item = $_typedResult.readTableOrNull(_workout_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -5607,7 +5602,7 @@ final class $$CompletedWorkoutExercisesTableReferences extends BaseReferences<
 
   $$ExercisesTableProcessedTableManager get exercise_id {
     final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id($_item.exercise_id));
+        .filter((f) => f.id($_item.exercise_id!));
     final item = $_typedResult.readTableOrNull(_exercise_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -6097,7 +6092,7 @@ final class $$CompletedSetsTableReferences
       get workout_exercise_id {
     final manager = $$CompletedWorkoutExercisesTableTableManager(
             $_db, $_db.completedWorkoutExercises)
-        .filter((f) => f.id($_item.workout_exercise_id));
+        .filter((f) => f.id($_item.workout_exercise_id!));
     final item = $_typedResult.readTableOrNull(_workout_exercise_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -6449,7 +6444,7 @@ final class $$PlannedWorkoutExercisesTableReferences extends BaseReferences<
   $$PlannedWorkoutsTableProcessedTableManager get workout_id {
     final manager =
         $$PlannedWorkoutsTableTableManager($_db, $_db.plannedWorkouts)
-            .filter((f) => f.id($_item.workout_id));
+            .filter((f) => f.id($_item.workout_id!));
     final item = $_typedResult.readTableOrNull(_workout_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -6462,7 +6457,7 @@ final class $$PlannedWorkoutExercisesTableReferences extends BaseReferences<
 
   $$ExercisesTableProcessedTableManager get exercise_id {
     final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id($_item.exercise_id));
+        .filter((f) => f.id($_item.exercise_id!));
     final item = $_typedResult.readTableOrNull(_exercise_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7125,7 +7120,7 @@ final class $$ExerciseMusclesTableReferences extends BaseReferences<
 
   $$ExercisesTableProcessedTableManager get exercise_id {
     final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id($_item.exercise_id));
+        .filter((f) => f.id($_item.exercise_id!));
     final item = $_typedResult.readTableOrNull(_exercise_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7138,7 +7133,7 @@ final class $$ExerciseMusclesTableReferences extends BaseReferences<
 
   $$MuscleGroupsTableProcessedTableManager get muscle_group_id {
     final manager = $$MuscleGroupsTableTableManager($_db, $_db.muscleGroups)
-        .filter((f) => f.id($_item.muscle_group_id));
+        .filter((f) => f.id($_item.muscle_group_id!));
     final item = $_typedResult.readTableOrNull(_muscle_group_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7458,7 +7453,7 @@ final class $$PlannedSetsTableReferences
   $$PlannedWorkoutExercisesTableProcessedTableManager get workout_exercise_id {
     final manager = $$PlannedWorkoutExercisesTableTableManager(
             $_db, $_db.plannedWorkoutExercises)
-        .filter((f) => f.id($_item.workout_exercise_id));
+        .filter((f) => f.id($_item.workout_exercise_id!));
     final item = $_typedResult.readTableOrNull(_workout_exercise_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7939,7 +7934,7 @@ final class $$UserWorkoutPlansTableTableReferences extends BaseReferences<
 
   $$WorkoutPlansTableProcessedTableManager get workout_plan_id {
     final manager = $$WorkoutPlansTableTableManager($_db, $_db.workoutPlans)
-        .filter((f) => f.id($_item.workout_plan_id));
+        .filter((f) => f.id($_item.workout_plan_id!));
     final item = $_typedResult.readTableOrNull(_workout_plan_idTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(

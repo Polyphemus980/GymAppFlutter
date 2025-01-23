@@ -15,9 +15,7 @@ CompletedSet _$CompletedSetFromJson(Map<String, dynamic> json) => CompletedSet(
       repetitions: (json['repetitions'] as num).toInt(),
       duration_seconds: (json['duration_seconds'] as num?)?.toInt(),
       weight: (json['weight'] as num?)?.toDouble(),
-      created_at: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
+      created_at: DateTime.parse(json['created_at'] as String),
       updated_at: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
@@ -33,6 +31,6 @@ Map<String, dynamic> _$CompletedSetToJson(CompletedSet instance) =>
       'duration_seconds': instance.duration_seconds,
       'dirty': instance.dirty,
       'weight': instance.weight,
-      'created_at': instance.created_at?.toIso8601String(),
+      'created_at': instance.created_at.toIso8601String(),
       'updated_at': instance.updated_at?.toIso8601String(),
     };

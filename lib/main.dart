@@ -23,6 +23,7 @@ void main() async {
   );
   await setUp();
   HydratedBloc.storage = storage;
+
   runApp(const GlobalProviders(
     child: MyApp(),
   ));
