@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 
@@ -16,9 +15,9 @@ class SplashScreen extends StatelessWidget {
         listener: (context, state) async {
           if (state is Authenticated) {
             context.go('/home');
-          } else if (state is Unauthenticated && context.isOnline) {
+          } else if (state is Unauthenticated && getIt.isOnline) {
             context.go('/login');
-          } else if (state is Unauthenticated && !context.isOnline) {
+          } else if (state is Unauthenticated && !getIt.isOnline) {
             if (getIt.get<OfflineUserDataSingleton>().hasUser) {
               context.go('/home');
             }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/get_it_dependency_injection.dart';
-import 'package:gym_app/network_connectivity_notifier.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:provider/provider.dart';
 
@@ -30,10 +29,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 context.go('/start');
               },
               label: Text(
-                  '${Provider.of<TimerNotifier>(context).elapsedSeconds} + ${getIt.get<OfflineUserDataSingleton>().hasUser}+ ${context.watch<NetworkConnectivityNotifier>().isOnline}'),
+                  '${Provider.of<TimerNotifier>(context).elapsedSeconds} + ${getIt.get<OfflineUserDataSingleton>().hasUser}'),
               icon: const Icon(Icons.fitness_center),
             );
           } else {
+            // return FloatingActionButton.extended(
+            //   onPressed: () {},
+            //   label: Text(
+            //       '${context.watch<NetworkConnectivityNotifier>().isOnline}'),
+            //   icon: const Icon(Icons.fitness_center),
+            // );
             return const SizedBox.shrink();
           }
         },
@@ -45,8 +50,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Social',
+            icon: Icon(Icons.explore),
+            label: 'Discover',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),

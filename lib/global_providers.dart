@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/network_connectivity_notifier.dart';
-import 'package:gym_app/services/sync.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_bloc.dart';
-import 'get_it_dependency_injection.dart';
 import 'theme_notifier.dart';
 import 'timer_notifier.dart';
 import 'workout_bloc.dart';
@@ -22,12 +19,10 @@ class GlobalProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<NetworkConnectivityNotifier>(
-          create: (_) => NetworkConnectivityNotifier(
-              syncCenter: getIt.get<SynchronizationCenter>()),
-        ),
         ChangeNotifierProvider<ThemeNotifier>(
-          create: (_) => ThemeNotifier(),
+          create: (_) {
+            return ThemeNotifier();
+          },
         ),
         BlocProvider<WorkoutBloc>(
             create: (BuildContext context) => WorkoutBloc()),

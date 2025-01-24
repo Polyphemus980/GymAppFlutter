@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
+import 'package:gym_app/screens/home_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -59,7 +61,8 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const Placeholder(),
+              builder: (context, state) =>
+                  HomeScreen(db: getIt.get<AppDatabase>()),
             ),
             GoRoute(
               path: '/exercise',
@@ -101,6 +104,7 @@ final router = GoRouter(
           builder: (context, state) {
             return WorkoutPlanDisplayScreen(
               workoutRepository: getIt.get<LocalWorkoutRepository>(),
+              syncWorkoutRepository: getIt.get<SyncWorkoutRepository>(),
               workoutPlanId: state.pathParameters['id']!,
             );
           }),

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 
 import '../exercise_bloc.dart';
-import '../get_it_dependency_injection.dart';
 
 class SearchAndFilterRow extends StatelessWidget {
   void _showCopyModal(BuildContext parentContext) {
@@ -79,7 +77,6 @@ class ExerciseList extends StatelessWidget {
   final bool Function(Exercise)? selectCheckMethod;
   @override
   Widget build(BuildContext context) {
-    final exerciseRepository = getIt.get<LocalExerciseRepository>();
     return BlocBuilder<ExerciseBloc, ExerciseState>(
       builder: (context, state) {
         if (state is ExerciseLoading) {
@@ -116,12 +113,6 @@ class ExerciseList extends StatelessWidget {
                   title: Text(exercise.name),
                   subtitle: Text(
                     exercise.muscles!,
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      exerciseRepository.deleteExercise(exercise.id);
-                    },
                   ),
                   onTap: () {
                     if (onTapMethod != null) {

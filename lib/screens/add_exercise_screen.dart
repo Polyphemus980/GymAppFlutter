@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
+import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
 class AddExerciseScreen extends HookWidget {
@@ -14,7 +15,7 @@ class AddExerciseScreen extends HookWidget {
       List<MuscleGroup> muscles, BuildContext context) async {
     try {
       await syncExerciseRepository.addExerciseSync(
-          context.currentUserId, name, description, muscles, context.isOnline);
+          context.currentUserId, name, description, muscles, getIt.isOnline);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Exercise '$name' added successfully!")),
       );

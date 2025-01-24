@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_app/data/models/WorkoutPlanHelpers.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:gym_app/data/models/workout_plan_helpers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app_database.dart';
@@ -165,6 +165,35 @@ class SyncWorkoutRepository {
                 ..where((wp) => wp.id.equals(insertedPlannedSet.id)))
               .write(const PlannedSetsCompanion(dirty: Value(true)));
         }
+      }
+    }
+  }
+
+  Future<void> signUserUpForWorkoutPlan(
+      String userId, String planId, bool isOnline) async {
+    debugPrint("isOnline ${isOnline.toString()}");
+    final insertedUserWorkoutPlan = await db
+        .into(db.userWorkoutPlansTable)
+        .insertReturning(UserWorkoutPlansTableCompanion(
+          user_id: Value(userId),
+          workout_plan_id: Value(planId),
+          dirty: Value(!isOnline),
+        ));
+    debugPrint("here");
+    if (isOnline) {
+      debugPrint("here in online");
+      try {
+        debugPrint("here in supabase");
+        await supabaseClient
+            .from('user_workout_plans')
+            .insert(insertedUserWorkoutPlan.toJson());
+        debugPrint("print");
+      } catch (err) {
+        debugPrint("$err");
+        (db.update(db.userWorkoutPlansTable)
+              ..where((uwp) => uwp.user_id.equals(userId))
+              ..where((uwp) => uwp.workout_plan_id.equals(planId)))
+            .write(const UserWorkoutPlansTableCompanion(dirty: Value(true)));
       }
     }
   }

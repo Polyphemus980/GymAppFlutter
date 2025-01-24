@@ -143,7 +143,7 @@ class DaysPages extends HookWidget {
 
                                   context.read<NewWorkoutPlanBloc>().add(
                                       FinishCreationEvent(
-                                          isOnline: context.isOnline,
+                                          isOnline: getIt.isOnline,
                                           userId: context.currentUserId));
                                 },
                                 height: 75,

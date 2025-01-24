@@ -2,13 +2,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_app/services/sync.dart';
 
-class NetworkConnectivityNotifier extends ChangeNotifier {
+class NetworkConnectivityService {
   bool _isOnline = false;
   final Connectivity _connectivity = Connectivity();
   final SynchronizationCenter syncCenter;
+
   bool get isOnline => _isOnline;
 
-  NetworkConnectivityNotifier({required this.syncCenter}) {
+  NetworkConnectivityService({required this.syncCenter}) {
     _initConnectivity();
     _setupConnectivityStream();
   }
@@ -24,10 +25,10 @@ class NetworkConnectivityNotifier extends ChangeNotifier {
 
   void _setupConnectivityStream() {
     _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
+        .listen((List<ConnectivityResult> result) async {
       final isOnline = !result.contains(ConnectivityResult.none);
       if (isOnline) {
-        syncCenter.syncFromLocalToRemote();
+        await syncCenter.syncFromLocalToRemote();
       }
       _updateConnectionStatus(isOnline);
     });
@@ -35,6 +36,6 @@ class NetworkConnectivityNotifier extends ChangeNotifier {
 
   void _updateConnectionStatus(bool isOnline) {
     _isOnline = isOnline;
-    notifyListeners();
+    // Notify listeners or other parts of the app if needed
   }
 }

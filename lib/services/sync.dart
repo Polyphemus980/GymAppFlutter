@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/database_helpers.dart';
 import 'package:gym_app/data/models/completed_set.dart';
@@ -82,17 +83,17 @@ class SynchronizationCenter {
   }
 
   final tables = [
-    'completed_sets',
-    'completed_workouts',
-    'completed_workout_exercises',
     'exercises',
     'exercise_muscles',
-    'planned_sets',
+    'workout_plans',
     'planned_workouts',
     'planned_workout_exercises',
+    'planned_sets',
+    'completed_workouts',
+    'completed_workout_exercises',
+    'completed_sets',
     'user_preferences',
     'user_workout_plans',
-    'workout_plans',
   ];
 
   late Map<String, dynamic> tableToDaoMap;
@@ -115,16 +116,62 @@ class SynchronizationCenter {
   }
 
   Future<void> syncFromLocalToRemote() async {
+    bool errorOccurred = false;
     for (final table in tables) {
-      final dirtyRecords = await (db.select(tableToDaoMap[table])
-            ..where((tbl) {
-              final dirtyColumn = (tbl as DirtyTable).dirty;
-              return dirtyColumn.equals(true);
-            }))
-          .get();
-      final dirtyRecordsJson =
-          dirtyRecords.map((record) => record.toJson()).toList();
-      await supabaseClient.from(table).upsert(dirtyRecordsJson);
+      try {
+        final dirtyRecords = await (db.select(tableToDaoMap[table])
+              ..where((tbl) {
+                final dirtyColumn = (tbl as DirtyTable).dirty;
+                return dirtyColumn.equals(true);
+              }))
+            .get();
+        final dirtyRecordsJson =
+            dirtyRecords.map((record) => record.toJson()).toList();
+        await supabaseClient.from(table).upsert(dirtyRecordsJson);
+      } catch (err) {
+        debugPrint("$err");
+        errorOccurred = true;
+      }
+    }
+    if (!errorOccurred) {
+      for (final table in tables) {
+        await (db.update(tableToDaoMap[table])
+              ..where((tbl) {
+                final dirtyColumn = (tbl as DirtyTable).dirty;
+                return dirtyColumn.equals(true);
+              }))
+            .write(_createCompanionForTable(table, dirty: false));
+      }
+    }
+  }
+
+  Insertable<dynamic> _createCompanionForTable(String table,
+      {required bool dirty}) {
+    switch (table) {
+      case 'exercises':
+        return ExercisesCompanion(dirty: Value(dirty));
+      case 'exercise_muscles':
+        return ExerciseMusclesCompanion(dirty: Value(dirty));
+      case 'workout_plans':
+        return WorkoutPlansCompanion(dirty: Value(dirty));
+      case 'planned_workouts':
+        return PlannedWorkoutsCompanion(dirty: Value(dirty));
+      case 'planned_workout_exercises':
+        return PlannedWorkoutExercisesCompanion(dirty: Value(dirty));
+      case 'planned_sets':
+        return PlannedSetsCompanion(dirty: Value(dirty));
+      case 'completed_workouts':
+        return CompletedWorkoutsCompanion(dirty: Value(dirty));
+      case 'completed_workout_exercises':
+        return CompletedWorkoutExercisesCompanion(dirty: Value(dirty));
+      case 'completed_sets':
+        return CompletedSetsCompanion(dirty: Value(dirty));
+      case 'user_preferences':
+        return UserPreferencesTableCompanion(dirty: Value(dirty));
+      case 'user_workout_plans':
+        return UserWorkoutPlansTableCompanion(dirty: Value(dirty));
+      default:
+        throw ArgumentError('Unknown table: $table');
     }
   }
 }

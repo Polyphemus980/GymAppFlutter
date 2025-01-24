@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:gym_app/services/network_connectivity_service.dart';
 import 'package:gym_app/services/sync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -36,10 +37,16 @@ Future<void> setUp() async {
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
   getIt.registerSingleton<SynchronizationCenter>(SynchronizationCenter(
       db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
-  // await getIt
-  //     .get<SynchronizationCenter>()
-  //     .syncFromRemoteToLocal(DateTime(1970));
-  //await getIt.get<SynchronizationCenter>().syncFromLocalToRemote();
+  getIt.registerSingleton<NetworkConnectivityService>(
+      NetworkConnectivityService(
+          syncCenter: getIt.get<SynchronizationCenter>()));
   await getIt.get<OfflineUserDataSingleton>().initialize();
+  await getIt
+      .get<SynchronizationCenter>()
+      .syncFromRemoteToLocal(DateTime(1970));
   setUpEnded = true;
+}
+
+extension GetItExtensions on GetIt {
+  bool get isOnline => get<NetworkConnectivityService>().isOnline;
 }
