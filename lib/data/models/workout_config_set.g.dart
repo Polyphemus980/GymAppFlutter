@@ -8,7 +8,6 @@ part of 'workout_config_set.dart';
 
 WorkoutConfigSet _$WorkoutConfigSetFromJson(Map<String, dynamic> json) =>
     WorkoutConfigSet(
-      exerciseId: (json['exerciseId'] as num).toInt(),
       setNumber: (json['setNumber'] as num).toInt(),
       completed: json['completed'] as bool? ?? false,
       repetitions: (json['repetitions'] as num?)?.toInt(),
@@ -22,7 +21,6 @@ WorkoutConfigSet _$WorkoutConfigSetFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$WorkoutConfigSetToJson(WorkoutConfigSet instance) =>
     <String, dynamic>{
-      'exerciseId': instance.exerciseId,
       'setNumber': instance.setNumber,
       'repetitions': instance.repetitions,
       'weight': instance.weight,

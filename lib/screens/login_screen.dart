@@ -3,7 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
+import 'package:gym_app/data/repositories/local_preferences_repository.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
+
+import '../get_it_dependency_injection.dart';
+import '../theme_notifier.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -19,12 +24,25 @@ class LoginScreen extends StatelessWidget {
         }
         return const LoginForm();
       },
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content:
                   Text("Error occurred while authenticating: ${state.error}")));
         } else if (state is Authenticated) {
+          final preferencesRepository = getIt.get<LocalPreferencesRepository>();
+          final userPreferences =
+              await preferencesRepository.getUserPreferences(state.user.id);
+          if (userPreferences != null) {
+            context
+                .read<ThemeNotifier>()
+                .changeUserTheme(userPreferences.is_dark_mode);
+          } else {
+            preferencesRepository.insertUserPreferences(userId: state.user.id);
+          }
+          await getIt
+              .get<OfflineUserDataSingleton>()
+              .addUserIdToStorage(state.user.id);
           context.go('/home');
         }
       },

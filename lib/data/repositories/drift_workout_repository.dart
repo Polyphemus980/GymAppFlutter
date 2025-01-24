@@ -6,17 +6,19 @@ import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DriftWorkoutRepository extends LocalWorkoutRepository {
+class DriftWorkoutRepository implements LocalWorkoutRepository {
   final AppDatabase db;
 
   DriftWorkoutRepository({required this.db});
   @override
-  Stream<List<WorkoutPlan>> watchWorkoutPlans() {
-    final workoutPlanStream = db.select(db.workoutPlans).watch();
+  Stream<List<WorkoutPlan>> watchWorkoutPlans(String userId) {
+    final workoutPlanStream = (db.select(db.workoutPlans)
+          ..where((workoutPlan) => workoutPlan.user_id.equals(userId)))
+        .watch();
     return workoutPlanStream.switchMap((plans) {
       final workoutStreams = plans.map((plan) {
         return (db.select(db.plannedWorkouts)
-              ..where((workout) => workout.workoutPlanId.equals(plan.id)))
+              ..where((workout) => workout.workout_plan_id.equals(plan.id)))
             .watch()
             .map((workouts) {
           plan.workouts = workouts;
@@ -30,25 +32,24 @@ class DriftWorkoutRepository extends LocalWorkoutRepository {
   }
 
   @override
-  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails() {
+  Stream<List<WorkoutPlan>> watchWorkoutPlansWithDetails(String userId) {
     final workoutPlanStream = db.select(db.workoutPlans).watch();
 
     return workoutPlanStream.switchMap((plans) {
       final planStreams = plans.map((plan) {
-        // Get planned workouts for this plan
         return (db.select(db.plannedWorkouts)
-              ..where((workout) => workout.workoutPlanId.equals(plan.id)))
+              ..where((workout) => workout.workout_plan_id.equals(plan.id)))
             .watch()
             .switchMap((workouts) {
           final exerciseStreams = workouts.map((workout) {
             return (db.select(db.plannedWorkoutExercises)
-                  ..where((exercise) => exercise.workoutId.equals(workout.id)))
+                  ..where((exercise) => exercise.workout_id.equals(workout.id)))
                 .watch()
                 .switchMap((exercises) {
               final setStreams = exercises.map((exercise) {
                 return (db.select(db.plannedSets)
                       ..where(
-                          (set) => set.workoutExerciseId.equals(exercise.id)))
+                          (set) => set.workout_exercise_id.equals(exercise.id)))
                     .watch()
                     .map((sets) {
                   exercise.sets = sets;
@@ -78,7 +79,8 @@ class DriftWorkoutRepository extends LocalWorkoutRepository {
   }
 
   @override
-  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(int planId) {
+  Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(
+      String planId, String userId) {
     final workoutPlanStream = (db.select(db.workoutPlans)
           ..where((plan) => plan.id.equals(planId)))
         .watchSingleOrNull();
@@ -89,23 +91,23 @@ class DriftWorkoutRepository extends LocalWorkoutRepository {
       }
 
       final planStream = (db.select(db.plannedWorkouts)
-            ..where((workout) => workout.workoutPlanId.equals(plan.id)))
+            ..where((workout) => workout.workout_plan_id.equals(plan.id)))
           .watch()
           .switchMap((workouts) {
         final exerciseStreams = workouts.map((workout) {
           return (db.select(db.plannedWorkoutExercises)
-                ..where((exercise) => exercise.workoutId.equals(workout.id)))
+                ..where((exercise) => exercise.workout_id.equals(workout.id)))
               .watch()
               .switchMap((exercises) {
             final setStreams = exercises.map((exercise) {
               final exerciseStream = (db.select(db.exercises)
-                    ..where((ex) => ex.id.equals(exercise.exerciseId)))
+                    ..where((ex) => ex.id.equals(exercise.exercise_id)))
                   .watchSingleOrNull();
 
               return exerciseStream.switchMap((exerciseDetails) {
                 return (db.select(db.plannedSets)
                       ..where(
-                          (set) => set.workoutExerciseId.equals(exercise.id)))
+                          (set) => set.workout_exercise_id.equals(exercise.id)))
                     .watch()
                     .map((sets) {
                   exercise.sets = sets;

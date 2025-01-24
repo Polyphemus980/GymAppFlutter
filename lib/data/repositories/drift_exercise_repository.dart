@@ -19,15 +19,15 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   Future<void> _insertExerciseMuscles(
-      List<MuscleGroup> muscles, int exerciseId) async {
+      List<MuscleGroup> muscles, String exerciseId) async {
     for (final muscle in muscles) {
       await db.into(db.exerciseMuscles).insert(ExerciseMusclesCompanion(
-          exerciseId: Value(exerciseId), muscleGroupId: Value(muscle.id)));
+          exercise_id: Value(exerciseId), muscle_group_id: Value(muscle.id)));
     }
   }
 
   @override
-  Future<void> deleteExercise(int id) async {
+  Future<void> deleteExercise(String id) async {
     await (db.delete(db.exercises)..where((exercise) => exercise.id.equals(id)))
         .go();
   }
@@ -39,7 +39,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   @override
-  Future<Exercise?> getExerciseById(int id) async {
+  Future<Exercise?> getExerciseById(String id) async {
     final exercise = await (db.select(db.exercises)
           ..where((exercise) => exercise.id.equals(id)))
         .getSingleOrNull();
@@ -52,8 +52,8 @@ class DriftExerciseRepository implements LocalExerciseRepository {
           id: Value(exercise.id),
           name: Value(exercise.name),
           description: Value(exercise.description),
-          createdAt: Value(exercise.createdAt),
-          updatedAt: Value(DateTime.now()),
+          created_at: Value(exercise.created_at),
+          updated_at: Value(DateTime.now()),
         ));
   }
 
@@ -72,14 +72,14 @@ class DriftExerciseRepository implements LocalExerciseRepository {
       final muscleQuery = (db.select(db.exerciseMuscles)).join(
         [
           innerJoin(db.muscleGroups,
-              db.muscleGroups.id.equalsExp(db.exerciseMuscles.muscleGroupId))
+              db.muscleGroups.id.equalsExp(db.exerciseMuscles.muscle_group_id))
         ],
-      )..where(db.exerciseMuscles.exerciseId.isIn(ids));
+      )..where(db.exerciseMuscles.exercise_id.isIn(ids));
       return muscleQuery.watch().map((rows) {
-        final idToMuscles = <int, List<MuscleGroup>>{};
+        final idToMuscles = <String, List<MuscleGroup>>{};
         for (final row in rows) {
           final item = row.readTable(db.muscleGroups);
-          final id = row.readTable(db.exerciseMuscles).exerciseId;
+          final id = row.readTable(db.exerciseMuscles).exercise_id;
 
           idToMuscles.putIfAbsent(id, () => []).add(item);
         }
@@ -89,7 +89,7 @@ class DriftExerciseRepository implements LocalExerciseRepository {
           if (idToMuscles.containsKey(id) &&
               idToMuscles[id]!.toSet().containsAll(groups.toSet())) {
             final exercise = idToExercise[id]!;
-            exercise.muscleGroups = idToMuscles[id]!;
+            exercise.muscle_groups = idToMuscles[id]!;
             exerciseList.add(exercise);
           }
         }

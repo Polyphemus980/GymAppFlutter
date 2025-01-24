@@ -7,7 +7,8 @@ import 'package:gym_app/widgets/exercise_common_widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models/exercise.dart';
-import '../main.dart';
+import '../get_it_dependency_injection.dart';
+import '../theme_notifier.dart';
 
 class SelectExerciseScreen extends StatefulWidget {
   const SelectExerciseScreen({super.key, required this.selectedExercises});

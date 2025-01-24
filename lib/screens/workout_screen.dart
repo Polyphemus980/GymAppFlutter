@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
@@ -152,7 +153,8 @@ class WorkoutListScreen extends StatelessWidget {
                 height: 16.0,
               ),
               StreamBuilder(
-                stream: workoutRepository.watchWorkoutPlans(),
+                stream:
+                    workoutRepository.watchWorkoutPlans(context.currentUserId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator(); // Loading state
@@ -256,12 +258,12 @@ class PlanCard extends StatelessWidget {
                     children: [
                       PlanInfoChip(
                         icon: Icons.calendar_today,
-                        text: '${plan.numWeeks} weeks',
+                        text: '${plan.num_weeks} weeks',
                       ),
                       const SizedBox(width: 12),
                       PlanInfoChip(
                           icon: Icons.schedule,
-                          text: '${plan.daysPerWeek} days/week'),
+                          text: '${plan.days_per_week} days/week'),
                     ],
                   ),
                 ],

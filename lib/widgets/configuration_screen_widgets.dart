@@ -38,7 +38,6 @@ class _SetCardState extends State<SetCard> {
     setState(() {
       WorkoutConfigSet newSet = WorkoutConfigSet(
         completed: false,
-        exerciseId: widget.exercise.id,
         setNumber: sets.length,
       );
       sets.add(newSet);

@@ -1,40 +1,60 @@
 import 'package:drift/drift.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 import 'completed_workout_exercise.dart';
+import 'dirty_table.dart';
 
+part 'completed_set.g.dart';
+
+@JsonSerializable()
 class CompletedSet {
-  final int id;
-  final int workoutExerciseId;
-  final int setNumber;
+  final String id;
+  final String user_id;
+  final String workout_exercise_id;
+  final int set_number;
   final int repetitions;
-  final int? durationSeconds;
+  final int? duration_seconds;
+  final bool dirty;
   final double? weight;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final DateTime created_at;
+  final DateTime? updated_at;
 
   CompletedSet({
+    required this.dirty,
+    required this.user_id,
     required this.id,
-    required this.workoutExerciseId,
-    required this.setNumber,
+    required this.workout_exercise_id,
+    required this.set_number,
     required this.repetitions,
-    this.durationSeconds,
+    this.duration_seconds,
     this.weight,
-    this.createdAt,
-    this.updatedAt,
+    required this.created_at,
+    this.updated_at,
   });
+
+  factory CompletedSet.fromJson(Map<String, dynamic> json) =>
+      _$CompletedSetFromJson(json);
+  Map<String, dynamic> toJson() => _$CompletedSetToJson(this);
 
   double? get volume => weight != null ? weight! * repetitions : null;
 }
 
 @UseRowClass(CompletedSet)
-class CompletedSets extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get workoutExerciseId =>
-      integer().references(CompletedWorkoutExercises, #id)();
-  IntColumn get setNumber => integer()();
+class CompletedSets extends Table implements DirtyTable {
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
+  TextColumn get user_id => text()();
+  TextColumn get workout_exercise_id =>
+      text().references(CompletedWorkoutExercises, #id)();
+  IntColumn get set_number => integer()();
   IntColumn get repetitions => integer()();
-  IntColumn get durationSeconds => integer().nullable()();
+  IntColumn get duration_seconds => integer().nullable()();
   RealColumn get weight => real().nullable()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updated_at => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+  @override
+  BoolColumn get dirty => boolean()();
 }

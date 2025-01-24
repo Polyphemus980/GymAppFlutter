@@ -56,10 +56,13 @@ class AppTextFormField extends StatelessWidget {
   final String? hintText;
   final String? errorText;
   final bool obscureText;
+  final bool readOnly;
   final TextStyle? errorStyle;
   final String? Function(String?)? validator;
   final void Function()? onEditingComplete;
   final void Function(String)? onChanged;
+
+  final TextInputType? keyboardType;
   const AppTextFormField(
       {super.key,
       this.errorStyle,
@@ -73,7 +76,9 @@ class AppTextFormField extends StatelessWidget {
       this.onEditingComplete,
       this.errorText,
       this.validator,
-      this.obscureText = false});
+      this.keyboardType,
+      this.obscureText = false,
+      this.readOnly = false});
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +91,11 @@ class AppTextFormField extends StatelessWidget {
         inputFormatters: formatters,
         controller: controller,
         style: Theme.of(context).textTheme.titleMedium,
-        keyboardType: TextInputType.number,
+        keyboardType: keyboardType,
         onChanged: onChanged,
         obscureText: obscureText,
         maxLines: obscureText ? 1 : null,
+        readOnly: readOnly,
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,

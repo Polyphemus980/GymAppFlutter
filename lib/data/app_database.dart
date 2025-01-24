@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:uuid/uuid.dart';
 
 import 'models/completed_set.dart';
 import 'models/completed_workout.dart';
@@ -12,9 +13,12 @@ import 'models/completed_workout_exercise.dart';
 import 'models/exercise.dart';
 import 'models/exercise_muscles.dart';
 import 'models/muscle_group.dart';
+import 'models/offline_user_data.dart';
 import 'models/planned_set.dart';
 import 'models/planned_workout.dart';
 import 'models/planned_workout_exercise.dart';
+import 'models/user_preferences.dart';
+import 'models/user_workout_plans.dart';
 import 'models/workout_plan.dart';
 
 part 'app_database.g.dart';
@@ -34,7 +38,10 @@ typedef ExerciseWithMuscleGroups = ({
   CompletedWorkoutExercises,
   MuscleGroups,
   ExerciseMuscles,
-  PlannedSets
+  PlannedSets,
+  UserPreferencesTable,
+  UserWorkoutPlansTable,
+  OfflineUserDataTable
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection()) {

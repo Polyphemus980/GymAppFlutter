@@ -1,133 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/repositories/local_exercise_repository.dart';
-import 'package:gym_app/main.dart';
+import 'package:gym_app/context_extensions.dart';
+import 'package:gym_app/data/models/muscle_group.dart';
+import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
+import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
-import '../data/models/muscle_group.dart';
+class AddExerciseScreen extends HookWidget {
+  final SyncExerciseRepository syncExerciseRepository;
+  const AddExerciseScreen({super.key, required this.syncExerciseRepository});
 
-class AddExerciseScreen extends StatefulWidget {
-  const AddExerciseScreen({super.key});
-
-  @override
-  AddExerciseScreenState createState() => AddExerciseScreenState();
-}
-
-class AddExerciseScreenState extends State<AddExerciseScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-
-  bool _isLoading = false;
-  List<MuscleGroup> selected = [];
-  String text = "";
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  bool validateMuscles() {
-    return selected.isNotEmpty;
-  }
-
-  Future<void> _insertExercise() async {
-    if ((_formKey.currentState?.validate() ?? false) && validateMuscles()) {
-      final repository = getIt.get<LocalExerciseRepository>();
-      final name = _nameController.text.trim();
-      final description = _descriptionController.text.trim();
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        repository.addExercise(name, description, selected);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Exercise '$name' added successfully!")),
-          );
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to add exercise: $e")),
-          );
-        }
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+  Future<void> _insertExercise(String name, String description,
+      List<MuscleGroup> muscles, BuildContext context) async {
+    try {
+      await syncExerciseRepository.addExerciseSync(
+          context.currentUserId, name, description, muscles, getIt.isOnline);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Exercise '$name' added successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to add exercise: $e")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final formKey = useState(GlobalKey<FormState>());
+    final nameController = useTextEditingController();
+    final descriptionController = useTextEditingController();
+    final musclesController = useTextEditingController();
+    final selectedMuscles = useState(<MuscleGroup>[]);
+    final isLoading = useState(false);
     return AppScaffold(
-        title: "Add exercise",
-        actions: [
-          _isLoading
-              ? const CircularProgressIndicator()
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FilledButton.icon(
-                    onPressed: _insertExercise,
-                    icon: const Icon(Icons.save),
-                    label: const Text('Save'),
-                  ),
-                ),
-        ],
+        title: 'Add exercise',
         child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(children: [
-              TextFormField(
-                  controller: _nameController,
-                  decoration:
-                      const InputDecoration(label: Text('Exercise Name')),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Name must not be empty';
-                    }
-                    return null;
-                  }),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration:
-                    const InputDecoration(label: Text('Exercise Description')),
-              ),
-              const SizedBox(height: 16),
-              Column(
-                children: [
-                  // Label for the muscles selection
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'Muscle Groups', // The label text
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+            key: formKey.value,
+            child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 32.0),
+                child: Column(spacing: 32, children: [
+                  AppTextFormField(
+                    width: double.infinity,
+                    controller: nameController,
+                    labelText: "Name",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Must have a name";
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await context.push('/add/pick', extra: selected);
-
-                      setState(() {
-                        text = selected
+                  AppTextFormField(
+                    width: double.infinity,
+                    controller: descriptionController,
+                    labelText: "Description",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Must have a description";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  Row(spacing: 16, children: [
+                    Expanded(
+                        child: AppTextFormField(
+                            width: double.infinity,
+                            labelText: "Muscles",
+                            controller: musclesController,
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Must have a description";
+                              } else {
+                                return null;
+                              }
+                            })),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () async {
+                        await context.push('/add/pick',
+                            extra: selectedMuscles.value);
+                        musclesController.text = selectedMuscles.value
                             .map((muscleGroup) => muscleGroup.name)
                             .join(', ');
-                      });
-                    },
-                    child: Text(text.isNotEmpty ? text : 'Pick exercise'),
+                      },
+                    )
+                  ]),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 75,
+                    child: isLoading.value
+                        ? ElevatedButton(
+                            onPressed: () {},
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          )
+                        : ElevatedButton.icon(
+                            icon: Icon(
+                              Icons.save,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                            onPressed: () async {
+                              if (formKey.value.currentState!.validate()) {
+                                await _insertExercise(
+                                    nameController.text.trim(),
+                                    descriptionController.text.trim(),
+                                    selectedMuscles.value,
+                                    context);
+                                context.pop();
+                              }
+                            },
+                            label: Text("Add",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary),
+                          ),
                   )
-                ],
-              ),
-            ]),
-          ),
-        ));
+                ]))));
   }
 }

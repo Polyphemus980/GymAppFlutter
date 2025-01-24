@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/repositories/local_workout_repository.dart';
+import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/new_workout_plan_bloc.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
-import 'package:provider/provider.dart';
 
-import '../main.dart';
+import '../get_it_dependency_injection.dart';
 
 class NewWorkoutPlanScreen extends StatelessWidget {
   final int numWeeks;
@@ -26,7 +26,7 @@ class NewWorkoutPlanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<NewWorkoutPlanBloc>(
       create: (_) => NewWorkoutPlanBloc(
-          workoutRepository: getIt.get<LocalWorkoutRepository>())
+          syncWorkoutRepository: getIt.get<SyncWorkoutRepository>())
         ..add(InitializePlanEvent(
             numDays: numDays,
             numWeeks: numWeeks,
@@ -133,16 +133,18 @@ class DaysPages extends HookWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: AppInkWellButton(
                                 onTap: () {
-                                  if (!state.plan.isFilled()) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Every training day must have at least 1 exercise")));
-                                    return;
-                                  }
-                                  context
-                                      .read<NewWorkoutPlanBloc>()
-                                      .add(FinishCreationEvent());
+                                  // if (!state.plan.isFilled()) {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //       const SnackBar(
+                                  //           content: Text(
+                                  //               "Every training day must have at least 1 exercise")));
+                                  //   return;
+                                  // }
+
+                                  context.read<NewWorkoutPlanBloc>().add(
+                                      FinishCreationEvent(
+                                          isOnline: getIt.isOnline,
+                                          userId: context.currentUserId));
                                 },
                                 height: 75,
                                 text: "Finish")),
@@ -201,7 +203,7 @@ class DayCard extends StatelessWidget {
               child: Text(
                 "No exercises added yet",
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
               ),
             ),
@@ -312,9 +314,7 @@ class DayContainer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Provider.of<ThemeNotifier>(context).isLightTheme()
-            ? Colors.white
-            : Colors.grey.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: Theme.of(context).colorScheme.secondary),
         boxShadow: const [
@@ -335,7 +335,8 @@ class DayContainer extends StatelessWidget {
                   title!,
                   softWrap: true,
                   style: TextStyle(
-                      fontSize: 24, color: Theme.of(context).primaryColor),
+                      fontSize: 24,
+                      color: Theme.of(context).colorScheme.onPrimary),
                 ),
               ),
             if (actions != null)
@@ -357,10 +358,7 @@ class PlanExerciseTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .secondaryContainer
-            .withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outlineVariant,
@@ -373,12 +371,9 @@ class PlanExerciseTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  exercise.exercise.name,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+                child: Text(exercise.exercise.name,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -416,7 +411,7 @@ class PlanExerciseTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  "Set ${setIndex + 1}: Perform ${set.minRepetitions == set.maxRepetitions ? set.minRepetitions : "${set.minRepetitions} - ${set.maxRepetitions}"} reps ${set.rpe != null ? 'at RPE ${set.rpe}' : ''}",
+                  "Set ${setIndex + 1}: ${set.minRepetitions == set.maxRepetitions ? set.minRepetitions : "${set.minRepetitions} - ${set.maxRepetitions}"} reps ${set.rpe != null ? 'at RPE ${set.rpe}' : ''}",
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
