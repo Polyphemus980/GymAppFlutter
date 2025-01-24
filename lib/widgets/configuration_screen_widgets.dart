@@ -78,7 +78,7 @@ class _SetCardState extends State<SetCard> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.4),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),

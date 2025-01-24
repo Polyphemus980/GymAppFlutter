@@ -6,6 +6,8 @@ import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/home_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
+import 'package:gym_app/screens/train_screen.dart';
+import 'package:gym_app/screens/workout_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_bloc.dart';
@@ -25,7 +27,6 @@ import 'screens/profile_screen.dart';
 import 'screens/select_exercise_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/workout_plan_display_screen.dart';
-import 'screens/workout_screen.dart';
 import 'timer_notifier.dart';
 import 'widgets/bottom_nav_bar.dart';
 
@@ -59,6 +60,9 @@ final router = GoRouter(
       ShellRoute(
           builder: (context, state, child) => BottomNavBar(child),
           routes: [
+            GoRoute(
+                path: '/train',
+                builder: (context, state) => const TrainScreen()),
             GoRoute(
               path: '/home',
               builder: (context, state) =>

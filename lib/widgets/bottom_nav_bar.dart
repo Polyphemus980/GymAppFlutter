@@ -77,7 +77,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             case 1:
               context.go('/workout');
             case 2:
-              context.go('/exercise');
+              context.go('/train');
             case 3:
               context.go('/profile');
           }

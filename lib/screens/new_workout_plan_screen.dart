@@ -314,7 +314,8 @@ class DayContainer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+        color:
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 1),
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: Theme.of(context).colorScheme.secondary),
         boxShadow: const [
@@ -336,7 +337,7 @@ class DayContainer extends StatelessWidget {
                   softWrap: true,
                   style: TextStyle(
                       fontSize: 24,
-                      color: Theme.of(context).colorScheme.onPrimary),
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
                 ),
               ),
             if (actions != null)
@@ -358,7 +359,10 @@ class PlanExerciseTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outlineVariant,
@@ -381,15 +385,16 @@ class PlanExerciseTile extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .tertiary
+                      .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   "${exercise.sets.length} sets",
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
                 ),
               ),
             ],
@@ -407,12 +412,16 @@ class PlanExerciseTile extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .tertiary
+                      .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   "Set ${setIndex + 1}: ${set.minRepetitions == set.maxRepetitions ? set.minRepetitions : "${set.minRepetitions} - ${set.maxRepetitions}"} reps ${set.rpe != null ? 'at RPE ${set.rpe}' : ''}",
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
                 ),
               );
             }).toList(),

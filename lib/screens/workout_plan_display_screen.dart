@@ -8,7 +8,9 @@ import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/screens/new_workout_plan_screen.dart';
+import 'package:gym_app/theme_notifier.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
+import 'package:provider/provider.dart';
 
 class WorkoutPlanDisplayScreen extends HookWidget {
   final LocalWorkoutRepository workoutRepository;
@@ -24,6 +26,14 @@ class WorkoutPlanDisplayScreen extends HookWidget {
   Widget build(BuildContext context) {
     final pageController = usePageController();
     return AppScaffold(
+      actions: [
+        IconButton(
+          onPressed: () {
+            context.read<ThemeNotifier>().toggleTheme();
+          },
+          icon: const Icon(Icons.dark_mode),
+        )
+      ],
       title: "Display workout plan",
       child: StreamBuilder(
         stream: workoutRepository.watchWorkoutPlanWithDetails(
