@@ -21,8 +21,8 @@ class SplashScreen extends StatelessWidget {
             if (getIt.get<OfflineUserDataSingleton>().hasUser) {
               context.go('/home');
             }
-            context.go('/login');
           }
+          context.go('/home');
         },
         child: const Center(
           child: FlutterLogo(size: 160),

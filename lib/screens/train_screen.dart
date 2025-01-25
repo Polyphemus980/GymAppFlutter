@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
+import 'package:gym_app/data/models/workout_plan.dart';
+import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
 
 class TrainScreen extends StatelessWidget {
-  const TrainScreen({super.key});
+  final LocalWorkoutRepository workoutRepository;
+  const TrainScreen({super.key, required this.workoutRepository});
 
   void displayWorkoutPopUp(BuildContext context) {
     showDialog(
@@ -39,9 +43,7 @@ class TrainScreen extends StatelessWidget {
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            // Quick start section
+          child: Column(spacing: 16, mainAxisSize: MainAxisSize.min, children: [
             const Text(
               'Quick Start',
               style: TextStyle(
@@ -49,8 +51,7 @@ class TrainScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-            InkWell(
+            AppInkWellButton(
               onTap: () {
                 if (context.read<WorkoutBloc>().state is WorkoutInProgress) {
                   displayWorkoutPopUp(context);
@@ -58,74 +59,53 @@ class TrainScreen extends StatelessWidget {
                   context.push('/new');
                 }
               },
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primaryContainer
-                      .withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.2),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondaryContainer
+                          .withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .secondaryContainer
-                            .withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 30,
-                        color:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
-                      ),
+                    child: Icon(
+                      Icons.add,
+                      size: 30,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Custom Workout',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Start with an empty workout and add exercises as you go',
-                            style: TextStyle(
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Custom Workout',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                               color: Theme.of(context)
                                   .colorScheme
-                                  .onPrimaryContainer
-                                  .withValues(alpha: 0.5),
-                            ),
+                                  .onPrimaryContainer),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Start with an empty workout and add exercises as you go',
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer
+                                .withValues(alpha: 0.5),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 32),
             const Text(
               'Continue programs',
               style: TextStyle(
@@ -133,8 +113,132 @@ class TrainScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            StreamBuilder(
+                stream: workoutRepository
+                    .watchUserWorkoutPlans(context.currentUserId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final userPlans = snapshot.data!;
+                    return ListView.separated(
+                      separatorBuilder: (context, index) => const SizedBox(
+                        height: 16,
+                      ),
+                      shrinkWrap: true,
+                      itemCount: userPlans.length,
+                      itemBuilder: (context, index) {
+                        final plan = userPlans[index];
+                        return WorkoutPlanContinueCard(
+                            onTap: () {
+                              if (context.read<WorkoutBloc>().state
+                                  is WorkoutInProgress) {
+                                displayWorkoutPopUp(context);
+                              } else {
+                                context.go('/planned_workout', extra: plan);
+                              }
+                            },
+                            currentDay: plan.current_day,
+                            currentWeek: plan.current_week,
+                            plan: plan.plan!);
+                      },
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else {
+                    return const Text("User hasnt interacted with any plan");
+                  }
+                }),
           ]),
         ),
+      ),
+    );
+  }
+}
+
+class WorkoutPlanContinueCard extends StatelessWidget {
+  final int currentDay;
+  final int currentWeek;
+  final WorkoutPlan plan;
+  final VoidCallback onTap;
+  const WorkoutPlanContinueCard({
+    super.key,
+    required this.currentDay,
+    required this.currentWeek,
+    required this.plan,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppInkWellButton(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.fitness_center,
+              size: 30,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Plan Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  plan.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Week ${currentWeek + 1} / Day ${currentDay + 1}',
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onPrimaryContainer
+                        .withValues(alpha: 0.5),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Progress Bar
+                LinearProgressIndicator(
+                  value: (currentDay + currentWeek * plan.days_per_week) *
+                          1.0 /
+                          (plan.num_weeks * plan.days_per_week) +
+                      0.5,
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .secondaryContainer
+                      .withValues(alpha: 0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+        ],
       ),
     );
   }

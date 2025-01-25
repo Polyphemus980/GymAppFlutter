@@ -1,6 +1,8 @@
+import 'package:drift/drift.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
 import 'package:gym_app/data/models/planned_workout_exercise.dart';
+import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:rxdart/rxdart.dart';
@@ -133,5 +135,55 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
 
       return planStream;
     });
+  }
+
+  @override
+  Stream<List<UserWorkoutPlans>> watchUserWorkoutPlans(String userId) {
+    return (db.select(db.userWorkoutPlansTable)).watch().map((userPlans) {
+      return Future.wait(userPlans.map((workoutPlan) async {
+        workoutPlan.plan = await (db.select(db.workoutPlans)
+              ..where((plan) => plan.id.equals(workoutPlan.workout_plan_id)))
+            .getSingleOrNull();
+        return workoutPlan;
+      }));
+    }).switchMap((futureList) => Stream.fromFuture(futureList));
+  }
+
+  @override
+  Future<PlannedWorkout> getPlannedWorkout(UserWorkoutPlans plan) async {
+    final plannedWorkout = await (db.select(db.plannedWorkouts)
+          ..where(
+              (workout) => workout.workout_plan_id.equals(plan.workout_plan_id))
+          ..where((workout) => workout.day_number.equals(plan.current_day))
+          ..where((workout) => workout.week_number.equals(plan.current_week)))
+        .getSingle();
+    final workoutExercises = await (db.select(db.plannedWorkoutExercises)
+          ..where((workout) => workout.workout_id.equals(plannedWorkout.id)))
+        .get();
+    for (final workoutExercise in workoutExercises) {
+      workoutExercise.sets = await (db.select(db.plannedSets)
+            ..where(
+                (set) => set.workout_exercise_id.equals(workoutExercise.id)))
+          .get();
+      final exercise = await (db.select(db.exercises)
+            ..where(
+                (exercise) => exercise.id.equals(workoutExercise.exercise_id)))
+          .getSingle();
+      final query = db.select(db.muscleGroups).join(
+        [
+          innerJoin(
+            db.exerciseMuscles,
+            db.exerciseMuscles.muscle_group_id.equalsExp(db.muscleGroups.id),
+          ),
+        ],
+      )..where(db.exerciseMuscles.exercise_id.equals(exercise.id));
+
+      final result = await query.get();
+      exercise.muscle_groups =
+          result.map((row) => row.readTable(db.muscleGroups)).toList();
+      workoutExercise.exercise = exercise;
+    }
+    plannedWorkout.exercises = workoutExercises;
+    return plannedWorkout;
   }
 }

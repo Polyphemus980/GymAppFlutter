@@ -30,6 +30,7 @@ class UserWorkoutPlans {
   Map<String, dynamic> toJson() => _$UserWorkoutPlansToJson(this);
 }
 
+@UseRowClass(UserWorkoutPlans)
 class UserWorkoutPlansTable extends Table implements DirtyTable {
   TextColumn get user_id => text()();
   TextColumn get workout_plan_id =>

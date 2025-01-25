@@ -48,7 +48,7 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
             Padding(
               padding: const EdgeInsetsDirectional.all(16.0),
               child: FloatingActionButton.extended(
-                  onPressed: () => context.pop(),
+                  onPressed: () => context.pop(widget.selectedExercises),
                   label: Text(
                       "${widget.selectedExercises.length} exercises selected")),
             ),

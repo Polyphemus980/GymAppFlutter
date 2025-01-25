@@ -18,7 +18,7 @@ class HomeScreen extends HookWidget {
               },
             );
           } else {
-            return Text("nothing yet");
+            return const Text("nothing yet");
           }
         });
   }

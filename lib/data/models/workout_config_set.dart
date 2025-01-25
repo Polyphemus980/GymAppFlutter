@@ -3,7 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'workout_config_set.g.dart';
 
-//TODO: This class should be used in the configuration screen as the user may not want to include the weights/reps in there.
 @JsonSerializable()
 class WorkoutConfigSet {
   int setNumber;
@@ -31,6 +30,7 @@ class WorkoutConfigSet {
   factory WorkoutConfigSet.fromPlannedSet(PlannedSet plannedSet) {
     return WorkoutConfigSet(
       completed: false,
+      isWeight: false,
       setNumber: plannedSet.set_number,
       minRepetitions: plannedSet.min_repetitions,
       maxRepetitions: plannedSet.max_repetitions,

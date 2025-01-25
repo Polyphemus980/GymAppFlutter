@@ -3256,7 +3256,7 @@ class UserPreferencesTableCompanion extends UpdateCompanion<UserPreferences> {
 }
 
 class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
-    with TableInfo<$UserWorkoutPlansTableTable, UserWorkoutPlansTableData> {
+    with TableInfo<$UserWorkoutPlansTableTable, UserWorkoutPlans> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3309,8 +3309,7 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   String get actualTableName => $name;
   static const String $name = 'user_workout_plans_table';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<UserWorkoutPlansTableData> instance,
+  VerificationContext validateIntegrity(Insertable<UserWorkoutPlans> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -3352,16 +3351,15 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   @override
   Set<GeneratedColumn> get $primaryKey => {user_id, workout_plan_id};
   @override
-  UserWorkoutPlansTableData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  UserWorkoutPlans map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return UserWorkoutPlansTableData(
-      dirty: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}dirty'])!,
+    return UserWorkoutPlans(
       user_id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
       workout_plan_id: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}workout_plan_id'])!,
+      dirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}dirty'])!,
       current_week: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}current_week'])!,
       current_day: attachedDatabase.typeMapping
@@ -3375,120 +3373,7 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   }
 }
 
-class UserWorkoutPlansTableData extends DataClass
-    implements Insertable<UserWorkoutPlansTableData> {
-  final bool dirty;
-  final String user_id;
-  final String workout_plan_id;
-  final int current_week;
-  final int current_day;
-  const UserWorkoutPlansTableData(
-      {required this.dirty,
-      required this.user_id,
-      required this.workout_plan_id,
-      required this.current_week,
-      required this.current_day});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['dirty'] = Variable<bool>(dirty);
-    map['user_id'] = Variable<String>(user_id);
-    map['workout_plan_id'] = Variable<String>(workout_plan_id);
-    map['current_week'] = Variable<int>(current_week);
-    map['current_day'] = Variable<int>(current_day);
-    return map;
-  }
-
-  UserWorkoutPlansTableCompanion toCompanion(bool nullToAbsent) {
-    return UserWorkoutPlansTableCompanion(
-      dirty: Value(dirty),
-      user_id: Value(user_id),
-      workout_plan_id: Value(workout_plan_id),
-      current_week: Value(current_week),
-      current_day: Value(current_day),
-    );
-  }
-
-  factory UserWorkoutPlansTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return UserWorkoutPlansTableData(
-      dirty: serializer.fromJson<bool>(json['dirty']),
-      user_id: serializer.fromJson<String>(json['user_id']),
-      workout_plan_id: serializer.fromJson<String>(json['workout_plan_id']),
-      current_week: serializer.fromJson<int>(json['current_week']),
-      current_day: serializer.fromJson<int>(json['current_day']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'dirty': serializer.toJson<bool>(dirty),
-      'user_id': serializer.toJson<String>(user_id),
-      'workout_plan_id': serializer.toJson<String>(workout_plan_id),
-      'current_week': serializer.toJson<int>(current_week),
-      'current_day': serializer.toJson<int>(current_day),
-    };
-  }
-
-  UserWorkoutPlansTableData copyWith(
-          {bool? dirty,
-          String? user_id,
-          String? workout_plan_id,
-          int? current_week,
-          int? current_day}) =>
-      UserWorkoutPlansTableData(
-        dirty: dirty ?? this.dirty,
-        user_id: user_id ?? this.user_id,
-        workout_plan_id: workout_plan_id ?? this.workout_plan_id,
-        current_week: current_week ?? this.current_week,
-        current_day: current_day ?? this.current_day,
-      );
-  UserWorkoutPlansTableData copyWithCompanion(
-      UserWorkoutPlansTableCompanion data) {
-    return UserWorkoutPlansTableData(
-      dirty: data.dirty.present ? data.dirty.value : this.dirty,
-      user_id: data.user_id.present ? data.user_id.value : this.user_id,
-      workout_plan_id: data.workout_plan_id.present
-          ? data.workout_plan_id.value
-          : this.workout_plan_id,
-      current_week: data.current_week.present
-          ? data.current_week.value
-          : this.current_week,
-      current_day:
-          data.current_day.present ? data.current_day.value : this.current_day,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UserWorkoutPlansTableData(')
-          ..write('dirty: $dirty, ')
-          ..write('user_id: $user_id, ')
-          ..write('workout_plan_id: $workout_plan_id, ')
-          ..write('current_week: $current_week, ')
-          ..write('current_day: $current_day')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(dirty, user_id, workout_plan_id, current_week, current_day);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is UserWorkoutPlansTableData &&
-          other.dirty == this.dirty &&
-          other.user_id == this.user_id &&
-          other.workout_plan_id == this.workout_plan_id &&
-          other.current_week == this.current_week &&
-          other.current_day == this.current_day);
-}
-
-class UserWorkoutPlansTableCompanion
-    extends UpdateCompanion<UserWorkoutPlansTableData> {
+class UserWorkoutPlansTableCompanion extends UpdateCompanion<UserWorkoutPlans> {
   final Value<bool> dirty;
   final Value<String> user_id;
   final Value<String> workout_plan_id;
@@ -3513,7 +3398,7 @@ class UserWorkoutPlansTableCompanion
   })  : dirty = Value(dirty),
         user_id = Value(user_id),
         workout_plan_id = Value(workout_plan_id);
-  static Insertable<UserWorkoutPlansTableData> custom({
+  static Insertable<UserWorkoutPlans> custom({
     Expression<bool>? dirty,
     Expression<String>? user_id,
     Expression<String>? workout_plan_id,
@@ -3806,7 +3691,7 @@ final class $$WorkoutPlansTableReferences
   }
 
   static MultiTypedResultKey<$UserWorkoutPlansTableTable,
-      List<UserWorkoutPlansTableData>> _userWorkoutPlansTableRefsTable(
+      List<UserWorkoutPlans>> _userWorkoutPlansTableRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.userWorkoutPlansTable,
           aliasName: $_aliasNameGenerator(
@@ -8011,7 +7896,7 @@ typedef $$UserWorkoutPlansTableTableUpdateCompanionBuilder
 });
 
 final class $$UserWorkoutPlansTableTableReferences extends BaseReferences<
-    _$AppDatabase, $UserWorkoutPlansTableTable, UserWorkoutPlansTableData> {
+    _$AppDatabase, $UserWorkoutPlansTableTable, UserWorkoutPlans> {
   $$UserWorkoutPlansTableTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
@@ -8159,14 +8044,14 @@ class $$UserWorkoutPlansTableTableAnnotationComposer
 class $$UserWorkoutPlansTableTableTableManager extends RootTableManager<
     _$AppDatabase,
     $UserWorkoutPlansTableTable,
-    UserWorkoutPlansTableData,
+    UserWorkoutPlans,
     $$UserWorkoutPlansTableTableFilterComposer,
     $$UserWorkoutPlansTableTableOrderingComposer,
     $$UserWorkoutPlansTableTableAnnotationComposer,
     $$UserWorkoutPlansTableTableCreateCompanionBuilder,
     $$UserWorkoutPlansTableTableUpdateCompanionBuilder,
-    (UserWorkoutPlansTableData, $$UserWorkoutPlansTableTableReferences),
-    UserWorkoutPlansTableData,
+    (UserWorkoutPlans, $$UserWorkoutPlansTableTableReferences),
+    UserWorkoutPlans,
     PrefetchHooks Function({bool workout_plan_id})> {
   $$UserWorkoutPlansTableTableTableManager(
       _$AppDatabase db, $UserWorkoutPlansTableTable table)
@@ -8263,14 +8148,14 @@ typedef $$UserWorkoutPlansTableTableProcessedTableManager
     = ProcessedTableManager<
         _$AppDatabase,
         $UserWorkoutPlansTableTable,
-        UserWorkoutPlansTableData,
+        UserWorkoutPlans,
         $$UserWorkoutPlansTableTableFilterComposer,
         $$UserWorkoutPlansTableTableOrderingComposer,
         $$UserWorkoutPlansTableTableAnnotationComposer,
         $$UserWorkoutPlansTableTableCreateCompanionBuilder,
         $$UserWorkoutPlansTableTableUpdateCompanionBuilder,
-        (UserWorkoutPlansTableData, $$UserWorkoutPlansTableTableReferences),
-        UserWorkoutPlansTableData,
+        (UserWorkoutPlans, $$UserWorkoutPlansTableTableReferences),
+        UserWorkoutPlans,
         PrefetchHooks Function({bool workout_plan_id})>;
 typedef $$OfflineUserDataTableTableCreateCompanionBuilder
     = OfflineUserDataTableCompanion Function({

@@ -129,12 +129,14 @@ class AppInkWellButton extends StatelessWidget {
   const AppInkWellButton(
       {super.key,
       required this.onTap,
-      required this.text,
+      this.child,
+      this.text,
       this.width,
       this.height});
 
   final VoidCallback onTap;
-  final String text;
+  final Widget? child;
+  final String? text;
   final double? width;
   final double? height;
   @override
@@ -144,6 +146,7 @@ class AppInkWellButton extends StatelessWidget {
           Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Theme.of(context)
               .colorScheme
@@ -167,14 +170,16 @@ class AppInkWellButton extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-              ),
+              child: text != null
+                  ? Text(
+                      text!,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                  : child,
             ),
           ),
         ),

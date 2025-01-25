@@ -105,12 +105,14 @@ class DaysPages extends HookWidget {
                                 index: dayIndex,
                                 onAddExercise: (index) async {
                                   final sets = await context.push(
-                                      '/plan/create/new',
-                                      extra: List<SetData>.from(state
-                                          .plan
-                                          .weeks[weekIndex]
-                                          .days[dayIndex]
-                                          .sets)) as List<SetData>;
+                                          '/plan/create/new',
+                                          extra: List<SetData>.from(state
+                                              .plan
+                                              .weeks[weekIndex]
+                                              .days[dayIndex]
+                                              .sets)) as List<SetData>? ??
+                                      [];
+
                                   context.read<NewWorkoutPlanBloc>().add(
                                       ChangedDayEvent(
                                           sets: sets,
@@ -133,13 +135,13 @@ class DaysPages extends HookWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: AppInkWellButton(
                                 onTap: () {
-                                  // if (!state.plan.isFilled()) {
-                                  //   ScaffoldMessenger.of(context).showSnackBar(
-                                  //       const SnackBar(
-                                  //           content: Text(
-                                  //               "Every training day must have at least 1 exercise")));
-                                  //   return;
-                                  // }
+                                  if (!state.plan.isFilled()) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Every training day must have at least 1 exercise")));
+                                    return;
+                                  }
 
                                   context.read<NewWorkoutPlanBloc>().add(
                                       FinishCreationEvent(
@@ -213,7 +215,7 @@ class DayCard extends StatelessWidget {
                 onAddExercise!(index);
               },
               width: 200,
-              height: 50,
+              height: 60,
               text: "Add exercises",
             ),
         ],

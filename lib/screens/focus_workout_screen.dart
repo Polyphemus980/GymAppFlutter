@@ -18,7 +18,6 @@ import '../timer_notifier.dart';
 class FocusWorkoutScreen extends HookWidget {
   const FocusWorkoutScreen({super.key, required this.sets});
   final List<SetData> sets;
-
   @override
   Widget build(BuildContext context) {
     useEffect(() {
@@ -311,6 +310,10 @@ class SetList extends StatelessWidget {
               reps: set.repetitions ?? 0,
               weight: set.weight ?? 0,
               isCompleted: set.completed,
+              isPlanned: !set.isWeight,
+              rpe: set.rpe,
+              minReps: set.minRepetitions,
+              maxReps: set.maxRepetitions,
             );
           },
         ),
@@ -341,7 +344,10 @@ class SetTile extends StatefulWidget {
   final int reps;
   final double weight;
   final bool isCompleted;
-
+  final bool isPlanned;
+  final int? minReps;
+  final int? maxReps;
+  final double? rpe;
   const SetTile({
     super.key,
     required this.setIndex,
@@ -349,6 +355,10 @@ class SetTile extends StatefulWidget {
     required this.weight,
     required this.isCompleted,
     required this.exerciseIndex,
+    this.isPlanned = false,
+    this.minReps,
+    this.maxReps,
+    this.rpe,
   });
 
   @override
@@ -396,10 +406,7 @@ class _SetTileState extends State<SetTile> {
                     style: TextStyle(
                       color: widget.isCompleted
                           ? Colors.white
-                          : Theme.of(context)
-                              .colorScheme
-                              .onPrimary
-                              .withValues(alpha: 1),
+                          : Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -485,37 +492,38 @@ class _SetTileState extends State<SetTile> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Plan: ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+            if (widget.isPlanned)
+              Padding(
+                padding: const EdgeInsets.only(left: 40.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Plan: ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'RPE ${1}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    Text(
+                      'RPE ${widget.rpe}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    '${1}-${5} reps',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(width: 16),
+                    Text(
+                      '${widget.minReps}-${widget.maxReps} reps',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),

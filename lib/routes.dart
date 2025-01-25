@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
@@ -17,7 +18,6 @@ import 'data/repositories/local_workout_repository.dart';
 import 'data/repositories/sync_exercise_repository.dart';
 import 'get_it_dependency_injection.dart';
 import 'screens/add_exercise_screen.dart';
-import 'screens/empty_workout_screen.dart';
 import 'screens/exercise_list_screen.dart';
 import 'screens/focus_workout_screen.dart';
 import 'screens/login_screen.dart';
@@ -26,6 +26,7 @@ import 'screens/new_workout_plan_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/select_exercise_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/workout_configuration_screen.dart';
 import 'screens/workout_plan_display_screen.dart';
 import 'timer_notifier.dart';
 import 'widgets/bottom_nav_bar.dart';
@@ -62,7 +63,9 @@ final router = GoRouter(
           routes: [
             GoRoute(
                 path: '/train',
-                builder: (context, state) => const TrainScreen()),
+                builder: (context, state) => TrainScreen(
+                      workoutRepository: getIt.get<LocalWorkoutRepository>(),
+                    )),
             GoRoute(
               path: '/home',
               builder: (context, state) =>
@@ -134,7 +137,8 @@ final router = GoRouter(
                     path: 'new',
                     builder: (context, state) {
                       final data = state.extra as List<SetData>;
-                      return PreWorkoutScreen(
+                      return WorkoutConfigurationScreen(
+                        workoutRepository: getIt.get<LocalWorkoutRepository>(),
                         isRpe: true,
                         data: data,
                         title: "Create workout",
@@ -156,9 +160,26 @@ final router = GoRouter(
         builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
+          path: '/planned_workout',
+          builder: (context, state) {
+            final plan = state.extra as UserWorkoutPlans;
+            return WorkoutConfigurationScreen(
+              workoutRepository: getIt.get<LocalWorkoutRepository>(),
+              title: "Edit workout",
+              finishButtonText: "Start Workout",
+              finishButtonOnTap: (sets) {
+                Provider.of<TimerNotifier>(context, listen: false).startTimer();
+                context.go('/start', extra: sets);
+              },
+              isRpe: true,
+              workoutPlan: plan,
+            );
+          }),
+      GoRoute(
           path: '/new',
           builder: (context, state) {
-            return PreWorkoutScreen(
+            return WorkoutConfigurationScreen(
+              workoutRepository: getIt.get<LocalWorkoutRepository>(),
               title: "Create workout",
               finishButtonText: "Start Workout",
               finishButtonOnTap: (sets) {
