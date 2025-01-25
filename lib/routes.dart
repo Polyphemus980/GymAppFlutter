@@ -9,6 +9,7 @@ import 'package:gym_app/screens/home_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:gym_app/screens/train_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
+import 'package:gym_app/services/android_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_bloc.dart';
@@ -168,6 +169,7 @@ final router = GoRouter(
               title: "Edit workout",
               finishButtonText: "Start Workout",
               finishButtonOnTap: (sets) {
+                NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
                 context.go('/start', extra: sets);
               },
@@ -183,6 +185,7 @@ final router = GoRouter(
               title: "Create workout",
               finishButtonText: "Start Workout",
               finishButtonOnTap: (sets) {
+                NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
                 context.go('/start', extra: sets);
               },

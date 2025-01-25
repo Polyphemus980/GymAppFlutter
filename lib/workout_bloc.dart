@@ -152,6 +152,7 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
   }
 
   _endWorkout(EndWorkoutEvent event, Emitter<WorkoutState> emit) {
+    emitPresentation(EndWorkoutEvent());
     emit(WorkoutEnded());
     clear();
   }
@@ -162,8 +163,6 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
     switch (type) {
       case 'WorkoutInProgress':
         return WorkoutInProgress.fromJson(json['data']);
-      case 'WorkoutEnded':
-        return WorkoutEnded();
       default:
         return InitialState();
     }
@@ -175,10 +174,6 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
       return {
         'type': 'WorkoutInProgress',
         'data': state.toJson(),
-      };
-    } else if (state is WorkoutEnded) {
-      return {
-        'type': 'WorkoutEnded',
       };
     }
     return null;

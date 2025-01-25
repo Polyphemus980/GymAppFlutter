@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/services/android_notification_service.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +33,12 @@ class FocusWorkoutScreen extends HookWidget {
           pageController.animateToPage(event.page,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut);
+        } else if (event is EndWorkoutEvent) {
+          context.read<TimerNotifier>().cancelTimer();
+          NotificationService.stopWorkoutNotification();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Finished workout")));
+          context.go('/home');
         }
       },
       child: BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
@@ -97,13 +105,8 @@ class FocusWorkoutScreen extends HookWidget {
               ]),
             ),
           );
-        } else if (state is WorkoutEnded) {
-          return const Center(child: Text("Workout ended"));
-        } else {
-          return Center(
-            child: Text(state.toString()),
-          );
         }
+        return const SizedBox.shrink();
       }),
     );
   }

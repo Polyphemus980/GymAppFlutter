@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gym_app/services/android_notification_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ void main() async {
   );
   await setUp();
   HydratedBloc.storage = storage;
-
+  await NotificationService.initialize();
   runApp(const GlobalProviders(
     child: MyApp(),
   ));
