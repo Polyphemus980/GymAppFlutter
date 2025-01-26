@@ -15,8 +15,8 @@ extension BuildContextExtensions on BuildContext {
     return authState.user;
   }
 
-  String get currentUserId {
-    return getIt.get<OfflineUserDataSingleton>().userId!;
+  String? get currentUserId {
+    return getIt.get<OfflineUserDataSingleton>().userId;
   }
 
   bool get isAuthenticated {

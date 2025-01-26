@@ -23,7 +23,7 @@ class ThemeNotifier extends ChangeNotifier {
   bool _isLightTheme() => _currentTheme == lightTheme;
   bool isLightTheme() => _isLightTheme();
 
-  ThemeNotifier()
+  ThemeNotifier({ThemeMode themeMode = ThemeMode.system})
       : _currentTheme = ThemeMode.system == ThemeMode.light
             ? FlexThemeData.light(
                 scheme: FlexScheme.vesuviusBurn,
@@ -44,7 +44,7 @@ class ThemeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeUserTheme(bool userHasDarkTheme) {
+  void setUserTheme(bool userHasDarkTheme) {
     if ((userHasDarkTheme && _isLightTheme()) ||
         (!userHasDarkTheme && !_isLightTheme())) {
       toggleTheme();

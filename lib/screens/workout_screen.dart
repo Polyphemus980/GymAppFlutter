@@ -59,7 +59,7 @@ class WorkoutListScreen extends StatelessWidget {
               ),
               StreamBuilder(
                 stream:
-                    workoutRepository.watchWorkoutPlans(context.currentUserId),
+                    workoutRepository.watchWorkoutPlans(context.currentUserId!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator(); // Loading state

@@ -115,7 +115,7 @@ class TrainScreen extends StatelessWidget {
             ),
             StreamBuilder(
                 stream: workoutRepository
-                    .watchUserWorkoutPlans(context.currentUserId),
+                    .watchUserWorkoutPlans(context.currentUserId!),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final userPlans = snapshot.data!;

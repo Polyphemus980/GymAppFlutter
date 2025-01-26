@@ -36,7 +36,7 @@ class LoginScreen extends StatelessWidget {
           if (userPreferences != null) {
             context
                 .read<ThemeNotifier>()
-                .changeUserTheme(userPreferences.is_dark_mode);
+                .setUserTheme(userPreferences.is_dark_mode);
           } else {
             preferencesRepository.insertUserPreferences(userId: state.user.id);
           }

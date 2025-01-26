@@ -18,8 +18,10 @@ import '../theme_notifier.dart';
 import '../timer_notifier.dart';
 
 class FocusWorkoutScreen extends HookWidget {
-  const FocusWorkoutScreen({super.key, required this.sets});
+  const FocusWorkoutScreen(
+      {super.key, required this.sets, this.plannedWorkoutId});
   final List<SetData> sets;
+  final String? plannedWorkoutId;
   @override
   Widget build(BuildContext context) {
     useEffect(() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/auth_bloc.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/exercise_bloc.dart';
@@ -27,18 +27,13 @@ class ExerciseScreen extends StatelessWidget {
 
   void _toggleTheme(BuildContext context) {
     final themeNotifier = context.read<ThemeNotifier>();
-    final authBloc = context.read<AuthBloc>();
+    themeNotifier.toggleTheme();
 
-    if (authBloc.state is Authenticated) {
-      final userId = (authBloc.state as Authenticated).user.id;
-      themeNotifier.toggleTheme();
-
-      final isLightTheme = themeNotifier.isLightTheme();
-      getIt.get<LocalPreferencesRepository>().updateUserPreferences(
-            userId: userId,
-            isDarkMode: !isLightTheme,
-          );
-    }
+    final isLightTheme = themeNotifier.isLightTheme();
+    getIt.get<LocalPreferencesRepository>().updateUserPreferences(
+          userId: context.currentUserId!,
+          isDarkMode: !isLightTheme,
+        );
   }
 
   @override

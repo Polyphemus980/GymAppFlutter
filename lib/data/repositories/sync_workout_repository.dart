@@ -197,4 +197,38 @@ class SyncWorkoutRepository {
       }
     }
   }
+
+  Future<void> addCompletedWorkoutSync(List<SetData> exerciseSets,
+      String userId, bool isOnline, String? plannedWorkoutId) async {
+    final insertedWorkout = await db
+        .into(db.completedWorkouts)
+        .insertReturning(CompletedWorkoutsCompanion(
+          dirty: Value(!isOnline),
+          workout_date: Value(DateTime.now()),
+          planned_workout_id: Value(plannedWorkoutId),
+          user_id: Value(userId),
+          end_time: Value(DateTime.now()),
+        ));
+    for (final exerciseSet in exerciseSets.asMap().entries) {
+      final insertedWorkoutExercise = await db
+          .into(db.completedWorkoutExercises)
+          .insertReturning(CompletedWorkoutExercisesCompanion(
+            user_id: Value(userId),
+            dirty: Value(!isOnline),
+            workout_id: Value(insertedWorkout.id),
+            exercise_id: Value(exerciseSet.value.exercise.id),
+            exercise_order: Value(exerciseSet.key),
+          ));
+      for (final set in exerciseSet.value.sets.asMap().entries) {
+        await db.into(db.completedSets).insert(CompletedSetsCompanion(
+            workout_exercise_id: Value(insertedWorkoutExercise.id),
+            user_id: Value(userId),
+            set_number: Value(set.key),
+            weight: Value(set.value.weight),
+            repetitions: Value(set.value.repetitions!),
+            duration_seconds: Value(set.value.duration),
+            dirty: Value(!isOnline)));
+      }
+    }
+  }
 }

@@ -37,7 +37,7 @@ class WorkoutPlanDisplayScreen extends HookWidget {
       title: "Display workout plan",
       child: StreamBuilder(
         stream: workoutRepository.watchWorkoutPlanWithDetails(
-            workoutPlanId, context.currentUserId),
+            workoutPlanId, context.currentUserId!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
@@ -93,7 +93,7 @@ class WorkoutPlanDisplayScreen extends HookWidget {
                                 onTap: () async {
                                   await syncWorkoutRepository
                                       .signUserUpForWorkoutPlan(
-                                          context.currentUserId,
+                                          context.currentUserId!,
                                           workoutPlanId,
                                           getIt.isOnline);
                                   context.pop();

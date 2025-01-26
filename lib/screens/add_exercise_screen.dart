@@ -15,7 +15,7 @@ class AddExerciseScreen extends HookWidget {
       List<MuscleGroup> muscles, BuildContext context) async {
     try {
       await syncExerciseRepository.addExerciseSync(
-          context.currentUserId, name, description, muscles, getIt.isOnline);
+          context.currentUserId!, name, description, muscles, getIt.isOnline);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Exercise '$name' added successfully!")),
       );
