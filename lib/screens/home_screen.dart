@@ -12,6 +12,6 @@ class HomeScreen extends HookWidget {
         onPressed: () {
           VibrationService.vibrate(duration: 500);
         },
-        child: Text("vibrate"));
+        child: const Text("vibrate"));
   }
 }

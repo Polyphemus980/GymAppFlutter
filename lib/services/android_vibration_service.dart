@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class VibrationService {
@@ -10,7 +11,7 @@ class VibrationService {
       try {
         await platform.invokeMethod('vibrate', {'duration': duration});
       } on PlatformException catch (e) {
-        print('Failed to vibrate: ${e.message}');
+        debugPrint('Failed to vibrate: ${e.message}');
       }
     }
   }
