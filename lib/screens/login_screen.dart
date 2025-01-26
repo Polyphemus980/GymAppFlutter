@@ -42,7 +42,7 @@ class LoginScreen extends StatelessWidget {
           }
           await getIt
               .get<OfflineUserDataSingleton>()
-              .addUserIdToStorage(state.user.id);
+              .addUserIdToStorage(state.user.id, state.user.email!);
           context.go('/home');
         }
       },

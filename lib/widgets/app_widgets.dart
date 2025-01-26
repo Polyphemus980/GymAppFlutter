@@ -57,6 +57,7 @@ class AppTextFormField extends StatelessWidget {
   final String? errorText;
   final bool obscureText;
   final bool readOnly;
+  final int? maxLines;
   final TextStyle? errorStyle;
   final String? Function(String?)? validator;
   final void Function()? onEditingComplete;
@@ -77,6 +78,7 @@ class AppTextFormField extends StatelessWidget {
       this.errorText,
       this.validator,
       this.keyboardType,
+      this.maxLines,
       this.obscureText = false,
       this.readOnly = false});
 
@@ -94,7 +96,7 @@ class AppTextFormField extends StatelessWidget {
         keyboardType: keyboardType,
         onChanged: onChanged,
         obscureText: obscureText,
-        maxLines: obscureText ? 1 : null,
+        maxLines: obscureText ? 1 : maxLines,
         readOnly: readOnly,
         decoration: InputDecoration(
           hintText: hintText,

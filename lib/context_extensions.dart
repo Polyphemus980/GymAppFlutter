@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/auth_bloc.dart';
+import 'package:gym_app/data/models/offline_user_data.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'get_it_dependency_injection.dart';
@@ -16,7 +17,11 @@ extension BuildContextExtensions on BuildContext {
   }
 
   String? get currentUserId {
-    return getIt.get<OfflineUserDataSingleton>().userId;
+    return getIt.get<OfflineUserDataSingleton>().userData?.userId;
+  }
+
+  OfflineUserData? get currentOfflineUser {
+    return getIt.get<OfflineUserDataSingleton>().userData;
   }
 
   bool get isAuthenticated {

@@ -13,17 +13,18 @@ class NotificationService {
 
   static Future<void> initialize(
       {Function(NotificationResponse)? onNotificationTap}) async {
-    if (Platform.isAndroid) {
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
-
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
-
-      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-      await _createNotificationChannel();
+    if (!Platform.isAndroid) {
+      return;
     }
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    await _createNotificationChannel();
   }
 
   static Future<void> _createNotificationChannel() async {
@@ -42,6 +43,9 @@ class NotificationService {
   }
 
   static Future<void> showWorkoutNotificationWithActions() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       NotificationService.workoutChannelId,
@@ -67,6 +71,9 @@ class NotificationService {
 
   static Future<void> updateWorkoutNotificationWithActions(
       String elapsedTime, bool isPaused) async {
+    if (!Platform.isAndroid) {
+      return;
+    }
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       NotificationService.workoutChannelId,
@@ -91,6 +98,9 @@ class NotificationService {
   }
 
   static Future<void> stopWorkoutNotification() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
     await flutterLocalNotificationsPlugin.cancel(0);
   }
 }

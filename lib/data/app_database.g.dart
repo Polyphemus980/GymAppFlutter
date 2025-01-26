@@ -3482,8 +3482,13 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
   late final GeneratedColumn<String> userId = GeneratedColumn<String>(
       'user_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
-  List<GeneratedColumn> get $columns => [userId];
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [userId, email];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3500,6 +3505,12 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
     return context;
   }
 
@@ -3511,6 +3522,8 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
     return OfflineUserData(
       userId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
     );
   }
 
@@ -3522,29 +3535,36 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
 
 class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
   final Value<String> userId;
+  final Value<String> email;
   final Value<int> rowid;
   const OfflineUserDataTableCompanion({
     this.userId = const Value.absent(),
+    this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   OfflineUserDataTableCompanion.insert({
     required String userId,
+    required String email,
     this.rowid = const Value.absent(),
-  }) : userId = Value(userId);
+  })  : userId = Value(userId),
+        email = Value(email);
   static Insertable<OfflineUserData> custom({
     Expression<String>? userId,
+    Expression<String>? email,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (userId != null) 'user_id': userId,
+      if (email != null) 'email': email,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   OfflineUserDataTableCompanion copyWith(
-      {Value<String>? userId, Value<int>? rowid}) {
+      {Value<String>? userId, Value<String>? email, Value<int>? rowid}) {
     return OfflineUserDataTableCompanion(
       userId: userId ?? this.userId,
+      email: email ?? this.email,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3554,6 +3574,9 @@ class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
     final map = <String, Expression>{};
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -3565,6 +3588,7 @@ class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
   String toString() {
     return (StringBuffer('OfflineUserDataTableCompanion(')
           ..write('userId: $userId, ')
+          ..write('email: $email, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -8160,11 +8184,13 @@ typedef $$UserWorkoutPlansTableTableProcessedTableManager
 typedef $$OfflineUserDataTableTableCreateCompanionBuilder
     = OfflineUserDataTableCompanion Function({
   required String userId,
+  required String email,
   Value<int> rowid,
 });
 typedef $$OfflineUserDataTableTableUpdateCompanionBuilder
     = OfflineUserDataTableCompanion Function({
   Value<String> userId,
+  Value<String> email,
   Value<int> rowid,
 });
 
@@ -8179,6 +8205,9 @@ class $$OfflineUserDataTableTableFilterComposer
   });
   ColumnFilters<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
 }
 
 class $$OfflineUserDataTableTableOrderingComposer
@@ -8192,6 +8221,9 @@ class $$OfflineUserDataTableTableOrderingComposer
   });
   ColumnOrderings<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
 }
 
 class $$OfflineUserDataTableTableAnnotationComposer
@@ -8205,6 +8237,9 @@ class $$OfflineUserDataTableTableAnnotationComposer
   });
   GeneratedColumn<String> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
 }
 
 class $$OfflineUserDataTableTableTableManager extends RootTableManager<
@@ -8237,18 +8272,22 @@ class $$OfflineUserDataTableTableTableManager extends RootTableManager<
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> userId = const Value.absent(),
+            Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               OfflineUserDataTableCompanion(
             userId: userId,
+            email: email,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String userId,
+            required String email,
             Value<int> rowid = const Value.absent(),
           }) =>
               OfflineUserDataTableCompanion.insert(
             userId: userId,
+            email: email,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

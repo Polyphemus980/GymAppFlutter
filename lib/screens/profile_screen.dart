@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
+import 'package:gym_app/context_extensions.dart';
+import 'package:gym_app/get_it_dependency_injection.dart';
+import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -10,32 +13,67 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-        title: 'Profile',
-        child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-            child: Column(spacing: 32, children: [
-              AppInkWellButton(
-                onTap: () {},
-                text: "Profile",
-              ),
-              AppInkWellButton(
+      title: 'Profile',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+        child: Column(
+          spacing: 32,
+          children: [
+            ProfileHeader(
+              avatar: const CircleAvatar(),
+              username: context.currentOfflineUser!.email,
+            ),
+            AppInkWellButton(
+              onTap: () {
+                context.push('/exercise');
+              },
+              text: "Exercises",
+            ),
+            AppInkWellButton(
                 onTap: () {
-                  context.push('/exercise');
+                  context.push('/calculator');
                 },
-                text: "Exercises",
-              ),
-              AppInkWellButton(onTap: () {}, text: "Calculator"),
-              ElevatedButton(
-                onPressed: () async {
-                  context.read<AuthBloc>().add(SignOutRequested());
-                  //await getIt
-                  //    .get<OfflineUserDataSingleton>()
-                  //    .deleteUserIdFromStorage();
-                  context.go('/login');
-                },
-                child: const Text("Sign out"),
-              ),
-            ])));
+                text: "Calculator"),
+            AppInkWellButton(
+              onTap: () async {
+                context.read<AuthBloc>().add(SignOutRequested());
+                await getIt
+                    .get<OfflineUserDataSingleton>()
+                    .deleteUserIdFromStorage();
+                context.go('/login');
+              },
+              text: "Sign out",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProfileHeader extends StatelessWidget {
+  final String username;
+  final Widget avatar;
+
+  const ProfileHeader({
+    Key? key,
+    required this.username,
+    required this.avatar,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 16,
+      children: [
+        avatar,
+        Flexible(
+          child: Text(
+            username,
+            style: const TextStyle(fontSize: 20),
+          ),
+        ),
+      ],
+    );
   }
 }

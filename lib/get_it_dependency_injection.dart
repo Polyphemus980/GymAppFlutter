@@ -40,7 +40,7 @@ Future<void> setUp() async {
   getIt.registerSingleton<NetworkConnectivityService>(
       NetworkConnectivityService(
           syncCenter: getIt.get<SynchronizationCenter>()));
-  //getIt.registerSingleton<NotificationService>(NotificationService());
+
   await getIt.get<OfflineUserDataSingleton>().initialize();
   await getIt
       .get<SynchronizationCenter>()
