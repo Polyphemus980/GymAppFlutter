@@ -8,8 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/dependency_injection/get_it_dependency_injection.dart';
 import 'core/dependency_injection/global_providers.dart';
+import 'features/theme/notifier/theme_notifier.dart';
 import 'routes.dart';
-import 'theme_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

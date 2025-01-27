@@ -2,20 +2,20 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_app/core/dependency_injection/get_it_dependency_injection.dart';
 import 'package:gym_app/data/app_database.dart';
-import 'package:gym_app/data/database_helpers.dart';
-import 'package:gym_app/data/models/completed_set.dart';
-import 'package:gym_app/data/models/completed_workout.dart';
-import 'package:gym_app/data/models/completed_workout_exercise.dart';
-import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/planned_set.dart';
-import 'package:gym_app/data/models/planned_workout.dart';
-import 'package:gym_app/data/models/planned_workout_exercise.dart';
-import 'package:gym_app/data/models/user_preferences.dart';
-import 'package:gym_app/data/models/user_workout_plans.dart';
-import 'package:gym_app/data/models/workout_plan.dart';
+import 'package:gym_app/data/helpers/database_helpers.dart';
+import 'package:gym_app/data/models/completed/completed_set.dart';
+import 'package:gym_app/data/models/completed/completed_workout.dart';
+import 'package:gym_app/data/models/completed/completed_workout_exercise.dart';
+import 'package:gym_app/data/models/exercise/exercise.dart';
+import 'package:gym_app/data/models/planned/planned_set.dart';
+import 'package:gym_app/data/models/planned/planned_workout.dart';
+import 'package:gym_app/data/models/planned/planned_workout_exercise.dart';
+import 'package:gym_app/data/models/user/user_preferences.dart';
+import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
+import 'package:gym_app/data/models/workout_plans/workout_plan.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../data/models/dirty_table.dart';
+import '../../data/model_interfaces/dirty_table.dart';
 
 class SynchronizationCenter {
   final SupabaseClient supabaseClient;

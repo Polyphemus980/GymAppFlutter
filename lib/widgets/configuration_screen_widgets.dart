@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gym_app/core/domain/sets/workout_config_set.dart';
 import 'package:gym_app/core/extensions/context_extensions.dart';
-import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/workout_config_set.dart';
+import 'package:gym_app/data/models/exercise/exercise.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
 
 import '../core/common_widgets/app_widgets.dart';

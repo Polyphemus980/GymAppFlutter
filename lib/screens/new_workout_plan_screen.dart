@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/core/common_widgets/app_widgets.dart';
+import 'package:gym_app/core/domain/sets/set_data.dart';
 import 'package:gym_app/core/extensions/context_extensions.dart';
-import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/repositories/sync_workout_repository.dart';
+import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
 import 'package:gym_app/new_workout_plan_bloc.dart';
 
 import '../core/dependency_injection/get_it_dependency_injection.dart';

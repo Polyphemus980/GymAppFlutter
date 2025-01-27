@@ -7,19 +7,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
-import 'models/completed_set.dart';
-import 'models/completed_workout.dart';
-import 'models/completed_workout_exercise.dart';
-import 'models/exercise.dart';
-import 'models/exercise_muscles.dart';
-import 'models/muscle_group.dart';
-import 'models/offline_user_data.dart';
-import 'models/planned_set.dart';
-import 'models/planned_workout.dart';
-import 'models/planned_workout_exercise.dart';
-import 'models/user_preferences.dart';
-import 'models/user_workout_plans.dart';
-import 'models/workout_plan.dart';
+import 'models/completed/completed_set.dart';
+import 'models/completed/completed_workout.dart';
+import 'models/completed/completed_workout_exercise.dart';
+import 'models/exercise/exercise.dart';
+import 'models/exercise/exercise_muscles.dart';
+import 'models/exercise/muscle_group.dart';
+import 'models/planned/planned_set.dart';
+import 'models/planned/planned_workout.dart';
+import 'models/planned/planned_workout_exercise.dart';
+import 'models/user/offline_user_data.dart';
+import 'models/user/user_preferences.dart';
+import 'models/workout_plans/user_workout_plans.dart';
+import 'models/workout_plans/workout_plan.dart';
 
 part 'app_database.g.dart';
 

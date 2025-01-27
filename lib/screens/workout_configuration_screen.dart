@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/core/common_widgets/app_widgets.dart';
-import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/models/user_workout_plans.dart';
-import 'package:gym_app/data/models/workout_config_set.dart';
-import 'package:gym_app/data/repositories/local_workout_repository.dart';
+import 'package:gym_app/core/domain/sets/set_data.dart';
+import 'package:gym_app/core/domain/sets/workout_config_set.dart';
+import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
+import 'package:gym_app/data/repositories/workout/local_workout_repository.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
 import 'package:gym_app/workout_config_bloc.dart';
 
-import '../data/models/exercise.dart';
+import '../data/models/exercise/exercise.dart';
 
 class WorkoutConfigurationScreen extends StatelessWidget {
   const WorkoutConfigurationScreen(

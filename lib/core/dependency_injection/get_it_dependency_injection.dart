@@ -1,18 +1,18 @@
 import 'package:get_it/get_it.dart';
 import 'package:gym_app/core/services/network_connectivity_service.dart';
 import 'package:gym_app/core/services/supabase_synchronization_service.dart';
-import 'package:gym_app/data/repositories/sync_exercise_repository.dart';
-import 'package:gym_app/data/repositories/sync_workout_repository.dart';
-import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:gym_app/data/repositories/exercise/sync_exercise_repository.dart';
+import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
+import 'package:gym_app/features/offline_auth/offline_user_data_singleton.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/app_database.dart';
-import '../../data/repositories/drift_exercise_repository.dart';
-import '../../data/repositories/drift_preferences_repository.dart';
-import '../../data/repositories/drift_workout_repository.dart';
-import '../../data/repositories/local_exercise_repository.dart';
-import '../../data/repositories/local_preferences_repository.dart';
-import '../../data/repositories/local_workout_repository.dart';
+import '../../data/repositories/exercise/drift_exercise_repository.dart';
+import '../../data/repositories/exercise/local_exercise_repository.dart';
+import '../../data/repositories/user/drift_preferences_repository.dart';
+import '../../data/repositories/user/local_preferences_repository.dart';
+import '../../data/repositories/workout/drift_workout_repository.dart';
+import '../../data/repositories/workout/local_workout_repository.dart';
 
 bool setUpEnded = false;
 final getIt = GetIt.instance;

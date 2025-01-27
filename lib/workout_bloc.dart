@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:bloc_presentation/bloc_presentation.dart';
-import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/models/workout_config_set.dart';
-import 'package:gym_app/data/repositories/sync_workout_repository.dart';
+import 'package:gym_app/core/domain/sets/set_data.dart';
+import 'package:gym_app/core/domain/sets/workout_config_set.dart';
+import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import 'core/dependency_injection/get_it_dependency_injection.dart';
@@ -171,7 +171,6 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
         sets: setDatas,
         plannedWorkoutId: currentState.plannedWorkoutId,
         userId: currentState.userId));
-    ;
   }
 
   _completeSet(CompleteSetEvent event, Emitter<WorkoutState> emit) {

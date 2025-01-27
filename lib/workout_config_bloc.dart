@@ -1,11 +1,11 @@
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/set_data.dart';
-import 'package:gym_app/data/models/user_workout_plans.dart';
-import 'package:gym_app/data/repositories/local_workout_repository.dart';
+import 'package:gym_app/core/domain/sets/set_data.dart';
+import 'package:gym_app/data/models/exercise/exercise.dart';
+import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
+import 'package:gym_app/data/repositories/workout/local_workout_repository.dart';
 
-import 'data/models/workout_config_set.dart';
+import 'core/domain/sets/workout_config_set.dart';
 
 abstract class WorkoutConfigEvent {}
 

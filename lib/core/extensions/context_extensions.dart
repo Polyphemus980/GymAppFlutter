@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/auth_bloc.dart';
-import 'package:gym_app/data/models/offline_user_data.dart';
-import 'package:gym_app/unit_notifier.dart';
+import 'package:gym_app/data/models/user/offline_user_data.dart';
+import 'package:gym_app/features/auth/blocs/auth_bloc.dart';
+import 'package:gym_app/features/units/notifier/unit_notifier.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../offline_user_data_singleton.dart';
+import '../../features/offline_auth/offline_user_data_singleton.dart';
 import '../dependency_injection/get_it_dependency_injection.dart';
 
 extension BuildContextExtensions on BuildContext {

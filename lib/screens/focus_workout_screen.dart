@@ -7,16 +7,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/core/common_widgets/app_widgets.dart';
+import 'package:gym_app/core/domain/sets/set_data.dart';
 import 'package:gym_app/core/extensions/context_extensions.dart';
 import 'package:gym_app/core/services/android_notification_service.dart';
-import 'package:gym_app/data/models/exercise.dart';
-import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/data/models/exercise/exercise.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../theme_notifier.dart';
-import '../timer_notifier.dart';
+import '../features/theme/notifier/theme_notifier.dart';
+import '../features/timer/notifier/timer_notifier.dart';
 
 class FocusWorkoutScreen extends HookWidget {
   const FocusWorkoutScreen(
