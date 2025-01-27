@@ -159,15 +159,15 @@ class ExerciseList extends StatelessWidget {
                 WorkoutContainer(
                   title: "Muscle groups",
                   width: 0.3 * constraints.maxWidth,
-                  height: 0.5 * constraints.maxHeight,
+                  height: 0.8 * constraints.maxHeight,
                   child: ExerciseData(exercise: setData.exercise),
                 ),
-                WorkoutContainer(
-                  title: "Statistics",
-                  width: 0.3 * constraints.maxWidth,
-                  height: 0.3 * constraints.maxHeight,
-                  child: const SizedBox.shrink(),
-                ),
+                // WorkoutContainer(
+                //   title: "Statistics",
+                //   width: 0.3 * constraints.maxWidth,
+                //   height: 0.3 * constraints.maxHeight,
+                //   child: const SizedBox.shrink(),
+                // ),
               ])
             ]);
       } else {

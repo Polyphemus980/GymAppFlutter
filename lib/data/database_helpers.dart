@@ -24,6 +24,7 @@ CompletedSetsCompanion toCompletedSetCompanion(CompletedSet completedSet) {
     weight: Value(completedSet.weight),
     created_at: Value(completedSet.created_at),
     updated_at: Value(completedSet.updated_at),
+    is_metric: Value(completedSet.is_metric),
   );
 }
 
@@ -77,10 +78,8 @@ ExercisesCompanion toExerciseCompanion(Exercise exercise) {
 ExerciseMusclesCompanion toExerciseMuscleCompanion(
     ExerciseMuscle exerciseMuscle) {
   return ExerciseMusclesCompanion(
-    exercise_id:
-        Value(exerciseMuscle.exercise_id), // Use the provided exercise_id
-    muscle_group_id: Value(
-        exerciseMuscle.muscle_group_id), // Use the provided muscle_group_id
+    exercise_id: Value(exerciseMuscle.exercise_id),
+    muscle_group_id: Value(exerciseMuscle.muscle_group_id),
     dirty: Value(exerciseMuscle.dirty),
   );
 }
@@ -145,6 +144,8 @@ UserWorkoutPlansTableCompanion toUserWorkoutPlansCompanion(
     workout_plan_id: Value(
         userWorkoutPlans.workout_plan_id), // Use the provided workout_plan_id
     dirty: Value(userWorkoutPlans.dirty),
+    current_week: Value(userWorkoutPlans.current_week),
+    current_day: Value(userWorkoutPlans.current_day),
   );
 }
 

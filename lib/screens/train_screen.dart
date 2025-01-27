@@ -136,7 +136,7 @@ class TrainScreen extends StatelessWidget {
                                   is WorkoutInProgress) {
                                 displayWorkoutPopUp(context);
                               } else {
-                                context.go('/planned_workout', extra: plan);
+                                context.push('/planned_workout', extra: plan);
                               }
                             },
                             currentDay: plan.current_day,

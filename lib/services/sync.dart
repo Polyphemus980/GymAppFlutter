@@ -112,22 +112,23 @@ class SynchronizationCenter {
     //     ? DateTime.fromMillisecondsSinceEpoch(lastSyncedMilliseconds)
     //     : null;
     for (final table in tables) {
-      var rows;
-      try {
-        // rows = lastSynced != null
-        //     ? await supabaseClient
-        //         .from(table)
-        //         .select()
-        //         .gt('updated_at', lastSynced)
-        //     : await supabaseClient.from(table).select();
-        rows = await supabaseClient.from(table).select();
-      } catch (err) {
-        debugPrint("$err");
-        break;
-      }
+      // var rows;
+      // try {
+      //   // rows = lastSynced != null
+      //   //     ? await supabaseClient
+      //   //         .from(table)
+      //   //         .select()
+      //   //         .gt('updated_at', lastSynced)
+      //   //     : await supabaseClient.from(table).select();
+      //   rows = await supabaseClient.from(table).select();
+      // } catch (err) {
+      //   debugPrint("$err");
+      //   break;
+      // }
+      final rows = await supabaseClient.from(table).select();
       if (rows.isNotEmpty) {
         final rowCompanions =
-            rows.map((row) => tableToInsertableMethods[table]!(row)).toList();
+            rows.map((row) => tableToInsertableMethods[table]!(row));
         await db.batch((batch) {
           batch.insertAllOnConflictUpdate(tableToDaoMap[table], rowCompanions);
         });
