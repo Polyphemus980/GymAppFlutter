@@ -162,12 +162,6 @@ class ExerciseList extends StatelessWidget {
                   height: 0.8 * constraints.maxHeight,
                   child: ExerciseData(exercise: setData.exercise),
                 ),
-                // WorkoutContainer(
-                //   title: "Statistics",
-                //   width: 0.3 * constraints.maxWidth,
-                //   height: 0.3 * constraints.maxHeight,
-                //   child: const SizedBox.shrink(),
-                // ),
               ])
             ]);
       } else {
@@ -324,8 +318,10 @@ class SetList extends StatelessWidget {
             context.read<WorkoutBloc>().add(CompleteSetEvent(
                 exerciseIndex: exerciseIndex,
                 duration: context.read<TimerNotifier>().elapsedSeconds,
-                isMetric: context.isMetric));
-            Provider.of<TimerNotifier>(context, listen: false).resetTimer();
+                isMetric: context.isMetric,
+                onSuccess: () =>
+                    Provider.of<TimerNotifier>(context, listen: false)
+                        .resetTimer()));
           },
           text: "Complete set",
         ),
@@ -415,7 +411,7 @@ class _SetTileState extends State<SetTile> {
                       const Icon(Icons.fitness_center, size: 20),
                       isEditing
                           ? AppTextFormField(
-                              width: 75,
+                              width: 60,
                               formatters: [
                                 WeightInputFormatter(),
                                 LengthLimitingTextInputFormatter(7)
@@ -463,6 +459,24 @@ class _SetTileState extends State<SetTile> {
                     isEditing
                         ? IconButton(
                             onPressed: () {
+                              int? reps = int.tryParse(_repsController.text);
+                              double? weight =
+                                  double.tryParse(_weightController.text);
+                              if (reps == null || reps < 0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Reps must be a valid positive integer")));
+                                return;
+                              }
+                              if (weight == null || weight < 0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Weight must be a valid positive value")));
+                                return;
+                              }
+
                               context.read<WorkoutBloc>().add(EditSetEvent(
                                     exerciseIndex: widget.exerciseIndex,
                                     setIndex: widget.setIndex,

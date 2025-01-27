@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
@@ -35,10 +37,12 @@ class CompleteSetEvent extends WorkoutEvent {
   final int exerciseIndex;
   final int duration;
   final bool isMetric;
+  final VoidCallback onSuccess;
   CompleteSetEvent(
       {required this.exerciseIndex,
       required this.duration,
-      required this.isMetric});
+      required this.isMetric,
+      required this.onSuccess});
 }
 
 class EndWorkoutEvent extends WorkoutEvent {
@@ -188,6 +192,7 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
       }
       set.duration = event.duration;
       set.completed = true;
+      event.onSuccess();
     }
     final shouldMove =
         sets[event.exerciseIndex].sets.every((set) => set.completed);
