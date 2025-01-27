@@ -2,10 +2,12 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/user_workout_plans.dart';
+import 'package:gym_app/data/repositories/local_exercise_repository.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/calculator_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
+import 'package:gym_app/screens/exercise_screen.dart';
 import 'package:gym_app/screens/home_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:gym_app/screens/train_screen.dart';
@@ -76,6 +78,21 @@ final router = GoRouter(
             GoRoute(
               path: '/exercise',
               builder: (context, state) => const ExerciseListScreen(),
+              routes: [
+                GoRoute(
+                  path: ':id', // Use ':id' to capture the parameter
+                  builder: (context, state) {
+                    final id = state
+                        .pathParameters['id']!; // Access the captured parameter
+                    return ExerciseDetailsScreen(
+                      name: "Deadlift",
+                      description: "Good exercise",
+                      id: id,
+                      exerciseRepository: getIt.get<LocalExerciseRepository>(),
+                    );
+                  },
+                ),
+              ],
             ),
             GoRoute(
               path: '/workout',
@@ -86,9 +103,9 @@ final router = GoRouter(
             GoRoute(
                 path: '/start',
                 builder: (context, state) {
-                  final map = state.extra as Map<String, dynamic>;
-                  final sets = map['sets'] as List<SetData>;
-                  final id = map['id'] as String?;
+                  final map = state.extra as Map<String, dynamic>?;
+                  final sets = map?['sets'] as List<SetData>? ?? [];
+                  final id = map?['id'] as String?;
                   return FocusWorkoutScreen(
                     sets: sets,
                     plannedWorkoutId: id,

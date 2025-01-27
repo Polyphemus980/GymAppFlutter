@@ -323,7 +323,8 @@ class SetList extends StatelessWidget {
           onTap: () {
             context.read<WorkoutBloc>().add(CompleteSetEvent(
                 exerciseIndex: exerciseIndex,
-                duration: context.read<TimerNotifier>().elapsedSeconds));
+                duration: context.read<TimerNotifier>().elapsedSeconds,
+                isMetric: context.isMetric));
             Provider.of<TimerNotifier>(context, listen: false).resetTimer();
           },
           text: "Complete set",
@@ -429,7 +430,7 @@ class _SetTileState extends State<SetTile> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                      const Text(' lbs'),
+                      Text(context.units),
                       const SizedBox(width: 8),
                       const Icon(Icons.repeat, size: 20),
                       isEditing

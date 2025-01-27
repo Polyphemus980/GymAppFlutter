@@ -22,20 +22,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       floatingActionButton: BlocBuilder<WorkoutBloc, WorkoutState>(
         builder: (BuildContext context, state) {
           if (state is WorkoutInProgress) {
-            // return ListenableBuilder(
-            //   listenable: context.watch<TimerNotifier>(),
-            //   builder: (context, child) {
-            //     return FloatingActionButton.extended(
-            //       onPressed: () {
-            //         context.go('/start');
-            //       },
-            //       label:
-            //           Text(context.read<TimerNotifier>().formattedElapsedTime),
-            //       icon: const Icon(Icons.fitness_center),
-            //     );
-            //   },
-            // );
-            return TimerFAB();
+            return const TimerFAB();
           } else {
             return const SizedBox.shrink();
           }
@@ -97,7 +84,7 @@ class TimerFAB extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Expanded controls that appear above the main FAB
+            // Timer controls that appear when expanded
             if (timerNotifier.isExpanded) ...[
               FloatingActionButton(
                 heroTag: 'reset',
@@ -113,7 +100,7 @@ class TimerFAB extends StatelessWidget {
                   if (timerNotifier.isRunning) {
                     timerNotifier.pauseTimer();
                   } else {
-                    timerNotifier.unpauseTimer();
+                    timerNotifier.startTimer();
                   }
                 },
                 child: Icon(
@@ -122,22 +109,37 @@ class TimerFAB extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
-            // Main FAB that shows the time and expands/collapses controls
-            FloatingActionButton.extended(
-              heroTag: 'timer',
-              onPressed: timerNotifier.toggleExpanded,
-              icon: Icon(
-                timerNotifier.isExpanded
-                    ? Icons.arrow_downward
-                    : Icons.arrow_upward,
-              ),
-              label: Text(
-                timerNotifier.formattedElapsedTime,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+            // Main FAB for navigation and expanding controls
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Timer display and control toggle
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: FloatingActionButton.small(
+                    heroTag: 'expand',
+                    onPressed: timerNotifier.toggleExpanded,
+                    child: Icon(
+                      timerNotifier.isExpanded
+                          ? Icons.arrow_downward
+                          : Icons.arrow_upward,
+                    ),
+                  ),
                 ),
-              ),
+                // Navigation FAB
+                FloatingActionButton.extended(
+                  heroTag: 'navigate',
+                  onPressed: () => context.go('/start'),
+                  icon: const Icon(Icons.fitness_center),
+                  label: Text(
+                    timerNotifier.formattedElapsedTime,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );

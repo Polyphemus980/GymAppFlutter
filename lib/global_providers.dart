@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/data/repositories/sync_workout_repository.dart';
 import 'package:gym_app/timer_notifier.dart';
+import 'package:gym_app/unit_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -23,12 +25,19 @@ class GlobalProviders extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<ThemeNotifier>(
           create: (_) {
-            return ThemeNotifier();
+            return ThemeNotifier(
+                preferencesRepository: getIt.get<LocalPreferencesRepository>());
           },
         ),
+        ChangeNotifierProvider<UnitNotifier>(
+          create: (_) => UnitNotifier(
+              preferencesRepository: getIt.get<LocalPreferencesRepository>()),
+        ),
         BlocProvider<WorkoutBloc>(
-            create: (BuildContext context) => WorkoutBloc(
-                workoutRepository: getIt.get<SyncWorkoutRepository>())),
+          create: (BuildContext context) => WorkoutBloc(
+            workoutRepository: getIt.get<SyncWorkoutRepository>(),
+          ),
+        ),
         ChangeNotifierProvider<TimerNotifier>(
           create: (_) => TimerNotifier(),
         ),

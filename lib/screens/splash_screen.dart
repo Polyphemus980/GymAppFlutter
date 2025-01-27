@@ -6,6 +6,7 @@ import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/theme_notifier.dart';
+import 'package:gym_app/unit_notifier.dart';
 
 import '../auth_bloc.dart';
 
@@ -18,6 +19,7 @@ class SplashScreen extends StatelessWidget {
         .getUserPreferences(context.currentUserId!);
     if (userPrefs != null) {
       context.read<ThemeNotifier>().setUserTheme(userPrefs.is_dark_mode);
+      context.read<UnitNotifier>().setUserUnits(userPrefs.is_metric);
     }
   }
 

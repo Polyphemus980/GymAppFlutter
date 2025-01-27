@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
@@ -236,7 +237,7 @@ class BaseSetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      padding: const EdgeInsets.fromLTRB(0, 4, 16, 4),
       child: Row(
         children: [
           SizedBox(
@@ -308,14 +309,14 @@ class _QuickSetRowState extends State<QuickSetRow> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           AppTextFormField(
-            labelText: "Weight",
+            labelText: "Weight (${context.units})",
             hintText: "0",
             formatters: [
               WeightInputFormatter(),
               LengthLimitingTextInputFormatter(7)
             ],
             controller: weightController,
-            width: 100,
+            width: 110,
             height: 45,
             onChanged: (value) {
               if (value.isNotEmpty) {
@@ -420,7 +421,7 @@ class _RpeSetRowState extends State<RpeSetRow> {
               LengthLimitingTextInputFormatter(3)
             ],
             controller: rpeController,
-            width: 100,
+            width: 80,
             height: 45,
             onChanged: (value) {
               final double? parsedValue = double.tryParse(value);

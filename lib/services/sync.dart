@@ -12,6 +12,7 @@ import 'package:gym_app/data/models/planned_workout_exercise.dart';
 import 'package:gym_app/data/models/user_preferences.dart';
 import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
+import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/models/dirty_table.dart';
@@ -101,10 +102,29 @@ class SynchronizationCenter {
       tableToInsertableMethods;
 
   Future<void> syncFromRemoteToLocal(DateTime lastSynced) async {
-    for (final table in tables) {
-      final rows = await supabaseClient.from(table).select();
-      //.gt('updated_at', lastSynced);
+    if (!getIt.isOnline) {
+      return;
+    }
 
+    // final sharedPrefs = await SharedPreferences.getInstance();
+    // final lastSyncedMilliseconds = sharedPrefs.getInt('lastSynced');
+    // final lastSynced = lastSyncedMilliseconds != null
+    //     ? DateTime.fromMillisecondsSinceEpoch(lastSyncedMilliseconds)
+    //     : null;
+    for (final table in tables) {
+      var rows;
+      try {
+        // rows = lastSynced != null
+        //     ? await supabaseClient
+        //         .from(table)
+        //         .select()
+        //         .gt('updated_at', lastSynced)
+        //     : await supabaseClient.from(table).select();
+        rows = await supabaseClient.from(table).select();
+      } catch (err) {
+        debugPrint("$err");
+        break;
+      }
       if (rows.isNotEmpty) {
         final rowCompanions =
             rows.map((row) => tableToInsertableMethods[table]!(row)).toList();

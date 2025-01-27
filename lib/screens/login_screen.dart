@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
 import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:gym_app/unit_notifier.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 
 import '../get_it_dependency_injection.dart';
@@ -37,6 +38,9 @@ class LoginScreen extends StatelessWidget {
             context
                 .read<ThemeNotifier>()
                 .setUserTheme(userPreferences.is_dark_mode);
+            context
+                .read<UnitNotifier>()
+                .setUserUnits(userPreferences.is_metric);
           } else {
             preferencesRepository.insertUserPreferences(userId: state.user.id);
           }

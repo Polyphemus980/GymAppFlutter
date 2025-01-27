@@ -34,14 +34,20 @@ class RemoveSetEvent extends WorkoutEvent {
 class CompleteSetEvent extends WorkoutEvent {
   final int exerciseIndex;
   final int duration;
-  CompleteSetEvent({required this.exerciseIndex, required this.duration});
+  final bool isMetric;
+  CompleteSetEvent(
+      {required this.exerciseIndex,
+      required this.duration,
+      required this.isMetric});
 }
 
 class EndWorkoutEvent extends WorkoutEvent {
   final String? userId;
+  final bool isMetric;
   final bool dismissed;
 
-  EndWorkoutEvent({this.userId, this.dismissed = false});
+  EndWorkoutEvent(
+      {this.userId, this.dismissed = false, required this.isMetric});
 }
 
 class EndWorkoutPresentationEvent extends WorkoutEvent {}
@@ -189,7 +195,7 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
       final nextIndex = sets
           .indexWhere((setData) => setData.sets.any((set) => !set.completed));
       if (nextIndex == -1) {
-        add(EndWorkoutEvent());
+        add(EndWorkoutEvent(isMetric: event.isMetric));
         return;
       }
       emitPresentation(ChangePageEvent(page: nextIndex));
@@ -204,8 +210,12 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
     emitPresentation(EndWorkoutPresentationEvent());
     final currentState = state as WorkoutInProgress;
     if (!event.dismissed) {
-      workoutRepository.addCompletedWorkoutSplit(currentState.sets,
-          currentState.userId, getIt.isOnline, currentState.plannedWorkoutId);
+      workoutRepository.addCompletedWorkoutSplit(
+          currentState.sets,
+          currentState.userId,
+          getIt.isOnline,
+          currentState.plannedWorkoutId,
+          event.isMetric);
     }
     emit(WorkoutEnded());
     clear();

@@ -35,11 +35,7 @@ class TimerNotifier extends ChangeNotifier {
   }
   startTimer() {
     if (!_isRunning) {
-      if (_startedAt == null) {
-        _startedAt = DateTime.now();
-      } else {
-        _startedAt = _startedAt!.add(DateTime.now().difference(_pausedAt!));
-      }
+      _startedAt = DateTime.now();
       _isRunning = true;
       _pausedAt = null;
       _notifyTimer?.cancel();
@@ -143,7 +139,6 @@ class TimerNotifier extends ChangeNotifier {
     final sharedPrefs = await SharedPreferences.getInstance();
     final last_saved = sharedPrefs.getInt('last_saved');
     final last_saved_date = DateTime.fromMillisecondsSinceEpoch(last_saved!);
-    print(last_saved_date.toString());
     final paused_at = sharedPrefs.getInt('paused_at');
     _pausedAt = paused_at != null
         ? DateTime.fromMillisecondsSinceEpoch(paused_at)

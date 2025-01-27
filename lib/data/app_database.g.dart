@@ -1809,6 +1809,15 @@ class $CompletedSetsTable extends CompletedSets
   late final GeneratedColumn<DateTime> updated_at = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _is_metricMeta =
+      const VerificationMeta('is_metric');
+  @override
+  late final GeneratedColumn<bool> is_metric = GeneratedColumn<bool>(
+      'is_metric', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_metric" IN (0, 1))'));
   @override
   List<GeneratedColumn> get $columns => [
         dirty,
@@ -1820,7 +1829,8 @@ class $CompletedSetsTable extends CompletedSets
         duration_seconds,
         weight,
         created_at,
-        updated_at
+        updated_at,
+        is_metric
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1893,6 +1903,12 @@ class $CompletedSetsTable extends CompletedSets
           updated_at.isAcceptableOrUnknown(
               data['updated_at']!, _updated_atMeta));
     }
+    if (data.containsKey('is_metric')) {
+      context.handle(_is_metricMeta,
+          is_metric.isAcceptableOrUnknown(data['is_metric']!, _is_metricMeta));
+    } else if (isInserting) {
+      context.missing(_is_metricMeta);
+    }
     return context;
   }
 
@@ -1918,6 +1934,8 @@ class $CompletedSetsTable extends CompletedSets
           .read(DriftSqlType.int, data['${effectivePrefix}duration_seconds']),
       weight: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight']),
+      is_metric: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_metric'])!,
       created_at: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updated_at: attachedDatabase.typeMapping
@@ -1942,6 +1960,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
   final Value<double?> weight;
   final Value<DateTime> created_at;
   final Value<DateTime?> updated_at;
+  final Value<bool> is_metric;
   final Value<int> rowid;
   const CompletedSetsCompanion({
     this.dirty = const Value.absent(),
@@ -1954,6 +1973,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     this.weight = const Value.absent(),
     this.created_at = const Value.absent(),
     this.updated_at = const Value.absent(),
+    this.is_metric = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CompletedSetsCompanion.insert({
@@ -1967,12 +1987,14 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     this.weight = const Value.absent(),
     this.created_at = const Value.absent(),
     this.updated_at = const Value.absent(),
+    required bool is_metric,
     this.rowid = const Value.absent(),
   })  : dirty = Value(dirty),
         user_id = Value(user_id),
         workout_exercise_id = Value(workout_exercise_id),
         set_number = Value(set_number),
-        repetitions = Value(repetitions);
+        repetitions = Value(repetitions),
+        is_metric = Value(is_metric);
   static Insertable<CompletedSet> custom({
     Expression<bool>? dirty,
     Expression<String>? id,
@@ -1984,6 +2006,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     Expression<double>? weight,
     Expression<DateTime>? created_at,
     Expression<DateTime>? updated_at,
+    Expression<bool>? is_metric,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1998,6 +2021,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       if (weight != null) 'weight': weight,
       if (created_at != null) 'created_at': created_at,
       if (updated_at != null) 'updated_at': updated_at,
+      if (is_metric != null) 'is_metric': is_metric,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2013,6 +2037,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       Value<double?>? weight,
       Value<DateTime>? created_at,
       Value<DateTime?>? updated_at,
+      Value<bool>? is_metric,
       Value<int>? rowid}) {
     return CompletedSetsCompanion(
       dirty: dirty ?? this.dirty,
@@ -2025,6 +2050,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       weight: weight ?? this.weight,
       created_at: created_at ?? this.created_at,
       updated_at: updated_at ?? this.updated_at,
+      is_metric: is_metric ?? this.is_metric,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2062,6 +2088,9 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     if (updated_at.present) {
       map['updated_at'] = Variable<DateTime>(updated_at.value);
     }
+    if (is_metric.present) {
+      map['is_metric'] = Variable<bool>(is_metric.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2081,6 +2110,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
           ..write('weight: $weight, ')
           ..write('created_at: $created_at, ')
           ..write('updated_at: $updated_at, ')
+          ..write('is_metric: $is_metric, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6052,6 +6082,7 @@ typedef $$CompletedSetsTableCreateCompanionBuilder = CompletedSetsCompanion
   Value<double?> weight,
   Value<DateTime> created_at,
   Value<DateTime?> updated_at,
+  required bool is_metric,
   Value<int> rowid,
 });
 typedef $$CompletedSetsTableUpdateCompanionBuilder = CompletedSetsCompanion
@@ -6066,6 +6097,7 @@ typedef $$CompletedSetsTableUpdateCompanionBuilder = CompletedSetsCompanion
   Value<double?> weight,
   Value<DateTime> created_at,
   Value<DateTime?> updated_at,
+  Value<bool> is_metric,
   Value<int> rowid,
 });
 
@@ -6129,6 +6161,9 @@ class $$CompletedSetsTableFilterComposer
   ColumnFilters<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<bool> get is_metric => $composableBuilder(
+      column: $table.is_metric, builder: (column) => ColumnFilters(column));
+
   $$CompletedWorkoutExercisesTableFilterComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableFilterComposer composer =
         $composerBuilder(
@@ -6188,6 +6223,9 @@ class $$CompletedSetsTableOrderingComposer
   ColumnOrderings<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get is_metric => $composableBuilder(
+      column: $table.is_metric, builder: (column) => ColumnOrderings(column));
+
   $$CompletedWorkoutExercisesTableOrderingComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableOrderingComposer composer =
         $composerBuilder(
@@ -6246,6 +6284,9 @@ class $$CompletedSetsTableAnnotationComposer
   GeneratedColumn<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => column);
 
+  GeneratedColumn<bool> get is_metric =>
+      $composableBuilder(column: $table.is_metric, builder: (column) => column);
+
   $$CompletedWorkoutExercisesTableAnnotationComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableAnnotationComposer composer =
         $composerBuilder(
@@ -6301,6 +6342,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             Value<double?> weight = const Value.absent(),
             Value<DateTime> created_at = const Value.absent(),
             Value<DateTime?> updated_at = const Value.absent(),
+            Value<bool> is_metric = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CompletedSetsCompanion(
@@ -6314,6 +6356,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             weight: weight,
             created_at: created_at,
             updated_at: updated_at,
+            is_metric: is_metric,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -6327,6 +6370,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             Value<double?> weight = const Value.absent(),
             Value<DateTime> created_at = const Value.absent(),
             Value<DateTime?> updated_at = const Value.absent(),
+            required bool is_metric,
             Value<int> rowid = const Value.absent(),
           }) =>
               CompletedSetsCompanion.insert(
@@ -6340,6 +6384,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             weight: weight,
             created_at: created_at,
             updated_at: updated_at,
+            is_metric: is_metric,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

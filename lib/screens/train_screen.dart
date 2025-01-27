@@ -24,9 +24,8 @@ class TrainScreen extends StatelessWidget {
               actions: [
                 TextButton(
                     onPressed: () {
-                      context
-                          .read<WorkoutBloc>()
-                          .add(EndWorkoutEvent(dismissed: true));
+                      context.read<WorkoutBloc>().add(
+                          EndWorkoutEvent(dismissed: true, isMetric: false));
                       context.read<TimerNotifier>().cancelTimer();
                       context.pop();
                     },
