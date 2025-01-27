@@ -1,6 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_app/services/sync.dart';
+import 'package:gym_app/core/services/supabase_synchronization_service.dart';
 
 class NetworkConnectivityService {
   bool _isOnline = false;

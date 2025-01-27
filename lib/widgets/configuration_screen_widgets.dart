@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gym_app/context_extensions.dart';
+import 'package:gym_app/core/extensions/context_extensions.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/screens/focus_workout_screen.dart';
 
-import 'app_widgets.dart';
+import '../core/common_widgets/app_widgets.dart';
 
 class SetCard extends StatefulWidget {
   const SetCard({

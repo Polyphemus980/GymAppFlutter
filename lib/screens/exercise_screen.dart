@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gym_app/core/common_widgets/app_widgets.dart';
 import 'package:gym_app/data/models/completed_set.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
-import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:intl/intl.dart';
 
 class ExerciseDetailsScreen extends StatefulWidget {

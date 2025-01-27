@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/core/services/android_notification_service.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
@@ -10,15 +11,15 @@ import 'package:gym_app/screens/exercise_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:gym_app/screens/train_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
-import 'package:gym_app/services/android_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_bloc.dart';
+import 'core/common_widgets/bottom_nav_bar.dart';
+import 'core/dependency_injection/get_it_dependency_injection.dart';
 import 'data/models/exercise.dart';
 import 'data/models/muscle_group.dart';
 import 'data/repositories/local_workout_repository.dart';
 import 'data/repositories/sync_exercise_repository.dart';
-import 'get_it_dependency_injection.dart';
 import 'screens/add_exercise_screen.dart';
 import 'screens/exercise_list_screen.dart';
 import 'screens/focus_workout_screen.dart';
@@ -31,7 +32,6 @@ import 'screens/splash_screen.dart';
 import 'screens/workout_configuration_screen.dart';
 import 'screens/workout_plan_display_screen.dart';
 import 'timer_notifier.dart';
-import 'widgets/bottom_nav_bar.dart';
 
 final router = GoRouter(
     redirect: (context, state) async {

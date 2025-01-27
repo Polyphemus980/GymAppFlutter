@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:gym_app/services/android_notification_service.dart';
-import 'package:gym_app/services/android_vibration_service.dart';
+import 'package:gym_app/core/services/android_notification_service.dart';
+import 'package:gym_app/core/services/android_vibration_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerNotifier extends ChangeNotifier {

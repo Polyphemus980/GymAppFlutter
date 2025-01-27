@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/context_extensions.dart';
+import 'package:gym_app/core/dependency_injection/get_it_dependency_injection.dart';
+import 'package:gym_app/core/extensions/context_extensions.dart';
 import 'package:gym_app/data/repositories/local_preferences_repository.dart';
-import 'package:gym_app/get_it_dependency_injection.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/theme_notifier.dart';
 import 'package:gym_app/unit_notifier.dart';

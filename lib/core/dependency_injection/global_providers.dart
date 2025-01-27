@@ -7,10 +7,10 @@ import 'package:gym_app/unit_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'auth_bloc.dart';
+import '../../auth_bloc.dart';
+import '../../theme_notifier.dart';
+import '../../workout_bloc.dart';
 import 'get_it_dependency_injection.dart';
-import 'theme_notifier.dart';
-import 'workout_bloc.dart';
 
 class GlobalProviders extends StatelessWidget {
   final Widget child;

@@ -5,8 +5,8 @@ import 'package:gym_app/data/models/offline_user_data.dart';
 import 'package:gym_app/unit_notifier.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'get_it_dependency_injection.dart';
-import 'offline_user_data_singleton.dart';
+import '../../offline_user_data_singleton.dart';
+import '../dependency_injection/get_it_dependency_injection.dart';
 
 extension BuildContextExtensions on BuildContext {
   User get currentUser {

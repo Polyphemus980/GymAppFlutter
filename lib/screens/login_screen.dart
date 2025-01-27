@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
+import 'package:gym_app/core/common_widgets/app_widgets.dart';
 import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/unit_notifier.dart';
-import 'package:gym_app/widgets/app_widgets.dart';
 
-import '../get_it_dependency_injection.dart';
+import '../core/dependency_injection/get_it_dependency_injection.dart';
 import '../theme_notifier.dart';
 
 class LoginScreen extends StatelessWidget {

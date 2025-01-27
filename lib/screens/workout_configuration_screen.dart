@@ -2,11 +2,11 @@ import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/core/common_widgets/app_widgets.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/models/workout_config_set.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
-import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/widgets/configuration_screen_widgets.dart';
 import 'package:gym_app/workout_config_bloc.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/auth_bloc.dart';
-import 'package:gym_app/context_extensions.dart';
-import 'package:gym_app/get_it_dependency_injection.dart';
+import 'package:gym_app/core/common_widgets/app_widgets.dart';
+import 'package:gym_app/core/dependency_injection/get_it_dependency_injection.dart';
+import 'package:gym_app/core/extensions/context_extensions.dart';
 import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/theme_notifier.dart';
-import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../unit_notifier.dart';

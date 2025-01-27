@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/timer_notifier.dart';
 import 'package:provider/provider.dart';
 
-import '../workout_bloc.dart';
+import '../../workout_bloc.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar(this.child, {super.key});
