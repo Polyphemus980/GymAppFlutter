@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
+import 'package:gym_app/timer_notifier.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,10 @@ class TrainScreen extends StatelessWidget {
               actions: [
                 TextButton(
                     onPressed: () {
-                      context.read<WorkoutBloc>().add(EndWorkoutEvent());
+                      context
+                          .read<WorkoutBloc>()
+                          .add(EndWorkoutEvent(dismissed: true));
+                      context.read<TimerNotifier>().cancelTimer();
                       context.pop();
                     },
                     child: const Text("Dismiss it")),
@@ -219,9 +223,8 @@ class WorkoutPlanContinueCard extends StatelessWidget {
                 // Progress Bar
                 LinearProgressIndicator(
                   value: (currentDay + currentWeek * plan.days_per_week) *
-                          1.0 /
-                          (plan.num_weeks * plan.days_per_week) +
-                      0.5,
+                      1.0 /
+                      (plan.num_weeks * plan.days_per_week),
                   backgroundColor: Theme.of(context)
                       .colorScheme
                       .secondaryContainer

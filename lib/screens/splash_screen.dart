@@ -24,22 +24,22 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthenticationState>(
-        listener: (context, state) async {
-          if (state is Authenticated) {
+      listener: (context, state) async {
+        if (state is Authenticated) {
+          await _intializeTheme(context);
+          context.go('/home');
+          return;
+        } else if (state is Unauthenticated) {
+          if (getIt.get<OfflineUserDataSingleton>().hasUser) {
             await _intializeTheme(context);
             context.go('/home');
-            return;
-          } else if (state is Unauthenticated) {
-            if (!getIt.isOnline &&
-                getIt.get<OfflineUserDataSingleton>().hasUser) {
-              await _intializeTheme(context);
-              context.go('/home');
-            }
           }
-          context.go('/login');
-        },
-        child: const Center(
-          child: FlutterLogo(size: 160),
-        ));
+        }
+        context.go('/login');
+      },
+      child: const Center(
+        child: FlutterLogo(size: 160),
+      ),
+    );
   }
 }

@@ -27,7 +27,7 @@ class WorkoutConfigurationScreen extends StatelessWidget {
   final String title;
   final String finishButtonText;
   final List<SetData>? data;
-  final void Function(List<SetData>) finishButtonOnTap;
+  final void Function(List<SetData>, String?) finishButtonOnTap;
   final LocalWorkoutRepository workoutRepository;
 
   @override
@@ -56,7 +56,7 @@ class WorkoutConfigurationList extends StatelessWidget {
   final String title;
   final String finishButtonText;
   final List<SetData>? data;
-  final void Function(List<SetData>) finishButtonOnTap;
+  final void Function(List<SetData>, String?) finishButtonOnTap;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,7 @@ class WorkoutConfigurationList extends StatelessWidget {
             content: Text(event.error),
           ));
         } else if (event is ValidationSucceededEvent) {
-          finishButtonOnTap(event.sets);
+          finishButtonOnTap(event.sets, event.plannedWorkoutId);
         }
       }, child: BlocBuilder<WorkoutConfigBloc, WorkoutConfigState>(
         builder: (context, state) {

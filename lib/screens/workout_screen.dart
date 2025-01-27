@@ -4,37 +4,10 @@ import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/workout_plan.dart';
 import 'package:gym_app/data/repositories/local_workout_repository.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
-import 'package:provider/provider.dart';
-
-import '../workout_bloc.dart';
 
 class WorkoutListScreen extends StatelessWidget {
   final LocalWorkoutRepository workoutRepository;
   const WorkoutListScreen({super.key, required this.workoutRepository});
-  void displayWorkoutPopUp(BuildContext context) {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-              title: const Text("Workout in progress"),
-              content: const Text(
-                  "A workout is currently in progress. Do you want to dismiss it and start a new one?"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      context.read<WorkoutBloc>().add(EndWorkoutEvent());
-                      context.pop();
-                    },
-                    child: const Text("Dismiss it")),
-                TextButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Text("Continue current one"))
-              ]);
-        });
-  }
 
   @override
   Widget build(BuildContext context) {

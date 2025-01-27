@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/services/android_notification_service.dart';
@@ -25,7 +26,10 @@ class FocusWorkoutScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useEffect(() {
-      context.read<WorkoutBloc>().add(InitializeSetsEvent(sets: sets));
+      context.read<WorkoutBloc>().add(InitializeSetsEvent(
+          sets: sets,
+          userId: context.currentUserId!,
+          plannedWorkoutId: plannedWorkoutId));
       return null;
     }, []);
     final pageController = usePageController();
@@ -35,77 +39,66 @@ class FocusWorkoutScreen extends HookWidget {
           pageController.animateToPage(event.page,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut);
-        } else if (event is EndWorkoutEvent) {
+        } else if (event is EndWorkoutPresentationEvent) {
           context.read<TimerNotifier>().cancelTimer();
           NotificationService.stopWorkoutNotification();
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Finished workout")));
           context.go('/home');
+        } else if (event is IncorrectRepsEvent) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Set must have more than 0 repetitions")));
         }
       },
       child: BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
         if (state is WorkoutInProgress && state.sets.isNotEmpty) {
           return AppScaffold(
             title: "Workout",
-            child: KeyboardListener(
-              focusNode: FocusNode(),
-              onKeyEvent: (event) {
-                if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                  pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                  pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                }
-              },
-              child: Column(spacing: 16, children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
-                  child: SmoothPageIndicator(
-                      controller: pageController, count: state.sets.length),
-                ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: pageController,
-                    itemCount: state.sets.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Stack(children: [
-                        ExerciseList(
-                            exerciseIndex: index, setData: state.sets[index]),
-                        if (Platform.isWindows)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FloatingActionButton(
-                              heroTag: "previousButton$index",
-                              onPressed: () {
-                                pageController.previousPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut);
-                              },
-                              child: const Icon(Icons.keyboard_arrow_left),
-                            ),
+            child: Column(spacing: 16, children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                child: SmoothPageIndicator(
+                    controller: pageController, count: state.sets.length),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: state.sets.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Stack(children: [
+                      ExerciseList(
+                          exerciseIndex: index, setData: state.sets[index]),
+                      if (Platform.isWindows)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: FloatingActionButton(
+                            heroTag: "previousButton$index",
+                            onPressed: () {
+                              pageController.previousPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            },
+                            child: const Icon(Icons.keyboard_arrow_left),
                           ),
-                        if (Platform.isWindows)
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FloatingActionButton(
-                              heroTag: "nextButton$index",
-                              onPressed: () {
-                                pageController.nextPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut);
-                              },
-                              child: const Icon(Icons.keyboard_arrow_right),
-                            ),
-                          )
-                      ]);
-                    },
-                  ),
+                        ),
+                      if (Platform.isWindows)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FloatingActionButton(
+                            heroTag: "nextButton$index",
+                            onPressed: () {
+                              pageController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            },
+                            child: const Icon(Icons.keyboard_arrow_right),
+                          ),
+                        )
+                    ]);
+                  },
                 ),
-              ]),
-            ),
+              ),
+            ]),
           );
         }
         return const SizedBox.shrink();
@@ -326,17 +319,14 @@ class SetList extends StatelessWidget {
       SizedBox(
         width: 250,
         height: 75,
-        child: ElevatedButton(
-          onPressed: () {
+        child: AppInkWellButton(
+          onTap: () {
+            context.read<WorkoutBloc>().add(CompleteSetEvent(
+                exerciseIndex: exerciseIndex,
+                duration: context.read<TimerNotifier>().elapsedSeconds));
             Provider.of<TimerNotifier>(context, listen: false).resetTimer();
-            context
-                .read<WorkoutBloc>()
-                .add(CompleteSetEvent(exerciseIndex: exerciseIndex));
           },
-          style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).primaryColor),
-          child: const Text("Complete set"),
+          text: "Complete set",
         ),
       )
     ]);

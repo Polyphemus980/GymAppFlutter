@@ -17,8 +17,8 @@ class ValidationFailedEvent extends WorkoutConfigEvent {
 
 class ValidationSucceededEvent extends WorkoutConfigEvent {
   final List<SetData> sets;
-
-  ValidationSucceededEvent({required this.sets});
+  final String? plannedWorkoutId;
+  ValidationSucceededEvent({required this.sets, this.plannedWorkoutId});
 }
 
 class FinishConfigurationEvent extends WorkoutConfigEvent {
@@ -60,8 +60,8 @@ class Loading extends WorkoutConfigState {}
 class Loaded extends WorkoutConfigState {
   final List<SetData> sets;
   final List<Exercise> exercises;
-
-  Loaded({required this.sets, required this.exercises});
+  final String? plannedWorkoutId;
+  Loaded({required this.sets, required this.exercises, this.plannedWorkoutId});
 }
 
 class Error extends WorkoutConfigState {
@@ -154,7 +154,8 @@ class WorkoutConfigBloc extends Bloc<WorkoutConfigEvent, WorkoutConfigState>
           .toList();
       final exercises =
           workout.exercises!.map((exercise) => exercise.exercise!).toList();
-      emit(Loaded(sets: setData, exercises: exercises));
+      emit(Loaded(
+          sets: setData, exercises: exercises, plannedWorkoutId: workout.id));
     } else {
       emit(Loaded(
           sets: event.data!,
@@ -177,7 +178,9 @@ class WorkoutConfigBloc extends Bloc<WorkoutConfigEvent, WorkoutConfigState>
         allSetsHaveData &&
         (!event.isRpe || (isRpeValid && isRepRangeValid))) {
       _adjustSetIndices(loadedState.sets);
-      emitPresentation(ValidationSucceededEvent(sets: loadedState.sets));
+      emitPresentation(ValidationSucceededEvent(
+          sets: loadedState.sets,
+          plannedWorkoutId: loadedState.plannedWorkoutId));
     } else {
       emitPresentation(ValidationFailedEvent(
           error: _getValidationErrorMessage(hasAtLeastOneExercise,

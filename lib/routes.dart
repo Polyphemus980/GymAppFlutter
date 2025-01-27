@@ -86,8 +86,13 @@ final router = GoRouter(
             GoRoute(
                 path: '/start',
                 builder: (context, state) {
-                  final sets = state.extra as List<SetData>? ?? [];
-                  return FocusWorkoutScreen(sets: sets);
+                  final map = state.extra as Map<String, dynamic>;
+                  final sets = map['sets'] as List<SetData>;
+                  final id = map['id'] as String?;
+                  return FocusWorkoutScreen(
+                    sets: sets,
+                    plannedWorkoutId: id,
+                  );
                 }),
             GoRoute(
               path: '/profile',
@@ -145,7 +150,7 @@ final router = GoRouter(
                         data: data,
                         title: "Create workout",
                         finishButtonText: "Save Workout",
-                        finishButtonOnTap: (sets) {
+                        finishButtonOnTap: (sets, _) {
                           context.pop(sets);
                         },
                       );
@@ -155,7 +160,7 @@ final router = GoRouter(
       ),
       GoRoute(
           path: '/calculator',
-          builder: (context, state) =>  CalculatorScreen()),
+          builder: (context, state) => const CalculatorScreen()),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
@@ -172,10 +177,10 @@ final router = GoRouter(
               workoutRepository: getIt.get<LocalWorkoutRepository>(),
               title: "Edit workout",
               finishButtonText: "Start Workout",
-              finishButtonOnTap: (sets) {
+              finishButtonOnTap: (sets, id) {
                 NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
-                context.go('/start', extra: sets);
+                context.go('/start', extra: {'sets': sets, 'id': id});
               },
               isRpe: true,
               workoutPlan: plan,
@@ -188,10 +193,10 @@ final router = GoRouter(
               workoutRepository: getIt.get<LocalWorkoutRepository>(),
               title: "Create workout",
               finishButtonText: "Start Workout",
-              finishButtonOnTap: (sets) {
+              finishButtonOnTap: (sets, id) {
                 NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
-                context.go('/start', extra: sets);
+                context.go('/start', extra: {'sets': sets, 'id': id});
               },
             );
           },

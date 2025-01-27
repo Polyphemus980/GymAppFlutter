@@ -10,6 +10,9 @@ class TimerNotifier extends ChangeNotifier {
   DateTime? _pausedAt;
   bool _isRunning = false;
   Timer? _notifyTimer;
+  bool _isExpanded = false;
+  bool get isExpanded => _isExpanded;
+  bool get isRunning => _isRunning;
   int get elapsedSeconds {
     if (_startedAt == null) {
       return 0;
@@ -69,12 +72,33 @@ class TimerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void unpauseTimer() {
+    _isRunning = true;
+    _startedAt = _startedAt!.add(DateTime.now().difference(_pausedAt!));
+    _pausedAt = null;
+    _notifyTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      notifyListeners();
+      if (elapsedSeconds % 90 == 0) {
+        VibrationService.vibrate();
+      }
+      NotificationService.updateWorkoutNotificationWithActions(
+          formattedElapsedTime, false);
+      _saveState();
+    });
+    notifyListeners();
+  }
+
   resetTimer() {
-    if (!_isRunning) {
+    if (!_isRunning && _pausedAt == null) {
       return;
     }
     _startedAt = DateTime.now();
     _pausedAt = null;
+    notifyListeners();
+  }
+
+  void toggleExpanded() {
+    _isExpanded = !_isExpanded;
     notifyListeners();
   }
 
@@ -132,6 +156,9 @@ class TimerNotifier extends ChangeNotifier {
     _isRunning = is_running ?? false;
 
     if (_isRunning) {
+      if (_pausedAt != null) {
+        _pausedAt = _pausedAt!.add(DateTime.now().difference(last_saved_date));
+      }
       _startedAt = _startedAt!.add(DateTime.now().difference(last_saved_date));
       resumeTimer();
     }

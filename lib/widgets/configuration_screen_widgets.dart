@@ -212,7 +212,7 @@ class ActionButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
           ),
           icon: Icon(icon, size: 20),
           label: Text(label),
