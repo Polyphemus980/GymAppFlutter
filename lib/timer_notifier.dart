@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gym_app/services/android_notification_service.dart';
 import 'package:gym_app/services/android_vibration_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerNotifier extends ChangeNotifier {
   DateTime? _startedAt;
@@ -26,6 +27,9 @@ class TimerNotifier extends ChangeNotifier {
     return '$minutes:$remainingSeconds';
   }
 
+  TimerNotifier() {
+    _loadState();
+  }
   startTimer() {
     if (!_isRunning) {
       if (_startedAt == null) {
@@ -37,13 +41,32 @@ class TimerNotifier extends ChangeNotifier {
       _pausedAt = null;
       _notifyTimer?.cancel();
       _notifyTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (elapsedSeconds % 90 == 0) VibrationService.vibrate();
         notifyListeners();
+        if (elapsedSeconds % 90 == 0) {
+          VibrationService.vibrate();
+        }
         NotificationService.updateWorkoutNotificationWithActions(
             formattedElapsedTime, false);
+        _saveState();
       });
       notifyListeners();
     }
+  }
+
+  void resumeTimer() {
+    _isRunning = true;
+    _pausedAt = null;
+    _notifyTimer?.cancel();
+    _notifyTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      notifyListeners();
+      if (elapsedSeconds % 90 == 0) {
+        VibrationService.vibrate();
+      }
+      NotificationService.updateWorkoutNotificationWithActions(
+          formattedElapsedTime, false);
+      _saveState();
+    });
+    notifyListeners();
   }
 
   resetTimer() {
@@ -63,6 +86,7 @@ class TimerNotifier extends ChangeNotifier {
       _isRunning = false;
       _notifyTimer?.cancel();
       NotificationService.stopWorkoutNotification();
+      _deleteState();
       notifyListeners();
     }
   }
@@ -75,6 +99,41 @@ class TimerNotifier extends ChangeNotifier {
       NotificationService.updateWorkoutNotificationWithActions(
           formattedElapsedTime, true);
       notifyListeners();
+    }
+  }
+
+  void _deleteState() async {
+    final sharedPrefs = await SharedPreferences.getInstance();
+    await sharedPrefs.clear();
+  }
+
+  void _saveState() async {
+    final sharedPrefs = await SharedPreferences.getInstance();
+    sharedPrefs.setInt('started_at', _startedAt?.millisecondsSinceEpoch ?? 0);
+    sharedPrefs.setInt('paused_at', _pausedAt?.millisecondsSinceEpoch ?? 0);
+    sharedPrefs.setInt('last_saved', DateTime.now().millisecondsSinceEpoch);
+    sharedPrefs.setBool('is_running', _isRunning);
+  }
+
+  void _loadState() async {
+    final sharedPrefs = await SharedPreferences.getInstance();
+    final last_saved = sharedPrefs.getInt('last_saved');
+    final last_saved_date = DateTime.fromMillisecondsSinceEpoch(last_saved!);
+    print(last_saved_date.toString());
+    final paused_at = sharedPrefs.getInt('paused_at');
+    _pausedAt = paused_at != null
+        ? DateTime.fromMillisecondsSinceEpoch(paused_at)
+        : null;
+    final started_at = sharedPrefs.getInt('started_at');
+    _startedAt = started_at != null
+        ? DateTime.fromMillisecondsSinceEpoch(started_at)
+        : null;
+    final is_running = sharedPrefs.getBool('is_running');
+    _isRunning = is_running ?? false;
+
+    if (_isRunning) {
+      _startedAt = _startedAt!.add(DateTime.now().difference(last_saved_date));
+      resumeTimer();
     }
   }
 

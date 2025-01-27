@@ -74,6 +74,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
           } else {
             add(_AuthStateChanged(user: null));
           }
+        } else if (data.event == AuthChangeEvent.tokenRefreshed) {
+          if (data.session != null) {
+            add(_AuthStateChanged(user: data.session!.user));
+          } else {
+            add(_AuthStateChanged(user: null));
+          }
         } else if (data.event == AuthChangeEvent.signedIn &&
             data.session != null) {
           add(_AuthStateChanged(user: data.session!.user));

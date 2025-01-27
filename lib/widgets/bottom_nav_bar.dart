@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/get_it_dependency_injection.dart';
-import 'package:gym_app/offline_user_data_singleton.dart';
+import 'package:gym_app/timer_notifier.dart';
 
 import '../workout_bloc.dart';
 
@@ -22,20 +21,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
       floatingActionButton: BlocBuilder<WorkoutBloc, WorkoutState>(
         builder: (BuildContext context, state) {
           if (state is WorkoutInProgress) {
-            return FloatingActionButton.extended(
-              onPressed: () {
-                context.go('/start');
+            return ListenableBuilder(
+              listenable: context.watch<TimerNotifier>(),
+              builder: (context, child) {
+                return FloatingActionButton.extended(
+                  onPressed: () {
+                    context.go('/start');
+                  },
+                  label:
+                      Text(context.read<TimerNotifier>().formattedElapsedTime),
+                  icon: const Icon(Icons.fitness_center),
+                );
               },
-              label: Text('${getIt.get<OfflineUserDataSingleton>().hasUser}'),
-              icon: const Icon(Icons.fitness_center),
             );
           } else {
-            // return FloatingActionButton.extended(
-            //   onPressed: () {},
-            //   label: Text(
-            //       '${context.watch<NetworkConnectivityNotifier>().isOnline}'),
-            //   icon: const Icon(Icons.fitness_center),
-            // );
             return const SizedBox.shrink();
           }
         },
