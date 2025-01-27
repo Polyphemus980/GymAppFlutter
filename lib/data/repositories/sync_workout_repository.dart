@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_app/data/models/planned_workout.dart';
@@ -59,8 +61,8 @@ class SyncWorkoutRepository {
       bool isOnline, String workoutPlanId, bool stopSupabaseInserting) async {
     for (var weekEntry in plan.weeks.asMap().entries) {
       for (var dayEntry in weekEntry.value.days.asMap().entries) {
-        final insertedWorkout = await _insertPlannedWorkout(
-            userId, isOnline, workoutPlanId, weekEntry.key, dayEntry.key);
+        final insertedWorkout = await _insertPlannedWorkout(userId, isOnline,
+            workoutPlanId, weekEntry.key, dayEntry.key, stopSupabaseInserting);
         if (isOnline && !stopSupabaseInserting) {
           try {
             await supabaseClient
@@ -80,8 +82,13 @@ class SyncWorkoutRepository {
     }
   }
 
-  Future<PlannedWorkout> _insertPlannedWorkout(String userId, bool isOnline,
-      String workoutPlanId, int weekIndex, int dayIndex) async {
+  Future<PlannedWorkout> _insertPlannedWorkout(
+      String userId,
+      bool isOnline,
+      String workoutPlanId,
+      int weekIndex,
+      int dayIndex,
+      bool stopSupabaseInserting) async {
     return await db
         .into(db.plannedWorkouts)
         .insertReturning(PlannedWorkoutsCompanion(
@@ -89,15 +96,20 @@ class SyncWorkoutRepository {
           workout_plan_id: Value(workoutPlanId),
           day_number: Value(dayIndex),
           week_number: Value(weekIndex),
-          dirty: Value(!isOnline),
+          dirty: Value(!isOnline || stopSupabaseInserting),
         ));
   }
 
   Future<void> _insertExercisesAndSets(String userId, bool isOnline,
       String workoutId, WorkoutDay day, bool stopSupabaseInserting) async {
-    for (var setDataEntry in day.sets.asMap().entries) {
+    for (final setDataEntry in day.sets.asMap().entries) {
       final insertedWorkoutExercise = await _insertPlannedWorkoutExercise(
-          userId, isOnline, workoutId, setDataEntry.key, setDataEntry.value);
+          userId,
+          isOnline,
+          workoutId,
+          setDataEntry.key,
+          setDataEntry.value,
+          stopSupabaseInserting);
 
       if (isOnline && !stopSupabaseInserting) {
         try {
@@ -123,7 +135,8 @@ class SyncWorkoutRepository {
       bool isOnline,
       String workoutId,
       int exerciseIndex,
-      SetData setData) async {
+      SetData setData,
+      bool stopSupabaseInserting) async {
     final insertedPlannedWorkoutExercise = await db
         .into(db.plannedWorkoutExercises)
         .insertReturning(PlannedWorkoutExercisesCompanion(
@@ -131,7 +144,9 @@ class SyncWorkoutRepository {
           workout_id: Value(workoutId),
           exercise_id: Value(setData.exercise.id),
           exercise_order: Value(exerciseIndex),
-          dirty: Value(!isOnline),
+          dirty: Value(
+            !isOnline || stopSupabaseInserting,
+          ),
         ));
     return insertedPlannedWorkoutExercise;
   }
@@ -142,7 +157,7 @@ class SyncWorkoutRepository {
       String workoutExerciseId,
       List<WorkoutConfigSet> sets,
       bool stopSupabaseInserting) async {
-    for (var setEntry in sets.asMap().entries) {
+    for (final setEntry in sets.asMap().entries) {
       final insertedPlannedSet =
           await db.into(db.plannedSets).insertReturning(PlannedSetsCompanion(
                 user_id: Value(userId),
@@ -151,7 +166,7 @@ class SyncWorkoutRepository {
                 min_repetitions: Value(setEntry.value.minRepetitions!),
                 max_repetitions: Value(setEntry.value.maxRepetitions!),
                 rpe: Value(setEntry.value.rpe!),
-                dirty: Value(!isOnline),
+                dirty: Value(!isOnline || stopSupabaseInserting),
               ));
       if (isOnline && !stopSupabaseInserting) {
         try {
@@ -171,7 +186,6 @@ class SyncWorkoutRepository {
 
   Future<void> signUserUpForWorkoutPlan(
       String userId, String planId, bool isOnline) async {
-    debugPrint("isOnline ${isOnline.toString()}");
     final insertedUserWorkoutPlan = await db
         .into(db.userWorkoutPlansTable)
         .insertReturning(UserWorkoutPlansTableCompanion(
@@ -179,21 +193,182 @@ class SyncWorkoutRepository {
           workout_plan_id: Value(planId),
           dirty: Value(!isOnline),
         ));
-    debugPrint("here");
     if (isOnline) {
-      debugPrint("here in online");
       try {
-        debugPrint("here in supabase");
         await supabaseClient
             .from('user_workout_plans')
             .insert(insertedUserWorkoutPlan.toJson());
-        debugPrint("print");
       } catch (err) {
-        debugPrint("$err");
         (db.update(db.userWorkoutPlansTable)
               ..where((uwp) => uwp.user_id.equals(userId))
               ..where((uwp) => uwp.workout_plan_id.equals(planId)))
             .write(const UserWorkoutPlansTableCompanion(dirty: Value(true)));
+      }
+    }
+  }
+
+  Future<void> addCompletedWorkoutSplit(
+      List<SetData> exerciseSets,
+      String userId,
+      bool isOnline,
+      String? plannedWorkoutId,
+      bool isMetric) async {
+    bool stopSupabaseInserting = false;
+    db.transaction(() async {
+      if (plannedWorkoutId != null) {
+        final plannedWorkout = await (db.select(db.plannedWorkouts)
+              ..where((pw) => pw.id.equals(plannedWorkoutId)))
+            .getSingle();
+        final userPlan = await (db.select(db.userWorkoutPlansTable)
+              ..where((pw) =>
+                  pw.workout_plan_id.equals(plannedWorkout.workout_plan_id)))
+            .getSingle();
+        final workoutPlan = await (db.select(db.workoutPlans)
+              ..where((pw) => pw.id.equals(plannedWorkout.workout_plan_id)))
+            .getSingle();
+        final day = (userPlan.current_day + 1) % workoutPlan.days_per_week;
+        final week = userPlan.current_week +
+            ((userPlan.current_day + 1) ~/ workoutPlan.days_per_week);
+        if (week == workoutPlan.num_weeks) {
+          await (db.delete(db.userWorkoutPlansTable)
+                ..where((plan) => plan.workout_plan_id.equals(workoutPlan.id)))
+              .go();
+          if (isOnline) {
+            try {
+              await supabaseClient
+                  .from('user_workout_plans')
+                  .delete()
+                  .eq('workout_plan_id', workoutPlan.id);
+            } catch (err) {
+              debugPrint("$err");
+            }
+          }
+        } else {
+          await (db.update(db.userWorkoutPlansTable)
+                ..where((plan) => plan.workout_plan_id.equals(workoutPlan.id)))
+              .write(UserWorkoutPlansTableCompanion(
+                  dirty: Value(!isOnline),
+                  current_day: Value(day),
+                  current_week: Value(week)));
+          if (isOnline) {
+            try {
+              await supabaseClient
+                  .from('user_workout_plans')
+                  .update({'current_day': day, 'current_week': week}).eq(
+                      'workout_plan_id', workoutPlan.id);
+            } catch (err) {
+              stopSupabaseInserting = true;
+              debugPrint("$err");
+              await (db.update(db.userWorkoutPlansTable)
+                    ..where(
+                        (plan) => plan.workout_plan_id.equals(workoutPlan.id)))
+                  .write(const UserWorkoutPlansTableCompanion(
+                dirty: Value(true),
+              ));
+            }
+          }
+        }
+      }
+      final insertedWorkout = await db
+          .into(db.completedWorkouts)
+          .insertReturning(CompletedWorkoutsCompanion(
+            dirty: Value(!isOnline),
+            workout_date: Value(DateTime.now()),
+            planned_workout_id: Value(plannedWorkoutId),
+            user_id: Value(userId),
+            end_time: Value(DateTime.now()),
+          ));
+      if (isOnline && !stopSupabaseInserting) {
+        try {
+          await supabaseClient
+              .from('completed_workouts')
+              .insert(insertedWorkout.toJson());
+        } catch (err) {
+          stopSupabaseInserting = true;
+          debugPrint("$err");
+          await (db.update(db.completedWorkouts)
+                ..where((wp) => wp.id.equals(insertedWorkout.id)))
+              .write(
+            const CompletedWorkoutsCompanion(
+              dirty: Value(true),
+            ),
+          );
+        }
+      }
+      await _insertCompletedExercisesAndSets(exerciseSets, userId, isOnline,
+          insertedWorkout.id, stopSupabaseInserting, isMetric);
+    });
+  }
+
+  Future<void> _insertCompletedExercisesAndSets(
+      List<SetData> exerciseSets,
+      String userId,
+      bool isOnline,
+      String workoutId,
+      bool stopSupabaseInserting,
+      bool isMetric) async {
+    for (final exerciseSet in exerciseSets.asMap().entries) {
+      final insertedWorkoutExercise =
+          await db.into(db.completedWorkoutExercises).insertReturning(
+                CompletedWorkoutExercisesCompanion(
+                    user_id: Value(userId),
+                    exercise_id: Value(exerciseSet.value.exercise.id),
+                    workout_id: Value(workoutId),
+                    exercise_order: Value(exerciseSet.key),
+                    dirty: Value(!isOnline || stopSupabaseInserting)),
+              );
+      if (isOnline && !stopSupabaseInserting) {
+        try {
+          await supabaseClient
+              .from('completed_workout_exercises')
+              .insert(insertedWorkoutExercise.toJson());
+        } catch (err) {
+          stopSupabaseInserting = true;
+          debugPrint("$err");
+          await (db.update(db.completedWorkoutExercises)
+                ..where((wp) => wp.id.equals(insertedWorkoutExercise.id)))
+              .write(
+                  const CompletedWorkoutExercisesCompanion(dirty: Value(true)));
+        }
+      }
+      await _insertCompleteSets(userId, isOnline, insertedWorkoutExercise.id,
+          exerciseSet.value.sets, stopSupabaseInserting, isMetric);
+    }
+  }
+
+  Future<void> _insertCompleteSets(
+      String userId,
+      bool isOnline,
+      String workoutExerciseId,
+      List<WorkoutConfigSet> sets,
+      bool stopSupabaseInserting,
+      bool isMetric) async {
+    for (final setEntry in sets.asMap().entries) {
+      final insertedCompletedSet =
+          await db.into(db.completedSets).insertReturning(
+                CompletedSetsCompanion(
+                  user_id: Value(userId),
+                  workout_exercise_id: Value(workoutExerciseId),
+                  set_number: Value(setEntry.key),
+                  repetitions: Value(setEntry.value.repetitions ?? 0),
+                  weight: Value(setEntry.value.weight ?? 0),
+                  duration_seconds: Value(setEntry.value.duration),
+                  dirty: Value(!isOnline || stopSupabaseInserting),
+                  is_metric: Value(isMetric),
+                ),
+              );
+      if (isOnline && !stopSupabaseInserting) {
+        try {
+          await supabaseClient
+              .from('completed_sets')
+              .insert(insertedCompletedSet.toJson());
+        } catch (err) {
+          stopSupabaseInserting = true;
+          debugPrint("$err");
+          await (db.update(db.completedSets)
+                ..where((wp) => wp.id.equals(insertedCompletedSet.id)))
+              .write(const CompletedSetsCompanion(dirty: Value(true)));
+        }
       }
     }
   }

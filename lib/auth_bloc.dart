@@ -74,6 +74,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
           } else {
             add(_AuthStateChanged(user: null));
           }
+        } else if (data.event == AuthChangeEvent.tokenRefreshed) {
+          if (data.session != null) {
+            add(_AuthStateChanged(user: data.session!.user));
+          } else {
+            add(_AuthStateChanged(user: null));
+          }
         } else if (data.event == AuthChangeEvent.signedIn &&
             data.session != null) {
           add(_AuthStateChanged(user: data.session!.user));
@@ -107,7 +113,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
       SignInRequested event, Emitter<AuthenticationState> emit) async {
     emit(AuthLoading());
     if (state is Authenticated) {
-      emit(state);
       return;
     }
     try {
@@ -121,7 +126,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
   _handleSignOut(
       SignOutRequested event, Emitter<AuthenticationState> emit) async {
     if (state is Unauthenticated) {
-      emit(state);
       return;
     }
     emit(AuthLoading());

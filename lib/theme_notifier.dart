@@ -1,7 +1,9 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_app/data/repositories/local_preferences_repository.dart';
 
 class ThemeNotifier extends ChangeNotifier {
+  final LocalPreferencesRepository preferencesRepository;
   final ThemeData lightTheme = FlexThemeData.light(
       tones: const FlexTones.dark(),
       scheme: FlexScheme.vesuviusBurn,
@@ -23,7 +25,9 @@ class ThemeNotifier extends ChangeNotifier {
   bool _isLightTheme() => _currentTheme == lightTheme;
   bool isLightTheme() => _isLightTheme();
 
-  ThemeNotifier()
+  ThemeNotifier(
+      {ThemeMode themeMode = ThemeMode.system,
+      required this.preferencesRepository})
       : _currentTheme = ThemeMode.system == ThemeMode.light
             ? FlexThemeData.light(
                 scheme: FlexScheme.vesuviusBurn,
@@ -39,15 +43,18 @@ class ThemeNotifier extends ChangeNotifier {
                 ));
 
   ThemeData get currentTheme => _currentTheme;
-  void toggleTheme() {
+  void toggleTheme(String userId) {
     _currentTheme = _isLightTheme() ? darkTheme : lightTheme;
+    preferencesRepository.updateUserPreferences(
+        userId: userId, isDarkMode: !_isLightTheme());
     notifyListeners();
   }
 
-  void changeUserTheme(bool userHasDarkTheme) {
+  void setUserTheme(bool userHasDarkTheme) {
     if ((userHasDarkTheme && _isLightTheme()) ||
         (!userHasDarkTheme && !_isLightTheme())) {
-      toggleTheme();
+      _currentTheme = _isLightTheme() ? darkTheme : lightTheme;
+      notifyListeners();
     }
   }
 }

@@ -15,8 +15,8 @@ class CompletedWorkout {
   final String? planned_workout_id;
   final String? workout_name;
   final DateTime workout_date;
-  final DateTime? start_time; // Added for precise timing
-  final DateTime? end_time; // Added for precise timing
+  final DateTime? start_time;
+  final DateTime? end_time;
   final int? total_duration;
   final String? notes;
   final DateTime created_at;

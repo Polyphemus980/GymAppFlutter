@@ -34,7 +34,7 @@ class SyncExerciseRepository {
       try {
         await supabaseClient
             .from('exercises')
-            .insert(insertedExercise.toJson());
+            .insert(insertedExercise.toJson(excludeMuscleGroups: true));
 
         final exerciseMuscles = muscles
             .map((muscle) => {

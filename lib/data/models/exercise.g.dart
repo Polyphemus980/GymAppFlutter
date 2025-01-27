@@ -18,7 +18,9 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
       updated_at: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-    );
+    )..muscle_groups = (json['muscle_groups'] as List<dynamic>?)
+        ?.map((e) => MuscleGroup.fromJson(e as Map<String, dynamic>))
+        .toList();
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'id': instance.id,
@@ -30,4 +32,5 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'created_at': instance.created_at.toIso8601String(),
       'updated_at': instance.updated_at?.toIso8601String(),
       'dirty': instance.dirty,
+      'muscle_groups': instance.muscle_groups,
     };

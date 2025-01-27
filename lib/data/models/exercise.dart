@@ -31,7 +31,6 @@ class Exercise {
   final DateTime? updated_at;
   final bool dirty;
 
-  @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<MuscleGroup>? muscle_groups;
 
   Exercise copy() {
@@ -70,7 +69,13 @@ class Exercise {
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ExerciseToJson(this);
+  Map<String, dynamic> toJson({bool excludeMuscleGroups = false}) {
+    final Map<String, dynamic> data = _$ExerciseToJson(this);
+    if (excludeMuscleGroups) {
+      data.remove('muscle_groups');
+    }
+    return data;
+  }
 }
 
 @UseRowClass(Exercise)

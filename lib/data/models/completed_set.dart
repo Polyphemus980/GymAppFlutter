@@ -16,6 +16,7 @@ class CompletedSet {
   final int repetitions;
   final int? duration_seconds;
   final bool dirty;
+  final bool is_metric;
   final double? weight;
   final DateTime created_at;
   final DateTime? updated_at;
@@ -29,6 +30,7 @@ class CompletedSet {
     required this.repetitions,
     this.duration_seconds,
     this.weight,
+    required this.is_metric,
     required this.created_at,
     this.updated_at,
   });
@@ -52,7 +54,7 @@ class CompletedSets extends Table implements DirtyTable {
   RealColumn get weight => real().nullable()();
   DateTimeColumn get created_at => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updated_at => dateTime().nullable()();
-
+  BoolColumn get is_metric => boolean()();
   @override
   Set<Column> get primaryKey => {id};
   @override

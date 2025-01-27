@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gym_app/context_extensions.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/set_data.dart';
+import 'package:gym_app/services/android_notification_service.dart';
 import 'package:gym_app/widgets/app_widgets.dart';
 import 'package:gym_app/workout_bloc.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +19,17 @@ import '../theme_notifier.dart';
 import '../timer_notifier.dart';
 
 class FocusWorkoutScreen extends HookWidget {
-  const FocusWorkoutScreen({super.key, required this.sets});
+  const FocusWorkoutScreen(
+      {super.key, required this.sets, this.plannedWorkoutId});
   final List<SetData> sets;
-
+  final String? plannedWorkoutId;
   @override
   Widget build(BuildContext context) {
     useEffect(() {
-      context.read<WorkoutBloc>().add(InitializeSetsEvent(sets: sets));
+      context.read<WorkoutBloc>().add(InitializeSetsEvent(
+          sets: sets,
+          userId: context.currentUserId!,
+          plannedWorkoutId: plannedWorkoutId));
       return null;
     }, []);
     final pageController = usePageController();
@@ -32,79 +39,69 @@ class FocusWorkoutScreen extends HookWidget {
           pageController.animateToPage(event.page,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut);
+        } else if (event is EndWorkoutPresentationEvent) {
+          context.read<TimerNotifier>().cancelTimer();
+          NotificationService.stopWorkoutNotification();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Finished workout")));
+          context.go('/workout');
+        } else if (event is IncorrectRepsEvent) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Set must have more than 0 repetitions")));
         }
       },
       child: BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
         if (state is WorkoutInProgress && state.sets.isNotEmpty) {
           return AppScaffold(
             title: "Workout",
-            child: KeyboardListener(
-              focusNode: FocusNode(),
-              onKeyEvent: (event) {
-                if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                  pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                  pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                }
-              },
-              child: Column(spacing: 16, children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
-                  child: SmoothPageIndicator(
-                      controller: pageController, count: state.sets.length),
-                ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: pageController,
-                    itemCount: state.sets.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Stack(children: [
-                        ExerciseList(
-                            exerciseIndex: index, setData: state.sets[index]),
-                        if (Platform.isWindows)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FloatingActionButton(
-                              heroTag: "previousButton$index",
-                              onPressed: () {
-                                pageController.previousPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut);
-                              },
-                              child: const Icon(Icons.keyboard_arrow_left),
-                            ),
+            child: Column(spacing: 16, children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                child: SmoothPageIndicator(
+                    controller: pageController, count: state.sets.length),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: state.sets.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Stack(children: [
+                      ExerciseList(
+                          exerciseIndex: index, setData: state.sets[index]),
+                      if (Platform.isWindows)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: FloatingActionButton(
+                            heroTag: "previousButton$index",
+                            onPressed: () {
+                              pageController.previousPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            },
+                            child: const Icon(Icons.keyboard_arrow_left),
                           ),
-                        if (Platform.isWindows)
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FloatingActionButton(
-                              heroTag: "nextButton$index",
-                              onPressed: () {
-                                pageController.nextPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut);
-                              },
-                              child: const Icon(Icons.keyboard_arrow_right),
-                            ),
-                          )
-                      ]);
-                    },
-                  ),
+                        ),
+                      if (Platform.isWindows)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FloatingActionButton(
+                            heroTag: "nextButton$index",
+                            onPressed: () {
+                              pageController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            },
+                            child: const Icon(Icons.keyboard_arrow_right),
+                          ),
+                        )
+                    ]);
+                  },
                 ),
-              ]),
-            ),
-          );
-        } else if (state is WorkoutEnded) {
-          return const Center(child: Text("Workout ended"));
-        } else {
-          return Center(
-            child: Text(state.toString()),
+              ),
+            ]),
           );
         }
+        return const SizedBox.shrink();
       }),
     );
   }
@@ -162,15 +159,15 @@ class ExerciseList extends StatelessWidget {
                 WorkoutContainer(
                   title: "Muscle groups",
                   width: 0.3 * constraints.maxWidth,
-                  height: 0.5 * constraints.maxHeight,
+                  height: 0.8 * constraints.maxHeight,
                   child: ExerciseData(exercise: setData.exercise),
                 ),
-                WorkoutContainer(
-                  title: "Statistics",
-                  width: 0.3 * constraints.maxWidth,
-                  height: 0.3 * constraints.maxHeight,
-                  child: const SizedBox.shrink(),
-                ),
+                // WorkoutContainer(
+                //   title: "Statistics",
+                //   width: 0.3 * constraints.maxWidth,
+                //   height: 0.3 * constraints.maxHeight,
+                //   child: const SizedBox.shrink(),
+                // ),
               ])
             ]);
       } else {
@@ -311,6 +308,10 @@ class SetList extends StatelessWidget {
               reps: set.repetitions ?? 0,
               weight: set.weight ?? 0,
               isCompleted: set.completed,
+              isPlanned: !set.isWeight,
+              rpe: set.rpe,
+              minReps: set.minRepetitions,
+              maxReps: set.maxRepetitions,
             );
           },
         ),
@@ -318,17 +319,15 @@ class SetList extends StatelessWidget {
       SizedBox(
         width: 250,
         height: 75,
-        child: ElevatedButton(
-          onPressed: () {
+        child: AppInkWellButton(
+          onTap: () {
+            context.read<WorkoutBloc>().add(CompleteSetEvent(
+                exerciseIndex: exerciseIndex,
+                duration: context.read<TimerNotifier>().elapsedSeconds,
+                isMetric: context.isMetric));
             Provider.of<TimerNotifier>(context, listen: false).resetTimer();
-            context
-                .read<WorkoutBloc>()
-                .add(CompleteSetEvent(exerciseIndex: exerciseIndex));
           },
-          style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).primaryColor),
-          child: const Text("Complete set"),
+          text: "Complete set",
         ),
       )
     ]);
@@ -341,7 +340,10 @@ class SetTile extends StatefulWidget {
   final int reps;
   final double weight;
   final bool isCompleted;
-
+  final bool isPlanned;
+  final int? minReps;
+  final int? maxReps;
+  final double? rpe;
   const SetTile({
     super.key,
     required this.setIndex,
@@ -349,6 +351,10 @@ class SetTile extends StatefulWidget {
     required this.weight,
     required this.isCompleted,
     required this.exerciseIndex,
+    this.isPlanned = false,
+    this.minReps,
+    this.maxReps,
+    this.rpe,
   });
 
   @override
@@ -396,10 +402,7 @@ class _SetTileState extends State<SetTile> {
                     style: TextStyle(
                       color: widget.isCompleted
                           ? Colors.white
-                          : Theme.of(context)
-                              .colorScheme
-                              .onPrimary
-                              .withValues(alpha: 1),
+                          : Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -427,7 +430,7 @@ class _SetTileState extends State<SetTile> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                      const Text(' lbs'),
+                      Text(context.units),
                       const SizedBox(width: 8),
                       const Icon(Icons.repeat, size: 20),
                       isEditing
@@ -485,37 +488,38 @@ class _SetTileState extends State<SetTile> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Plan: ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+            if (widget.isPlanned)
+              Padding(
+                padding: const EdgeInsets.only(left: 40.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Plan: ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'RPE ${1}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    Text(
+                      'RPE ${widget.rpe}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    '${1}-${5} reps',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(width: 16),
+                    Text(
+                      '${widget.minReps}-${widget.maxReps} reps',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),

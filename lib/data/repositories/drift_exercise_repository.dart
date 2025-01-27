@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/app_database.dart';
+import 'package:gym_app/data/models/completed_set.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
@@ -102,5 +103,38 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   Future<List<MuscleGroup>> getAllMuscleGroups() async {
     final muscleList = db.select(db.muscleGroups).get();
     return muscleList;
+  }
+
+  @override
+  Future<List<CompletedSet>> getLastCompletedSets(
+      String exerciseId, int numSets) async {
+    final query = db.select(db.completedSets).join([
+      innerJoin(
+          db.completedWorkoutExercises,
+          db.completedWorkoutExercises.id
+              .equalsExp(db.completedSets.workout_exercise_id),
+          useColumns: false)
+    ])
+      ..where(db.completedWorkoutExercises.exercise_id.equals(exerciseId))
+      ..orderBy([OrderingTerm.desc(db.completedSets.created_at)])
+      ..limit(5);
+    final lastSets = await query.get();
+    final completedSetsList = lastSets.map((row) {
+      return CompletedSet(
+        id: row.readTable(db.completedSets).id,
+        user_id: row.readTable(db.completedSets).user_id,
+        workout_exercise_id:
+            row.readTable(db.completedSets).workout_exercise_id,
+        set_number: row.readTable(db.completedSets).set_number,
+        repetitions: row.readTable(db.completedSets).repetitions,
+        duration_seconds: row.readTable(db.completedSets).duration_seconds,
+        weight: row.readTable(db.completedSets).weight,
+        created_at: row.readTable(db.completedSets).created_at,
+        updated_at: row.readTable(db.completedSets).updated_at,
+        dirty: row.readTable(db.completedSets).dirty,
+        is_metric: row.readTable(db.completedSets).is_metric,
+      );
+    }).toList();
+    return completedSetsList;
   }
 }

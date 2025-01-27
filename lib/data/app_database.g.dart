@@ -1809,6 +1809,15 @@ class $CompletedSetsTable extends CompletedSets
   late final GeneratedColumn<DateTime> updated_at = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _is_metricMeta =
+      const VerificationMeta('is_metric');
+  @override
+  late final GeneratedColumn<bool> is_metric = GeneratedColumn<bool>(
+      'is_metric', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_metric" IN (0, 1))'));
   @override
   List<GeneratedColumn> get $columns => [
         dirty,
@@ -1820,7 +1829,8 @@ class $CompletedSetsTable extends CompletedSets
         duration_seconds,
         weight,
         created_at,
-        updated_at
+        updated_at,
+        is_metric
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1893,6 +1903,12 @@ class $CompletedSetsTable extends CompletedSets
           updated_at.isAcceptableOrUnknown(
               data['updated_at']!, _updated_atMeta));
     }
+    if (data.containsKey('is_metric')) {
+      context.handle(_is_metricMeta,
+          is_metric.isAcceptableOrUnknown(data['is_metric']!, _is_metricMeta));
+    } else if (isInserting) {
+      context.missing(_is_metricMeta);
+    }
     return context;
   }
 
@@ -1918,6 +1934,8 @@ class $CompletedSetsTable extends CompletedSets
           .read(DriftSqlType.int, data['${effectivePrefix}duration_seconds']),
       weight: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight']),
+      is_metric: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_metric'])!,
       created_at: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updated_at: attachedDatabase.typeMapping
@@ -1942,6 +1960,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
   final Value<double?> weight;
   final Value<DateTime> created_at;
   final Value<DateTime?> updated_at;
+  final Value<bool> is_metric;
   final Value<int> rowid;
   const CompletedSetsCompanion({
     this.dirty = const Value.absent(),
@@ -1954,6 +1973,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     this.weight = const Value.absent(),
     this.created_at = const Value.absent(),
     this.updated_at = const Value.absent(),
+    this.is_metric = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CompletedSetsCompanion.insert({
@@ -1967,12 +1987,14 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     this.weight = const Value.absent(),
     this.created_at = const Value.absent(),
     this.updated_at = const Value.absent(),
+    required bool is_metric,
     this.rowid = const Value.absent(),
   })  : dirty = Value(dirty),
         user_id = Value(user_id),
         workout_exercise_id = Value(workout_exercise_id),
         set_number = Value(set_number),
-        repetitions = Value(repetitions);
+        repetitions = Value(repetitions),
+        is_metric = Value(is_metric);
   static Insertable<CompletedSet> custom({
     Expression<bool>? dirty,
     Expression<String>? id,
@@ -1984,6 +2006,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     Expression<double>? weight,
     Expression<DateTime>? created_at,
     Expression<DateTime>? updated_at,
+    Expression<bool>? is_metric,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1998,6 +2021,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       if (weight != null) 'weight': weight,
       if (created_at != null) 'created_at': created_at,
       if (updated_at != null) 'updated_at': updated_at,
+      if (is_metric != null) 'is_metric': is_metric,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2013,6 +2037,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       Value<double?>? weight,
       Value<DateTime>? created_at,
       Value<DateTime?>? updated_at,
+      Value<bool>? is_metric,
       Value<int>? rowid}) {
     return CompletedSetsCompanion(
       dirty: dirty ?? this.dirty,
@@ -2025,6 +2050,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
       weight: weight ?? this.weight,
       created_at: created_at ?? this.created_at,
       updated_at: updated_at ?? this.updated_at,
+      is_metric: is_metric ?? this.is_metric,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2062,6 +2088,9 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
     if (updated_at.present) {
       map['updated_at'] = Variable<DateTime>(updated_at.value);
     }
+    if (is_metric.present) {
+      map['is_metric'] = Variable<bool>(is_metric.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2081,6 +2110,7 @@ class CompletedSetsCompanion extends UpdateCompanion<CompletedSet> {
           ..write('weight: $weight, ')
           ..write('created_at: $created_at, ')
           ..write('updated_at: $updated_at, ')
+          ..write('is_metric: $is_metric, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3256,7 +3286,7 @@ class UserPreferencesTableCompanion extends UpdateCompanion<UserPreferences> {
 }
 
 class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
-    with TableInfo<$UserWorkoutPlansTableTable, UserWorkoutPlansTableData> {
+    with TableInfo<$UserWorkoutPlansTableTable, UserWorkoutPlans> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3309,8 +3339,7 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   String get actualTableName => $name;
   static const String $name = 'user_workout_plans_table';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<UserWorkoutPlansTableData> instance,
+  VerificationContext validateIntegrity(Insertable<UserWorkoutPlans> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -3352,16 +3381,15 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   @override
   Set<GeneratedColumn> get $primaryKey => {user_id, workout_plan_id};
   @override
-  UserWorkoutPlansTableData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  UserWorkoutPlans map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return UserWorkoutPlansTableData(
-      dirty: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}dirty'])!,
+    return UserWorkoutPlans(
       user_id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
       workout_plan_id: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}workout_plan_id'])!,
+      dirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}dirty'])!,
       current_week: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}current_week'])!,
       current_day: attachedDatabase.typeMapping
@@ -3375,120 +3403,7 @@ class $UserWorkoutPlansTableTable extends UserWorkoutPlansTable
   }
 }
 
-class UserWorkoutPlansTableData extends DataClass
-    implements Insertable<UserWorkoutPlansTableData> {
-  final bool dirty;
-  final String user_id;
-  final String workout_plan_id;
-  final int current_week;
-  final int current_day;
-  const UserWorkoutPlansTableData(
-      {required this.dirty,
-      required this.user_id,
-      required this.workout_plan_id,
-      required this.current_week,
-      required this.current_day});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['dirty'] = Variable<bool>(dirty);
-    map['user_id'] = Variable<String>(user_id);
-    map['workout_plan_id'] = Variable<String>(workout_plan_id);
-    map['current_week'] = Variable<int>(current_week);
-    map['current_day'] = Variable<int>(current_day);
-    return map;
-  }
-
-  UserWorkoutPlansTableCompanion toCompanion(bool nullToAbsent) {
-    return UserWorkoutPlansTableCompanion(
-      dirty: Value(dirty),
-      user_id: Value(user_id),
-      workout_plan_id: Value(workout_plan_id),
-      current_week: Value(current_week),
-      current_day: Value(current_day),
-    );
-  }
-
-  factory UserWorkoutPlansTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return UserWorkoutPlansTableData(
-      dirty: serializer.fromJson<bool>(json['dirty']),
-      user_id: serializer.fromJson<String>(json['user_id']),
-      workout_plan_id: serializer.fromJson<String>(json['workout_plan_id']),
-      current_week: serializer.fromJson<int>(json['current_week']),
-      current_day: serializer.fromJson<int>(json['current_day']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'dirty': serializer.toJson<bool>(dirty),
-      'user_id': serializer.toJson<String>(user_id),
-      'workout_plan_id': serializer.toJson<String>(workout_plan_id),
-      'current_week': serializer.toJson<int>(current_week),
-      'current_day': serializer.toJson<int>(current_day),
-    };
-  }
-
-  UserWorkoutPlansTableData copyWith(
-          {bool? dirty,
-          String? user_id,
-          String? workout_plan_id,
-          int? current_week,
-          int? current_day}) =>
-      UserWorkoutPlansTableData(
-        dirty: dirty ?? this.dirty,
-        user_id: user_id ?? this.user_id,
-        workout_plan_id: workout_plan_id ?? this.workout_plan_id,
-        current_week: current_week ?? this.current_week,
-        current_day: current_day ?? this.current_day,
-      );
-  UserWorkoutPlansTableData copyWithCompanion(
-      UserWorkoutPlansTableCompanion data) {
-    return UserWorkoutPlansTableData(
-      dirty: data.dirty.present ? data.dirty.value : this.dirty,
-      user_id: data.user_id.present ? data.user_id.value : this.user_id,
-      workout_plan_id: data.workout_plan_id.present
-          ? data.workout_plan_id.value
-          : this.workout_plan_id,
-      current_week: data.current_week.present
-          ? data.current_week.value
-          : this.current_week,
-      current_day:
-          data.current_day.present ? data.current_day.value : this.current_day,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UserWorkoutPlansTableData(')
-          ..write('dirty: $dirty, ')
-          ..write('user_id: $user_id, ')
-          ..write('workout_plan_id: $workout_plan_id, ')
-          ..write('current_week: $current_week, ')
-          ..write('current_day: $current_day')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(dirty, user_id, workout_plan_id, current_week, current_day);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is UserWorkoutPlansTableData &&
-          other.dirty == this.dirty &&
-          other.user_id == this.user_id &&
-          other.workout_plan_id == this.workout_plan_id &&
-          other.current_week == this.current_week &&
-          other.current_day == this.current_day);
-}
-
-class UserWorkoutPlansTableCompanion
-    extends UpdateCompanion<UserWorkoutPlansTableData> {
+class UserWorkoutPlansTableCompanion extends UpdateCompanion<UserWorkoutPlans> {
   final Value<bool> dirty;
   final Value<String> user_id;
   final Value<String> workout_plan_id;
@@ -3513,7 +3428,7 @@ class UserWorkoutPlansTableCompanion
   })  : dirty = Value(dirty),
         user_id = Value(user_id),
         workout_plan_id = Value(workout_plan_id);
-  static Insertable<UserWorkoutPlansTableData> custom({
+  static Insertable<UserWorkoutPlans> custom({
     Expression<bool>? dirty,
     Expression<String>? user_id,
     Expression<String>? workout_plan_id,
@@ -3597,8 +3512,13 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
   late final GeneratedColumn<String> userId = GeneratedColumn<String>(
       'user_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
-  List<GeneratedColumn> get $columns => [userId];
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [userId, email];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3615,6 +3535,12 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
     return context;
   }
 
@@ -3626,6 +3552,8 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
     return OfflineUserData(
       userId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
     );
   }
 
@@ -3637,29 +3565,36 @@ class $OfflineUserDataTableTable extends OfflineUserDataTable
 
 class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
   final Value<String> userId;
+  final Value<String> email;
   final Value<int> rowid;
   const OfflineUserDataTableCompanion({
     this.userId = const Value.absent(),
+    this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   OfflineUserDataTableCompanion.insert({
     required String userId,
+    required String email,
     this.rowid = const Value.absent(),
-  }) : userId = Value(userId);
+  })  : userId = Value(userId),
+        email = Value(email);
   static Insertable<OfflineUserData> custom({
     Expression<String>? userId,
+    Expression<String>? email,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (userId != null) 'user_id': userId,
+      if (email != null) 'email': email,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   OfflineUserDataTableCompanion copyWith(
-      {Value<String>? userId, Value<int>? rowid}) {
+      {Value<String>? userId, Value<String>? email, Value<int>? rowid}) {
     return OfflineUserDataTableCompanion(
       userId: userId ?? this.userId,
+      email: email ?? this.email,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3669,6 +3604,9 @@ class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
     final map = <String, Expression>{};
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -3680,6 +3618,7 @@ class OfflineUserDataTableCompanion extends UpdateCompanion<OfflineUserData> {
   String toString() {
     return (StringBuffer('OfflineUserDataTableCompanion(')
           ..write('userId: $userId, ')
+          ..write('email: $email, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3806,7 +3745,7 @@ final class $$WorkoutPlansTableReferences
   }
 
   static MultiTypedResultKey<$UserWorkoutPlansTableTable,
-      List<UserWorkoutPlansTableData>> _userWorkoutPlansTableRefsTable(
+      List<UserWorkoutPlans>> _userWorkoutPlansTableRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.userWorkoutPlansTable,
           aliasName: $_aliasNameGenerator(
@@ -6143,6 +6082,7 @@ typedef $$CompletedSetsTableCreateCompanionBuilder = CompletedSetsCompanion
   Value<double?> weight,
   Value<DateTime> created_at,
   Value<DateTime?> updated_at,
+  required bool is_metric,
   Value<int> rowid,
 });
 typedef $$CompletedSetsTableUpdateCompanionBuilder = CompletedSetsCompanion
@@ -6157,6 +6097,7 @@ typedef $$CompletedSetsTableUpdateCompanionBuilder = CompletedSetsCompanion
   Value<double?> weight,
   Value<DateTime> created_at,
   Value<DateTime?> updated_at,
+  Value<bool> is_metric,
   Value<int> rowid,
 });
 
@@ -6220,6 +6161,9 @@ class $$CompletedSetsTableFilterComposer
   ColumnFilters<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<bool> get is_metric => $composableBuilder(
+      column: $table.is_metric, builder: (column) => ColumnFilters(column));
+
   $$CompletedWorkoutExercisesTableFilterComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableFilterComposer composer =
         $composerBuilder(
@@ -6279,6 +6223,9 @@ class $$CompletedSetsTableOrderingComposer
   ColumnOrderings<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get is_metric => $composableBuilder(
+      column: $table.is_metric, builder: (column) => ColumnOrderings(column));
+
   $$CompletedWorkoutExercisesTableOrderingComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableOrderingComposer composer =
         $composerBuilder(
@@ -6337,6 +6284,9 @@ class $$CompletedSetsTableAnnotationComposer
   GeneratedColumn<DateTime> get updated_at => $composableBuilder(
       column: $table.updated_at, builder: (column) => column);
 
+  GeneratedColumn<bool> get is_metric =>
+      $composableBuilder(column: $table.is_metric, builder: (column) => column);
+
   $$CompletedWorkoutExercisesTableAnnotationComposer get workout_exercise_id {
     final $$CompletedWorkoutExercisesTableAnnotationComposer composer =
         $composerBuilder(
@@ -6392,6 +6342,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             Value<double?> weight = const Value.absent(),
             Value<DateTime> created_at = const Value.absent(),
             Value<DateTime?> updated_at = const Value.absent(),
+            Value<bool> is_metric = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CompletedSetsCompanion(
@@ -6405,6 +6356,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             weight: weight,
             created_at: created_at,
             updated_at: updated_at,
+            is_metric: is_metric,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -6418,6 +6370,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             Value<double?> weight = const Value.absent(),
             Value<DateTime> created_at = const Value.absent(),
             Value<DateTime?> updated_at = const Value.absent(),
+            required bool is_metric,
             Value<int> rowid = const Value.absent(),
           }) =>
               CompletedSetsCompanion.insert(
@@ -6431,6 +6384,7 @@ class $$CompletedSetsTableTableManager extends RootTableManager<
             weight: weight,
             created_at: created_at,
             updated_at: updated_at,
+            is_metric: is_metric,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -8011,7 +7965,7 @@ typedef $$UserWorkoutPlansTableTableUpdateCompanionBuilder
 });
 
 final class $$UserWorkoutPlansTableTableReferences extends BaseReferences<
-    _$AppDatabase, $UserWorkoutPlansTableTable, UserWorkoutPlansTableData> {
+    _$AppDatabase, $UserWorkoutPlansTableTable, UserWorkoutPlans> {
   $$UserWorkoutPlansTableTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
@@ -8159,14 +8113,14 @@ class $$UserWorkoutPlansTableTableAnnotationComposer
 class $$UserWorkoutPlansTableTableTableManager extends RootTableManager<
     _$AppDatabase,
     $UserWorkoutPlansTableTable,
-    UserWorkoutPlansTableData,
+    UserWorkoutPlans,
     $$UserWorkoutPlansTableTableFilterComposer,
     $$UserWorkoutPlansTableTableOrderingComposer,
     $$UserWorkoutPlansTableTableAnnotationComposer,
     $$UserWorkoutPlansTableTableCreateCompanionBuilder,
     $$UserWorkoutPlansTableTableUpdateCompanionBuilder,
-    (UserWorkoutPlansTableData, $$UserWorkoutPlansTableTableReferences),
-    UserWorkoutPlansTableData,
+    (UserWorkoutPlans, $$UserWorkoutPlansTableTableReferences),
+    UserWorkoutPlans,
     PrefetchHooks Function({bool workout_plan_id})> {
   $$UserWorkoutPlansTableTableTableManager(
       _$AppDatabase db, $UserWorkoutPlansTableTable table)
@@ -8263,23 +8217,25 @@ typedef $$UserWorkoutPlansTableTableProcessedTableManager
     = ProcessedTableManager<
         _$AppDatabase,
         $UserWorkoutPlansTableTable,
-        UserWorkoutPlansTableData,
+        UserWorkoutPlans,
         $$UserWorkoutPlansTableTableFilterComposer,
         $$UserWorkoutPlansTableTableOrderingComposer,
         $$UserWorkoutPlansTableTableAnnotationComposer,
         $$UserWorkoutPlansTableTableCreateCompanionBuilder,
         $$UserWorkoutPlansTableTableUpdateCompanionBuilder,
-        (UserWorkoutPlansTableData, $$UserWorkoutPlansTableTableReferences),
-        UserWorkoutPlansTableData,
+        (UserWorkoutPlans, $$UserWorkoutPlansTableTableReferences),
+        UserWorkoutPlans,
         PrefetchHooks Function({bool workout_plan_id})>;
 typedef $$OfflineUserDataTableTableCreateCompanionBuilder
     = OfflineUserDataTableCompanion Function({
   required String userId,
+  required String email,
   Value<int> rowid,
 });
 typedef $$OfflineUserDataTableTableUpdateCompanionBuilder
     = OfflineUserDataTableCompanion Function({
   Value<String> userId,
+  Value<String> email,
   Value<int> rowid,
 });
 
@@ -8294,6 +8250,9 @@ class $$OfflineUserDataTableTableFilterComposer
   });
   ColumnFilters<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
 }
 
 class $$OfflineUserDataTableTableOrderingComposer
@@ -8307,6 +8266,9 @@ class $$OfflineUserDataTableTableOrderingComposer
   });
   ColumnOrderings<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
 }
 
 class $$OfflineUserDataTableTableAnnotationComposer
@@ -8320,6 +8282,9 @@ class $$OfflineUserDataTableTableAnnotationComposer
   });
   GeneratedColumn<String> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
 }
 
 class $$OfflineUserDataTableTableTableManager extends RootTableManager<
@@ -8352,18 +8317,22 @@ class $$OfflineUserDataTableTableTableManager extends RootTableManager<
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> userId = const Value.absent(),
+            Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               OfflineUserDataTableCompanion(
             userId: userId,
+            email: email,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String userId,
+            required String email,
             Value<int> rowid = const Value.absent(),
           }) =>
               OfflineUserDataTableCompanion.insert(
             userId: userId,
+            email: email,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

@@ -1,3 +1,4 @@
+import 'package:gym_app/data/models/completed_set.dart';
 import 'package:gym_app/data/models/exercise.dart';
 import 'package:gym_app/data/models/muscle_group.dart';
 
@@ -11,4 +12,6 @@ abstract class LocalExerciseRepository {
   Stream<List<Exercise>> watchExercisesWithFilters(
       String query, List<MuscleGroup> groups);
   Future<List<MuscleGroup>> getAllMuscleGroups();
+  Future<List<CompletedSet>> getLastCompletedSets(
+      String exerciseId, int numSets);
 }
