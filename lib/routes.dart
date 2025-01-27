@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/set_data.dart';
 import 'package:gym_app/data/models/user_workout_plans.dart';
 import 'package:gym_app/data/repositories/local_exercise_repository.dart';
@@ -8,7 +7,6 @@ import 'package:gym_app/offline_user_data_singleton.dart';
 import 'package:gym_app/screens/calculator_screen.dart';
 import 'package:gym_app/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/screens/exercise_screen.dart';
-import 'package:gym_app/screens/home_screen.dart';
 import 'package:gym_app/screens/sign_up_screen.dart';
 import 'package:gym_app/screens/train_screen.dart';
 import 'package:gym_app/screens/workout_screen.dart';
@@ -50,7 +48,7 @@ final router = GoRouter(
 
         if (authState is Authenticated &&
             publicRoutes.contains(state.matchedLocation)) {
-          return '/home';
+          return '/workout';
         }
         return null;
       }
@@ -70,11 +68,6 @@ final router = GoRouter(
                 builder: (context, state) => TrainScreen(
                       workoutRepository: getIt.get<LocalWorkoutRepository>(),
                     )),
-            GoRoute(
-              path: '/home',
-              builder: (context, state) =>
-                  HomeScreen(db: getIt.get<AppDatabase>()),
-            ),
             GoRoute(
               path: '/exercise',
               builder: (context, state) => const ExerciseListScreen(),

@@ -44,7 +44,7 @@ class FocusWorkoutScreen extends HookWidget {
           NotificationService.stopWorkoutNotification();
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Finished workout")));
-          context.go('/home');
+          context.go('/workout');
         } else if (event is IncorrectRepsEvent) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Set must have more than 0 repetitions")));

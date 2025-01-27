@@ -31,10 +31,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             label: 'Discover',
           ),
@@ -58,12 +54,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           });
           switch (index) {
             case 0:
-              context.go('/home');
-            case 1:
               context.go('/workout');
-            case 2:
+            case 1:
               context.go('/train');
-            case 3:
+            case 2:
               context.go('/profile');
           }
         },

@@ -29,12 +29,12 @@ class SplashScreen extends StatelessWidget {
       listener: (context, state) async {
         if (state is Authenticated) {
           await _intializeTheme(context);
-          context.go('/home');
+          context.go('/workout');
           return;
         } else if (state is Unauthenticated) {
           if (getIt.get<OfflineUserDataSingleton>().hasUser) {
             await _intializeTheme(context);
-            context.go('/home');
+            context.go('/workout');
           }
         }
         context.go('/login');

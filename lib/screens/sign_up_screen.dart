@@ -30,7 +30,7 @@ class SignUpScreen extends StatelessWidget {
                   "Sign-up successful! Please check your email to confirm.")));
           context.go('/login');
         } else if (state is Authenticated) {
-          context.go('/home');
+          context.go('/workout');
         }
       },
     );
