@@ -35,31 +35,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Download version.txt
         uses: actions/download-artifact@v3
         with:
           name: gitversion
+
       - name: Create version number
         id: version
         run: echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '11'
+
+      - name: Check Java Version
+        run: java -version
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
+      - name: Clean Build
+        run: flutter clean
+
       - name: Get dependencies
         run: flutter pub get
+
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
+
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/heads/master'
@@ -75,31 +89,46 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Download version.txt
         uses: actions/download-artifact@v3
         with:
           name: gitversion
+
       - name: Create version number
         id: version
         run: echo "version=$(cat version.txt)" >> $env:GITHUB_OUTPUT
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - name: Get dependencies
-        run: flutter pub get
+
       - name: Enable Windows build
         run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
       - name: Build Windows
-        run: flutter build windows --release
+        run: flutter build windows --release --verbose
+
+      - name: Debug Directory Structure
+        run: |
+          Get-ChildItem -Path build\windows\runner\Release -Recurse
+          Write-Output "Current working directory: $(Get-Location)"
+
       - name: Create Windows ZIP
         run: |
-          Compress-Archive -Path build\windows\runner\Release\* -DestinationPath windows-release.zip
+          $releasePath = "$env:GITHUB_WORKSPACE\build\windows\runner\Release"
+          Compress-Archive -Path "$releasePath\*" -DestinationPath "$env:GITHUB_WORKSPACE\windows-release.zip"
+
       - name: Upload Windows build
         uses: actions/upload-artifact@v3
         with:
           name: windows-release
           path: windows-release.zip
+
       - name: Update Release
         uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/heads/master'
