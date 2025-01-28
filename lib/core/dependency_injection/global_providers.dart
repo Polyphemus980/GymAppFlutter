@@ -9,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/auth/blocs/auth_bloc.dart';
 import '../../features/theme/notifier/theme_notifier.dart';
-import '../../workout_bloc.dart';
+import '../../features/workouts/blocs/workout_bloc.dart';
 import 'get_it_dependency_injection.dart';
 
 class GlobalProviders extends StatelessWidget {

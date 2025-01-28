@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_app/core/domain/sets/workout_config_set.dart';
 import 'package:gym_app/core/extensions/context_extensions.dart';
+import 'package:gym_app/core/formatters/rpe_input_formatter.dart';
+import 'package:gym_app/core/formatters/weight_input_formatter.dart';
 import 'package:gym_app/data/models/exercise/exercise.dart';
-import 'package:gym_app/screens/focus_workout_screen.dart';
+import 'package:gym_app/features/workouts/screens/focus_workout_screen.dart';
 
-import '../core/common_widgets/app_widgets.dart';
+import '../../../core/common_widgets/app_widgets.dart';
 
 class SetCard extends StatefulWidget {
   const SetCard({
@@ -476,32 +478,5 @@ class _RpeSetRowState extends State<RpeSetRow> {
         ],
       ),
     );
-  }
-}
-
-class RpeInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) {
-      return newValue;
-    }
-
-    if (newValue.text == '.' ||
-        (newValue.text.endsWith('.') &&
-            '.'.allMatches(newValue.text).length == 1)) {
-      return newValue;
-    }
-
-    if (double.tryParse(newValue.text) != null) {
-      final number = double.parse(newValue.text);
-      if (number < 0 || number > 10) {
-        return oldValue;
-      }
-    } else {
-      return oldValue;
-    }
-
-    return newValue;
   }
 }

@@ -5,7 +5,7 @@ import 'package:gym_app/data/models/exercise/exercise.dart';
 import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
 import 'package:gym_app/data/repositories/workout/local_workout_repository.dart';
 
-import 'core/domain/sets/workout_config_set.dart';
+import '../../../core/domain/sets/workout_config_set.dart';
 
 abstract class WorkoutConfigEvent {}
 

@@ -6,7 +6,7 @@ import 'package:gym_app/core/domain/sets/workout_config_set.dart';
 import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-import 'core/dependency_injection/get_it_dependency_injection.dart';
+import '../../../core/dependency_injection/get_it_dependency_injection.dart';
 
 sealed class WorkoutEvent {}
 

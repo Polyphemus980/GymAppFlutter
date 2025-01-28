@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_app/features/timer/widgets/timer_floating_action_button.dart';
 
-import '../../workout_bloc.dart';
+import '../../features/workouts/blocs/workout_bloc.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar(this.child, {super.key});

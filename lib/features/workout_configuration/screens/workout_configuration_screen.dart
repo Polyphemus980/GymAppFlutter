@@ -7,10 +7,10 @@ import 'package:gym_app/core/domain/sets/set_data.dart';
 import 'package:gym_app/core/domain/sets/workout_config_set.dart';
 import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
 import 'package:gym_app/data/repositories/workout/local_workout_repository.dart';
-import 'package:gym_app/widgets/configuration_screen_widgets.dart';
-import 'package:gym_app/workout_config_bloc.dart';
+import 'package:gym_app/features/workout_configuration/blocs/workout_config_bloc.dart';
+import 'package:gym_app/features/workout_configuration/widgets/configuration_screen_widgets.dart';
 
-import '../data/models/exercise/exercise.dart';
+import '../../../data/models/exercise/exercise.dart';
 
 class WorkoutConfigurationScreen extends StatelessWidget {
   const WorkoutConfigurationScreen(

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gym_app/core/common_widgets/app_widgets.dart';
-import 'package:gym_app/screens/focus_workout_screen.dart';
+import 'package:gym_app/core/formatters/weight_input_formatter.dart';
+import 'package:gym_app/features/workouts/screens/focus_workout_screen.dart';
 
 class CalculatorScreen extends HookWidget {
   const CalculatorScreen({super.key});

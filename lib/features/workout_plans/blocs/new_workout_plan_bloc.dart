@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
 
-import 'core/domain/sets/set_data.dart';
-import 'core/domain/workouts/workout_plan_helpers.dart';
+import '../../../core/domain/sets/set_data.dart';
+import '../../../core/domain/workouts/workout_plan_helpers.dart';
 
 sealed class NewWorkoutPlanEvent {}
 

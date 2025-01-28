@@ -9,8 +9,8 @@ import 'package:gym_app/features/calculator/screens/calculator_screen.dart';
 import 'package:gym_app/features/exercise/screens/choose_muscle_groups_screen.dart';
 import 'package:gym_app/features/exercise/screens/exercise_details_screen.dart';
 import 'package:gym_app/features/offline_auth/offline_user_data_singleton.dart';
-import 'package:gym_app/screens/train_screen.dart';
-import 'package:gym_app/screens/workout_screen.dart';
+import 'package:gym_app/features/workout_plans/screens/workout_plan_list_screen.dart';
+import 'package:gym_app/features/workouts/screens/train_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'core/common_widgets/bottom_nav_bar.dart';
@@ -27,11 +27,11 @@ import 'features/exercise/screens/exercise_list_screen.dart';
 import 'features/exercise/screens/select_exercise_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'features/timer/notifier/timer_notifier.dart';
-import 'screens/focus_workout_screen.dart';
-import 'screens/new_workout_plan_form_screen.dart';
-import 'screens/new_workout_plan_screen.dart';
-import 'screens/workout_configuration_screen.dart';
-import 'screens/workout_plan_display_screen.dart';
+import 'features/workout_configuration/screens/workout_configuration_screen.dart';
+import 'features/workout_plans/screens/new_workout_plan_form_screen.dart';
+import 'features/workout_plans/screens/new_workout_plan_screen.dart';
+import 'features/workout_plans/screens/workout_plan_display_screen.dart';
+import 'features/workouts/screens/focus_workout_screen.dart';
 
 final router = GoRouter(
     redirect: (context, state) async {
