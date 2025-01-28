@@ -78,8 +78,6 @@ final router = GoRouter(
                     final id = state
                         .pathParameters['id']!; // Access the captured parameter
                     return ExerciseDetailsScreen(
-                      name: "Deadlift",
-                      description: "Good exercise",
                       id: id,
                       exerciseRepository: getIt.get<LocalExerciseRepository>(),
                     );

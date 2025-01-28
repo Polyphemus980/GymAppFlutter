@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:gym_app/core/domain/exercises/exercise_with_sets.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/completed/completed_set.dart';
 import 'package:gym_app/data/models/exercise/exercise.dart';
@@ -31,31 +32,6 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   Future<void> deleteExercise(String id) async {
     await (db.delete(db.exercises)..where((exercise) => exercise.id.equals(id)))
         .go();
-  }
-
-  @override
-  Future<List<Exercise>> getAllExercises() async {
-    final exercises = await db.select(db.exercises).get();
-    return exercises;
-  }
-
-  @override
-  Future<Exercise?> getExerciseById(String id) async {
-    final exercise = await (db.select(db.exercises)
-          ..where((exercise) => exercise.id.equals(id)))
-        .getSingleOrNull();
-    return exercise;
-  }
-
-  @override
-  Future<void> updateExercise(Exercise exercise) async {
-    await db.update(db.exercises).replace(ExercisesCompanion(
-          id: Value(exercise.id),
-          name: Value(exercise.name),
-          description: Value(exercise.description),
-          created_at: Value(exercise.created_at),
-          updated_at: Value(DateTime.now()),
-        ));
   }
 
   @override
@@ -106,6 +82,27 @@ class DriftExerciseRepository implements LocalExerciseRepository {
   }
 
   @override
+  Future<Exercise> getExercise(String exerciseId) async {
+    final exercise = await (db.select(db.exercises)
+          ..where((ex) => ex.id.equals(exerciseId)))
+        .getSingle();
+    final query = db.select(db.muscleGroups).join([
+      innerJoin(db.exerciseMuscles,
+          db.exerciseMuscles.muscle_group_id.equalsExp(db.muscleGroups.id),
+          useColumns: false)
+    ])
+      ..where(db.exerciseMuscles.exercise_id.equals(exerciseId));
+    final muscleGroupsRows = await query.get();
+    final muscleGroups = muscleGroupsRows.map((row) {
+      return MuscleGroup(
+          id: row.readTable(db.muscleGroups).id,
+          name: row.readTable(db.muscleGroups).name);
+    }).toList();
+    exercise.muscle_groups = muscleGroups;
+    return exercise;
+  }
+
+  @override
   Future<List<CompletedSet>> getLastCompletedSets(
       String exerciseId, int numSets) async {
     final query = db.select(db.completedSets).join([
@@ -136,5 +133,12 @@ class DriftExerciseRepository implements LocalExerciseRepository {
       );
     }).toList();
     return completedSetsList;
+  }
+
+  @override
+  Future<ExerciseWithSets> getExerciseWithSets(String exerciseId) async {
+    final exercise = await getExercise(exerciseId);
+    final sets = await getLastCompletedSets(exerciseId, 5);
+    return ExerciseWithSets(exercise: exercise, sets: sets);
   }
 }
