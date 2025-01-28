@@ -24,7 +24,7 @@ jobs:
       - name: Create version.txt
         run: echo "${{ steps.gitversion.outputs.semVer }}" > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: gitversion
           path: version.txt
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download version.txt
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: gitversion
       - name: Create version number
@@ -56,7 +56,7 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -76,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download version.txt
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: gitversion
       - name: Create version number
@@ -96,7 +96,7 @@ jobs:
         run: |
           Compress-Archive -Path build\windows\runner\Release\* -DestinationPath windows-release.zip
       - name: Upload Windows build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: windows-release
           path: windows-release.zip
