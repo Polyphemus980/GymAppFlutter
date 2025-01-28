@@ -49,7 +49,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
       - name: Check Java Version
         run: java -version
@@ -115,12 +115,12 @@ jobs:
 
       - name: Debug Directory Structure
         run: |
-          Get-ChildItem -Path build\windows\runner\Release -Recurse
+          Get-ChildItem -Path build\windows\x64\runner\Release -Recurse
           Write-Output "Current working directory: $(Get-Location)"
 
       - name: Create Windows ZIP
         run: |
-          $releasePath = "$env:GITHUB_WORKSPACE\build\windows\runner\Release"
+          $releasePath = "$env:GITHUB_WORKSPACE\build\windows\x64\runner\Release"
           Compress-Archive -Path "$releasePath\*" -DestinationPath "$env:GITHUB_WORKSPACE\windows-release.zip"
 
       - name: Upload Windows build
