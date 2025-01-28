@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gym_app/services/android_notification_service.dart';
+import 'package:gym_app/core/services/android_notification_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'get_it_dependency_injection.dart';
-import 'global_providers.dart';
+import 'core/dependency_injection/get_it_dependency_injection.dart';
+import 'core/dependency_injection/global_providers.dart';
+import 'features/theme/notifier/theme_notifier.dart';
 import 'routes.dart';
-import 'theme_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
