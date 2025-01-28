@@ -106,25 +106,7 @@ class SynchronizationCenter {
       return;
     }
 
-    // final sharedPrefs = await SharedPreferences.getInstance();
-    // final lastSyncedMilliseconds = sharedPrefs.getInt('lastSynced');
-    // final lastSynced = lastSyncedMilliseconds != null
-    //     ? DateTime.fromMillisecondsSinceEpoch(lastSyncedMilliseconds)
-    //     : null;
     for (final table in tables) {
-      // var rows;
-      // try {
-      //   // rows = lastSynced != null
-      //   //     ? await supabaseClient
-      //   //         .from(table)
-      //   //         .select()
-      //   //         .gt('updated_at', lastSynced)
-      //   //     : await supabaseClient.from(table).select();
-      //   rows = await supabaseClient.from(table).select();
-      // } catch (err) {
-      //   debugPrint("$err");
-      //   break;
-      // }
       final rows = await supabaseClient.from(table).select();
       if (rows.isNotEmpty) {
         final rowCompanions =
