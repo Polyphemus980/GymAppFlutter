@@ -10,12 +10,15 @@ class SyncExerciseRepository {
   SyncExerciseRepository({required this.db, required this.supabaseClient});
 
   Future<void> addExerciseSync(String userId, String name, String description,
-      List<MuscleGroup> muscles, bool isOnline) async {
+      List<MuscleGroup> muscles, bool isOnline,
+      {String? startPath, String? endPath}) async {
     final insertedExercise = await db.into(db.exercises).insertReturning(
         ExercisesCompanion(
             user_id: Value(userId),
             name: Value(name),
             description: Value(description),
+            start_position_image_path: Value(startPath),
+            end_position_image_path: Value(endPath),
             dirty: Value(!isOnline)));
 
     final exerciseMuscles = muscles

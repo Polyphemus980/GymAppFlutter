@@ -146,8 +146,11 @@ class SynchronizationCenter {
                 return dirtyColumn.equals(true);
               }))
             .get();
-        final dirtyRecordsJson =
-            dirtyRecords.map((record) => record.toJson()).toList();
+        final dirtyRecordsJson = dirtyRecords.map((record) {
+          final jsonRecord = record.toJson();
+          //jsonRecord.remove('muscle_groups');
+          return jsonRecord;
+        }).toList();
         await supabaseClient.from(table).upsert(dirtyRecordsJson);
       } catch (err) {
         debugPrint("$err");

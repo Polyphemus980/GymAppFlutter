@@ -61,20 +61,22 @@ class ExerciseWithSetsDisplay extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(seconds: 2),
-                child: isEndPosition.value
-                    ? Image.asset(
-                        'assets/f154f.svg.png',
-                        width: 200,
-                        height: 300,
-                      ).animate().fadeIn()
-                    : Image.asset(
-                        'assets/f154s.svg.png',
-                        width: 200,
-                        height: 300,
-                      ).animate().fadeIn(),
-              ),
+              if (data.exercise.start_position_image_path != null)
+                AnimatedSwitcher(
+                  duration: const Duration(seconds: 2),
+                  reverseDuration: const Duration(seconds: 2),
+                  child: isEndPosition.value
+                      ? Image.asset(
+                          data.exercise.end_position_image_path!,
+                          width: 200,
+                          height: 300,
+                        ).animate().fadeIn()
+                      : Image.asset(
+                          data.exercise.start_position_image_path!,
+                          width: 200,
+                          height: 300,
+                        ).animate().fadeIn(),
+                ),
               const Text(
                 'Description',
                 style: TextStyle(
