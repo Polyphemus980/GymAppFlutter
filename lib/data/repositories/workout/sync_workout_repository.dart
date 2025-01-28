@@ -184,8 +184,15 @@ class SyncWorkoutRepository {
     }
   }
 
-  Future<void> signUserUpForWorkoutPlan(
+  Future<bool> signUserUpForWorkoutPlan(
       String userId, String planId, bool isOnline) async {
+    final isInserted = await (db.select(db.userWorkoutPlansTable)
+          ..where((wp) => wp.workout_plan_id.equals(planId))
+          ..where((wp) => wp.user_id.equals(userId)))
+        .getSingleOrNull();
+    if (isInserted != null) {
+      return true;
+    }
     final insertedUserWorkoutPlan = await db
         .into(db.userWorkoutPlansTable)
         .insertReturning(UserWorkoutPlansTableCompanion(
@@ -205,6 +212,7 @@ class SyncWorkoutRepository {
             .write(const UserWorkoutPlansTableCompanion(dirty: Value(true)));
       }
     }
+    return false;
   }
 
   Future<void> addCompletedWorkoutSplit(

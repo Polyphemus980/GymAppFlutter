@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gym_app/core/common_widgets/app_widgets.dart';
 import 'package:gym_app/core/domain/exercises/exercise_with_sets.dart';
@@ -39,6 +42,17 @@ class ExerciseWithSetsDisplay extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isEndPosition = useState(false);
+
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        isEndPosition.value = !isEndPosition.value;
+      });
+      return () {
+        timer.cancel();
+      };
+    }, []);
+
     return AppScaffold(
       title: data.exercise.name,
       child: SingleChildScrollView(
@@ -47,6 +61,20 @@ class ExerciseWithSetsDisplay extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AnimatedSwitcher(
+                duration: const Duration(seconds: 2),
+                child: isEndPosition.value
+                    ? Image.asset(
+                        'assets/f154f.svg.png',
+                        width: 200,
+                        height: 300,
+                      ).animate().fadeIn()
+                    : Image.asset(
+                        'assets/f154s.svg.png',
+                        width: 200,
+                        height: 300,
+                      ).animate().fadeIn(),
+              ),
               const Text(
                 'Description',
                 style: TextStyle(

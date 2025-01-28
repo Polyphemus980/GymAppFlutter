@@ -81,11 +81,20 @@ class WorkoutPlanDisplayScreen extends HookWidget {
                             ),
                             AppInkWellButton(
                                 onTap: () async {
-                                  await syncWorkoutRepository
-                                      .signUserUpForWorkoutPlan(
-                                          context.currentUserId!,
-                                          workoutPlanId,
-                                          getIt.isOnline);
+                                  final alreadyJoined =
+                                      await syncWorkoutRepository
+                                          .signUserUpForWorkoutPlan(
+                                              context.currentUserId!,
+                                              workoutPlanId,
+                                              getIt.isOnline);
+                                  if (alreadyJoined) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            "User has already joined this program"),
+                                      ),
+                                    );
+                                  }
                                   context.pop();
                                 },
                                 text: "Join program")

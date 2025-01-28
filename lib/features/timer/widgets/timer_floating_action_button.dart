@@ -30,7 +30,7 @@ class TimerFAB extends StatelessWidget {
                   if (timerNotifier.isRunning) {
                     timerNotifier.pauseTimer();
                   } else {
-                    timerNotifier.startTimer();
+                    timerNotifier.unpauseTimer();
                   }
                 },
                 child: Icon(
