@@ -1,0 +1,110 @@
+name: Flutter Release
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  version:
+    name: Create version number
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.x'
+      - name: Generate version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+      - name: Create version.txt
+        run: echo "${{ steps.gitversion.outputs.semVer }}" > version.txt
+      - name: Upload version.txt
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitversion
+          path: version.txt
+
+  build_android:
+    name: Build Android App
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download version.txt
+        uses: actions/download-artifact@v2
+        with:
+          name: gitversion
+      - name: Create version number
+        id: version
+        run: echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_windows:
+    name: Build Windows App
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download version.txt
+        uses: actions/download-artifact@v2
+        with:
+          name: gitversion
+      - name: Create version number
+        id: version
+        run: echo "version=$(cat version.txt)" >> $env:GITHUB_OUTPUT
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Enable Windows build
+        run: flutter config --enable-windows-desktop
+      - name: Build Windows
+        run: flutter build windows --release
+      - name: Create Windows ZIP
+        run: |
+          Compress-Archive -Path build\windows\runner\Release\* -DestinationPath windows-release.zip
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-release
+          path: windows-release.zip
+      - name: Update Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          files: windows-release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

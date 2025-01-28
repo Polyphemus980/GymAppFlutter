@@ -55,80 +55,83 @@ class ExerciseWithSetsDisplay extends HookWidget {
 
     return AppScaffold(
       title: data.exercise.name,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (data.exercise.start_position_image_path != null)
-                AnimatedSwitcher(
-                  duration: const Duration(seconds: 2),
-                  reverseDuration: const Duration(seconds: 2),
-                  child: isEndPosition.value
-                      ? Image.asset(
-                          data.exercise.end_position_image_path!,
-                          width: 200,
-                          height: 300,
-                        ).animate().fadeIn()
-                      : Image.asset(
-                          data.exercise.start_position_image_path!,
-                          width: 200,
-                          height: 300,
-                        ).animate().fadeIn(),
+      child: SizedBox(
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (data.exercise.start_position_image_path != null)
+                  AnimatedSwitcher(
+                    duration: const Duration(seconds: 2),
+                    reverseDuration: const Duration(seconds: 2),
+                    child: isEndPosition.value
+                        ? Image.asset(
+                            data.exercise.end_position_image_path!,
+                            width: 200,
+                            height: 300,
+                          ).animate().fadeIn()
+                        : Image.asset(
+                            data.exercise.start_position_image_path!,
+                            width: 200,
+                            height: 300,
+                          ).animate().fadeIn(),
+                  ),
+                const Text(
+                  'Description',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              const Text(
-                'Description',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                data.exercise.description ?? '',
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Muscles worked',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(data.exercise.muscles ?? '',
+                const SizedBox(height: 8),
+                Text(
+                  data.exercise.description ?? '',
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.5,
-                  )),
-              const SizedBox(height: 24),
-              const Text(
-                'Recent Sets',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              data.sets.isNotEmpty
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: data.sets.length,
-                      itemBuilder: (context, index) {
-                        return ExerciseSetDetails(
-                          index: index,
-                          set: data.sets[index],
-                        );
-                      },
-                    )
-                  : const Text("No sets done yet for this exercise"),
-            ],
+                const SizedBox(height: 24),
+                const Text(
+                  'Muscles worked',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(data.exercise.muscles ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                    )),
+                const SizedBox(height: 24),
+                const Text(
+                  'Recent Sets',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                data.sets.isNotEmpty
+                    ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: data.sets.length,
+                        itemBuilder: (context, index) {
+                          return ExerciseSetDetails(
+                            index: index,
+                            set: data.sets[index],
+                          );
+                        },
+                      )
+                    : const Text("No sets done yet for this exercise"),
+              ],
+            ),
           ),
         ),
       ),
