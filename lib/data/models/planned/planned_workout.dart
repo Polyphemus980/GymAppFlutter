@@ -10,19 +10,6 @@ part 'planned_workout.g.dart';
 
 @json.JsonSerializable()
 class PlannedWorkout {
-  final String id;
-  final String user_id;
-  final String workout_plan_id;
-  final String? workout_name;
-  final int day_number;
-  final int week_number; // Added for workout plan ordering
-  final String? description; // Added for instructions
-  final DateTime created_at;
-  final bool dirty;
-  final DateTime? updated_at;
-
-  @json.JsonKey(includeFromJson: false, includeToJson: false)
-  List<PlannedWorkoutExercise>? exercises;
 
   PlannedWorkout({
     required this.dirty,
@@ -40,6 +27,19 @@ class PlannedWorkout {
 
   factory PlannedWorkout.fromJson(Map<String, dynamic> json) =>
       _$PlannedWorkoutFromJson(json);
+  final String id;
+  final String user_id;
+  final String workout_plan_id;
+  final String? workout_name;
+  final int day_number;
+  final int week_number; // Added for workout plan ordering
+  final String? description; // Added for instructions
+  final DateTime created_at;
+  final bool dirty;
+  final DateTime? updated_at;
+
+  @json.JsonKey(includeFromJson: false, includeToJson: false)
+  List<PlannedWorkoutExercise>? exercises;
   Map<String, dynamic> toJson() => _$PlannedWorkoutToJson(this);
 }
 

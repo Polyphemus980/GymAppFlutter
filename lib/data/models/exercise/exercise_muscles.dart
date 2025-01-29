@@ -12,12 +12,12 @@ class ExerciseMuscle {
   ExerciseMuscle(
       {required this.dirty,
       required this.exercise_id,
-      required this.muscle_group_id});
+      required this.muscle_group_id,});
+  factory ExerciseMuscle.fromJson(Map<String, dynamic> json) =>
+      _$ExerciseMuscleFromJson(json);
   final int exercise_id;
   final int muscle_group_id;
   final bool dirty;
-  factory ExerciseMuscle.fromJson(Map<String, dynamic> json) =>
-      _$ExerciseMuscleFromJson(json);
   Map<String, dynamic> toJson() => _$ExerciseMuscleToJson(this);
 }
 

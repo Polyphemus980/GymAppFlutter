@@ -12,27 +12,31 @@ import 'package:gym_app/features/workout_plans/widgets/new_workout_plan_screen_w
 import '../../../core/dependency_injection/get_it_dependency_injection.dart';
 
 class NewWorkoutPlanScreen extends StatelessWidget {
+  const NewWorkoutPlanScreen({
+    super.key,
+    required this.numWeeks,
+    required this.numDays,
+    required this.name,
+    required this.description,
+  });
   final int numWeeks;
   final int numDays;
   final String name;
   final String description;
-  const NewWorkoutPlanScreen(
-      {super.key,
-      required this.numWeeks,
-      required this.numDays,
-      required this.name,
-      required this.description});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NewWorkoutPlanBloc>(
       create: (_) => NewWorkoutPlanBloc(
-          syncWorkoutRepository: getIt.get<SyncWorkoutRepository>())
-        ..add(InitializePlanEvent(
+        syncWorkoutRepository: getIt.get<SyncWorkoutRepository>(),
+      )..add(
+          InitializePlanEvent(
             numDays: numDays,
             numWeeks: numWeeks,
             name: name,
-            description: description)),
+            description: description,
+          ),
+        ),
       child: DaysPages(
         numWeeks: numWeeks,
         numDays: numDays,
@@ -42,123 +46,146 @@ class NewWorkoutPlanScreen extends StatelessWidget {
 }
 
 class DaysPages extends HookWidget {
+  const DaysPages({super.key, required this.numWeeks, required this.numDays});
   final int numWeeks;
   final int numDays;
-  const DaysPages({super.key, required this.numWeeks, required this.numDays});
 
   void _showFilters(BuildContext parentContext) {
-    showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: parentContext,
-        isScrollControlled: true,
-        builder: (modalContext) {
-          return BlocProvider.value(
-            value: parentContext.read<NewWorkoutPlanBloc>(),
-            child: FractionallySizedBox(
-              heightFactor: 0.8,
-              widthFactor: 1,
-              child: DraggableScrollableSheet(
-                  initialChildSize: 1,
-                  minChildSize: 1,
-                  maxChildSize: 1,
-                  expand: false,
-                  builder: (context, scrollController) {
-                    return const CopyModal();
-                  }),
+    showModalBottomSheet<void>(
+      backgroundColor: Colors.transparent,
+      context: parentContext,
+      isScrollControlled: true,
+      builder: (modalContext) {
+        return BlocProvider.value(
+          value: parentContext.read<NewWorkoutPlanBloc>(),
+          child: FractionallySizedBox(
+            heightFactor: 0.8,
+            widthFactor: 1,
+            child: DraggableScrollableSheet(
+              initialChildSize: 1,
+              minChildSize: 1,
+              expand: false,
+              builder: (context, scrollController) {
+                return const CopyModal();
+              },
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController();
     return AppScaffold(
-      title: "Make schedule",
+      title: 'Make schedule',
       child: Column(
         children: [
           DraggableHorizontalList(
             onSelect: (index) {
-              pageController.animateToPage(index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut);
+              pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             },
             numWeeks: numWeeks,
           ),
           Expanded(
             child: BlocBuilder<NewWorkoutPlanBloc, NewWorkoutPlanState>(
-                builder: (context, state) {
-              if (state is InProgressState) {
-                return PageView.builder(
-                  controller: pageController,
-                  itemCount: numWeeks,
-                  itemBuilder: (BuildContext context, int weekIndex) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(spacing: 10, children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: state.plan.weeks[weekIndex].days.length,
-                            itemBuilder: (context, dayIndex) {
-                              return DayCard(
-                                sets: state
-                                    .plan.weeks[weekIndex].days[dayIndex].sets,
-                                index: dayIndex,
-                                onAddExercise: (index) async {
-                                  final sets = await context.push(
-                                          '/plan/create/new',
-                                          extra: List<SetData>.from(state
-                                              .plan
-                                              .weeks[weekIndex]
-                                              .days[dayIndex]
-                                              .sets)) as List<SetData>? ??
-                                      [];
+              builder: (context, state) {
+                if (state is InProgressState) {
+                  return PageView.builder(
+                    controller: pageController,
+                    itemCount: numWeeks,
+                    itemBuilder: (context, weekIndex) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          spacing: 10,
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount:
+                                    state.plan.weeks[weekIndex].days.length,
+                                itemBuilder: (context, dayIndex) {
+                                  return DayCard(
+                                    sets: state.plan.weeks[weekIndex]
+                                        .days[dayIndex].sets,
+                                    index: dayIndex,
+                                    onAddExercise: (index) async {
+                                      final sets = await context.push(
+                                            '/plan/create/new',
+                                            extra: List<SetData>.from(
+                                              state.plan.weeks[weekIndex]
+                                                  .days[dayIndex].sets,
+                                            ),
+                                          ) as List<SetData>? ??
+                                          [];
 
-                                  context.read<NewWorkoutPlanBloc>().add(
-                                      ChangedDayEvent(
-                                          sets: sets,
-                                          weekIndex: weekIndex,
-                                          dayIndex: dayIndex));
+                                      if (context.mounted) {
+                                        context.read<NewWorkoutPlanBloc>().add(
+                                              ChangedDayEvent(
+                                                sets: sets,
+                                                weekIndex: weekIndex,
+                                                dayIndex: dayIndex,
+                                              ),
+                                            );
+                                      }
+                                    },
+                                  );
                                 },
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: AppInkWellButton(
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: AppInkWellButton(
                                 onTap: () {
                                   _showFilters(context);
                                 },
                                 height: 75,
-                                text: "Copy days")),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: AppInkWellButton(
+                                text: 'Copy days',
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: AppInkWellButton(
                                 onTap: () {
                                   if (!state.plan.isFilled()) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Every training day must have at least 1 exercise")));
+                                      const SnackBar(
+                                        content: Text(
+                                          'Every training day must have at least 1 exercise',
+                                        ),
+                                      ),
+                                    );
                                     return;
                                   }
 
                                   context.read<NewWorkoutPlanBloc>().add(
-                                      FinishCreationEvent(
+                                        FinishCreationEvent(
                                           isOnline: getIt.isOnline,
-                                          userId: context.currentUserId!));
+                                          userId: context.currentUserId!,
+                                        ),
+                                      );
                                 },
                                 height: 75,
-                                text: "Finish")),
-                      ]),
-                    );
-                  },
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            }),
+                                text: 'Finish',
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
           ),
         ],
       ),

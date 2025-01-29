@@ -6,8 +6,8 @@ import 'package:gym_app/data/repositories/workout/local_workout_repository.dart'
 import 'package:gym_app/features/workout_plans/widgets/workout_plan_list_screen_widgets.dart';
 
 class WorkoutListScreen extends StatelessWidget {
-  final LocalWorkoutRepository workoutRepository;
   const WorkoutListScreen({super.key, required this.workoutRepository});
+  final LocalWorkoutRepository workoutRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class WorkoutListScreen extends StatelessWidget {
       title: 'Discover plans',
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -25,10 +25,10 @@ class WorkoutListScreen extends StatelessWidget {
                   context.push('/plan');
                 },
                 height: 100,
-                text: "Create custom program",
+                text: 'Create custom program',
               ),
               const SizedBox(
-                height: 16.0,
+                height: 16,
               ),
               StreamBuilder(
                 stream:

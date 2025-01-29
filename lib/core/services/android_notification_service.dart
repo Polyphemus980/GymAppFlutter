@@ -11,15 +11,16 @@ class NotificationService {
   static const String workoutChannelDescription =
       'Notifications for workout updates';
 
-  static Future<void> initialize(
-      {Function(NotificationResponse)? onNotificationTap}) async {
+  static Future<void> initialize({
+    void Function(NotificationResponse)? onNotificationTap,
+  }) async {
     if (!Platform.isAndroid) {
       return;
     }
-    const AndroidInitializationSettings initializationSettingsAndroid =
+    const initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings =
+    const initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -28,7 +29,7 @@ class NotificationService {
   }
 
   static Future<void> _createNotificationChannel() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    const channel = AndroidNotificationChannel(
       workoutChannelId,
       workoutChannelName,
       description: workoutChannelDescription,
@@ -46,8 +47,7 @@ class NotificationService {
     if (!Platform.isAndroid) {
       return;
     }
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
       NotificationService.workoutChannelId,
       NotificationService.workoutChannelName,
       channelDescription: NotificationService.workoutChannelDescription,
@@ -58,7 +58,7 @@ class NotificationService {
       showWhen: false,
     );
 
-    const NotificationDetails platformChannelSpecifics =
+    const platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(
@@ -70,12 +70,13 @@ class NotificationService {
   }
 
   static Future<void> updateWorkoutNotificationWithActions(
-      String elapsedTime, bool isPaused) async {
+    String elapsedTime,
+    bool isPaused,
+  ) async {
     if (!Platform.isAndroid) {
       return;
     }
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
       NotificationService.workoutChannelId,
       NotificationService.workoutChannelName,
       channelDescription: NotificationService.workoutChannelDescription,
@@ -86,7 +87,7 @@ class NotificationService {
       showWhen: false,
     );
 
-    const NotificationDetails platformChannelSpecifics =
+    const platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(

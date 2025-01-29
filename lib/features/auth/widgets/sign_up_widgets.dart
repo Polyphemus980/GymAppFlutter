@@ -23,46 +23,46 @@ class SignUpForm extends HookWidget {
               AppTextFormField(
                   controller: emailController,
                   width: double.infinity,
-                  labelText: "Email",
+                  labelText: 'Email',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Email must not be empty";
+                      return 'Email must not be empty';
                     }
                     return null;
-                  }),
+                  },),
               AppTextFormField(
                   controller: passwordController,
                   width: double.infinity,
-                  labelText: "Password",
+                  labelText: 'Password',
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Password must not be empty";
+                      return 'Password must not be empty';
                     }
                     return null;
-                  }),
+                  },),
               SizedBox(
                 width: double.infinity,
                 height: 75,
                 child: ElevatedButton.icon(
                   icon: Icon(Icons.navigate_next,
-                      color: Theme.of(context).colorScheme.onSecondary),
+                      color: Theme.of(context).colorScheme.onSecondary,),
                   onPressed: () {
                     if (formKey.value.currentState!.validate()) {
                       context.read<AuthBloc>().add(SignUpRequested(
                           email: emailController.text.trim(),
-                          password: passwordController.text.trim()));
+                          password: passwordController.text.trim(),),);
                     }
                   },
-                  label: Text("Sign up",
+                  label: Text('Sign up',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary)),
+                          color: Theme.of(context).colorScheme.onSecondary,),),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,),
                 ),
-              )
-            ])),
-      )),
+              ),
+            ],),),
+      ),),
     );
   }
 }

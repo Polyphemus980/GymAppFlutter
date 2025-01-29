@@ -27,7 +27,7 @@ class CalculatorScreen extends HookWidget {
       title: '1RM Calculator',
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 32,
@@ -38,10 +38,10 @@ class CalculatorScreen extends HookWidget {
                     onChanged: (value) {
                       weightValue.value += 1;
                     },
-                    hintText: "0.0",
+                    hintText: '0.0',
                     maxLines: 1,
                     controller: weightController,
-                    labelText: "Weight",
+                    labelText: 'Weight',
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     formatters: [
@@ -56,8 +56,8 @@ class CalculatorScreen extends HookWidget {
                   },
                   width: 100,
                   controller: repsController,
-                  hintText: "10",
-                  labelText: "Repetitions",
+                  hintText: '10',
+                  labelText: 'Repetitions',
                   keyboardType: TextInputType.number,
                   formatters: [
                     RepsInputFormatter(),
@@ -86,13 +86,13 @@ class CalculatorScreen extends HookWidget {
                       ),
                     ),
                   ],
-                )
-              ]),
+                ),
+              ],),
               const Center(
                   child: Text(
-                "Weight at given reps: ",
+                'Weight at given reps: ',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )),
+              ),),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
                 child: Container(
@@ -100,10 +100,10 @@ class CalculatorScreen extends HookWidget {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                           color:
-                              Theme.of(context).colorScheme.onSurfaceVariant)),
+                              Theme.of(context).colorScheme.onSurfaceVariant,),),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
+                        horizontal: 32, vertical: 16,),
                     child: ListView.separated(
                       separatorBuilder: (context, index) => const Divider(),
                       shrinkWrap: true,
@@ -112,15 +112,15 @@ class CalculatorScreen extends HookWidget {
                         return Row(
                           spacing: 32,
                           children: [
-                            Text("${index + 1}".padLeft(2),
+                            Text('${index + 1}'.padLeft(2),
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20)),
+                                    fontWeight: FontWeight.bold, fontSize: 20,),),
                             Text(
                               _calculateWeight(
                                       repsValue.value,
                                       double.tryParse(weightController.text) ??
                                           0,
-                                      index + 1)
+                                      index + 1,)
                                   .toStringAsFixed(2),
                               style: const TextStyle(fontSize: 16),
                             ),
@@ -130,7 +130,7 @@ class CalculatorScreen extends HookWidget {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

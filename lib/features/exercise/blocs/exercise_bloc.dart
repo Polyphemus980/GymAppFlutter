@@ -29,7 +29,7 @@ class ExerciseLoading extends ExerciseState {}
 
 class ExerciseLoaded extends ExerciseState {
   ExerciseLoaded(
-      this.loadedExercises, this.query, this.selectedMuscles, this.allMuscles);
+      this.loadedExercises, this.query, this.selectedMuscles, this.allMuscles,);
   final List<Exercise> loadedExercises;
   final String query;
   final List<MuscleGroup> selectedMuscles;
@@ -42,11 +42,6 @@ class ExerciseError extends ExerciseState {
 }
 
 class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
-  final LocalExerciseRepository exerciseRepository;
-  late List<MuscleGroup> _muscles;
-  String _query = '';
-  List<MuscleGroup> _filters = [];
-  late StreamSubscription<List<Exercise>> _exerciseSubscription;
 
   ExerciseBloc({required this.exerciseRepository}) : super(ExerciseLoading()) {
     on<FilterExerciseEvent>(
@@ -63,6 +58,11 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       add(LoadedExerciseEvent(exercises));
     });
   }
+  final LocalExerciseRepository exerciseRepository;
+  late List<MuscleGroup> _muscles;
+  String _query = '';
+  List<MuscleGroup> _filters = [];
+  late StreamSubscription<List<Exercise>> _exerciseSubscription;
 
   EventTransformer<ExerciseEvent> debounce<ExerciseEvent>() {
     return (events, mapper) {
@@ -85,14 +85,14 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   void _onLoaded(LoadedExerciseEvent event, Emitter<ExerciseState> emit) {
     if (_muscles.isEmpty) {
       emit(
-          ExerciseLoading()); // Emit a loading state if muscles are not yet loaded
+          ExerciseLoading(),); // Emit a loading state if muscles are not yet loaded
       return;
     }
     emit(ExerciseLoaded(event.loadedExercises, _query, _filters, _muscles));
   }
 
   Future<void> _onFilter(
-      FilterExerciseEvent event, Emitter<ExerciseState> emit) async {
+      FilterExerciseEvent event, Emitter<ExerciseState> emit,) async {
     emit(ExerciseLoading());
     _filters = event.selectedMuscles;
     try {
@@ -113,7 +113,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   }
 
   Future<void> _onSearch(
-      SearchExerciseEvent event, Emitter<ExerciseState> emit) async {
+      SearchExerciseEvent event, Emitter<ExerciseState> emit,) async {
     emit(ExerciseLoading());
     _query = event.query;
     try {

@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
 import 'package:gym_app/core/dependency_injection/get_it_dependency_injection.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/helpers/database_helpers.dart';
@@ -18,9 +17,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/model_interfaces/dirty_table.dart';
 
 class SynchronizationCenter {
-  final SupabaseClient supabaseClient;
-  final AppDatabase db;
-
   SynchronizationCenter({required this.supabaseClient, required this.db}) {
     tableToDaoMap = {
       'completed_sets': db.completedSets,
@@ -82,6 +78,8 @@ class SynchronizationCenter {
       },
     };
   }
+  final SupabaseClient supabaseClient;
+  final AppDatabase db;
 
   final tables = [
     'exercises',
@@ -107,23 +105,30 @@ class SynchronizationCenter {
     }
 
     for (final table in tables) {
+      //this should be based on userId and probably some last_synced_at stored
+      //timestamp, but no time
       final rows = await supabaseClient.from(table).select();
       if (rows.isNotEmpty) {
         final rowCompanions =
             rows.map((row) => tableToInsertableMethods[table]!(row));
         await db.batch((batch) {
-          batch.insertAllOnConflictUpdate(tableToDaoMap[table], rowCompanions);
+          batch.insertAllOnConflictUpdate(
+            tableToDaoMap[table] as TableInfo<Table, dynamic>,
+            rowCompanions,
+          );
         });
       }
     }
   }
 
   Future<void> syncFromLocalToRemote() async {
-    bool errorOccurred = false;
+    var errorOccurred = false;
     for (final table in tables) {
       try {
-        final dirtyRecords = await (db.select(tableToDaoMap[table])
-              ..where((tbl) {
+        final dirtyRecords = await (db.select(
+          tableToDaoMap[table]
+              as ResultSetImplementation<HasResultSet, dynamic>,
+        )..where((tbl) {
                 final dirtyColumn = (tbl as DirtyTable).dirty;
                 return dirtyColumn.equals(true);
               }))
@@ -135,13 +140,13 @@ class SynchronizationCenter {
         }).toList();
         await supabaseClient.from(table).upsert(dirtyRecordsJson);
       } catch (err) {
-        debugPrint("$err");
+        print('$err');
         errorOccurred = true;
       }
     }
     if (!errorOccurred) {
       for (final table in tables) {
-        await (db.update(tableToDaoMap[table])
+        await (db.update(tableToDaoMap[table] as TableInfo<Table, dynamic>)
               ..where((tbl) {
                 final dirtyColumn = (tbl as DirtyTable).dirty;
                 return dirtyColumn.equals(true);
@@ -151,8 +156,10 @@ class SynchronizationCenter {
     }
   }
 
-  Insertable<dynamic> _createCompanionForTable(String table,
-      {required bool dirty}) {
+  Insertable<dynamic> _createCompanionForTable(
+    String table, {
+    required bool dirty,
+  }) {
     switch (table) {
       case 'exercises':
         return ExercisesCompanion(dirty: Value(dirty));

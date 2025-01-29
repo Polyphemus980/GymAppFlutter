@@ -10,52 +10,44 @@ class Unauthenticated extends AuthenticationState {}
 class AuthLoading extends AuthenticationState {}
 
 class Authenticated extends AuthenticationState {
-  final User user;
-
   Authenticated({required this.user});
+  final User user;
 }
 
 class AuthEmailConfirmationRequired extends AuthenticationState {}
 
 class AuthError extends AuthenticationState {
-  final String error;
-
   AuthError({required this.error});
+  final String error;
 }
 
 sealed class AuthEvent {}
 
 class SignInRequested extends AuthEvent {
+  SignInRequested({required this.email, required this.password});
   final String email;
   final String password;
-  SignInRequested({required this.email, required this.password});
 }
 
 class SignUpRequested extends AuthEvent {
+  SignUpRequested({required this.email, required this.password});
   final String email;
   final String password;
-
-  SignUpRequested({required this.email, required this.password});
 }
 
 class SignOutRequested extends AuthEvent {}
 
 class _AuthStateChanged extends AuthEvent {
-  final User? user;
-
   _AuthStateChanged({required this.user});
+  final User? user;
 }
 
 class _AuthStateErrorEvent extends AuthEvent {
-  final String error;
-
   _AuthStateErrorEvent({required this.error});
+  final String error;
 }
 
 class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
-  final GoTrueClient supabaseClient;
-  StreamSubscription<AuthState>? _authStateSubscription;
-
   AuthBloc({required this.supabaseClient}) : super(Unauthenticated()) {
     _handleAuthStateChanges();
     on<SignUpRequested>(_handleSignUp);
@@ -64,6 +56,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     on<_AuthStateChanged>(_handleAuthStateChanged);
     on<_AuthStateErrorEvent>(_handleAuthError);
   }
+  final GoTrueClient supabaseClient;
+  StreamSubscription<AuthState>? _authStateSubscription;
 
   void _handleAuthStateChanges() {
     _authStateSubscription = supabaseClient.onAuthStateChange.listen(
@@ -95,12 +89,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     );
   }
 
-  _handleSignUp(
-      SignUpRequested event, Emitter<AuthenticationState> emit) async {
+  Future<void> _handleSignUp(
+    SignUpRequested event,
+    Emitter<AuthenticationState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final response = await supabaseClient.signUp(
-          password: event.password, email: event.email);
+        password: event.password,
+        email: event.email,
+      );
       if (response.user != null && response.session == null) {
         emit(AuthEmailConfirmationRequired());
       }
@@ -109,22 +107,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     }
   }
 
-  _handleSignIn(
-      SignInRequested event, Emitter<AuthenticationState> emit) async {
+  Future<void> _handleSignIn(
+    SignInRequested event,
+    Emitter<AuthenticationState> emit,
+  ) async {
     emit(AuthLoading());
     if (state is Authenticated) {
       return;
     }
     try {
       await supabaseClient.signInWithPassword(
-          password: event.password, email: event.email);
+        password: event.password,
+        email: event.email,
+      );
     } on AuthException catch (e) {
       emit(AuthError(error: e.message));
     }
   }
 
-  _handleSignOut(
-      SignOutRequested event, Emitter<AuthenticationState> emit) async {
+  Future<void> _handleSignOut(
+    SignOutRequested event,
+    Emitter<AuthenticationState> emit,
+  ) async {
     if (state is Unauthenticated) {
       return;
     }
@@ -136,8 +140,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     }
   }
 
-  _handleAuthStateChanged(
-      _AuthStateChanged event, Emitter<AuthenticationState> emit) {
+  void _handleAuthStateChanged(
+    _AuthStateChanged event,
+    Emitter<AuthenticationState> emit,
+  ) {
     if (event.user != null) {
       emit(Authenticated(user: event.user!));
     } else {
@@ -145,14 +151,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthenticationState> {
     }
   }
 
-  _handleAuthError(
-      _AuthStateErrorEvent event, Emitter<AuthenticationState> emit) {
+  void _handleAuthError(
+    _AuthStateErrorEvent event,
+    Emitter<AuthenticationState> emit,
+  ) {
     emit(AuthError(error: event.error));
   }
 
   @override
   Future<void> close() async {
-    super.close();
-    _authStateSubscription?.cancel();
+    await super.close();
+    await _authStateSubscription?.cancel();
   }
 }

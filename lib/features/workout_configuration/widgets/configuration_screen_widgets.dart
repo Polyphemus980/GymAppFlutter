@@ -22,7 +22,7 @@ class SetCard extends StatefulWidget {
   final int index;
   final Exercise exercise;
   final List<WorkoutConfigSet>? sets;
-  final Function(List<WorkoutConfigSet>) onUpdate;
+  final void Function(List<WorkoutConfigSet>) onUpdate;
 
   @override
   State<SetCard> createState() => _SetCardState();
@@ -39,8 +39,7 @@ class _SetCardState extends State<SetCard> {
 
   void addSet() {
     setState(() {
-      WorkoutConfigSet newSet = WorkoutConfigSet(
-        completed: false,
+      final newSet = WorkoutConfigSet(
         setNumber: sets.length,
       );
       sets.add(newSet);
@@ -64,18 +63,18 @@ class _SetCardState extends State<SetCard> {
 
     return Card(
       elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
         ),
       ),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: colorScheme.primaryContainer.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(16),
+          color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -116,16 +115,18 @@ class _SetCardState extends State<SetCard> {
               child: Row(
                 children: [
                   SizedBox(
-                      width: 40,
-                      child: Text("SET", style: theme.textTheme.labelSmall)),
+                    width: 40,
+                    child: Text('SET', style: theme.textTheme.labelSmall),
+                  ),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        widget.isRpe
-                            ? Text("RPE", style: theme.textTheme.labelSmall)
-                            : Text("Weight", style: theme.textTheme.labelSmall),
-                        Text("REPS", style: theme.textTheme.labelSmall),
+                        if (widget.isRpe)
+                          Text('RPE', style: theme.textTheme.labelSmall)
+                        else
+                          Text('Weight', style: theme.textTheme.labelSmall),
+                        Text('REPS', style: theme.textTheme.labelSmall),
                       ],
                     ),
                   ),
@@ -141,7 +142,8 @@ class _SetCardState extends State<SetCard> {
                   return widget.isRpe
                       ? RpeSetRow(
                           key: ValueKey(
-                              'rpe_${widget.exercise.id}_${sets[index].setNumber}'),
+                            'rpe_${widget.exercise.id}_${sets[index].setNumber}',
+                          ),
                           index: index,
                           set: sets[index],
                           onUpdate: (updatedSet) {
@@ -151,7 +153,8 @@ class _SetCardState extends State<SetCard> {
                         )
                       : QuickSetRow(
                           key: ValueKey(
-                              'weight_${widget.exercise.id}_${sets[index].setNumber}'),
+                            'weight_${widget.exercise.id}_${sets[index].setNumber}',
+                          ),
                           index: index,
                           set: sets[index],
                           onUpdate: (updatedSet) {
@@ -168,13 +171,13 @@ class _SetCardState extends State<SetCard> {
                 children: [
                   ActionButton(
                     icon: Icons.remove,
-                    label: "Remove Set",
+                    label: 'Remove Set',
                     onPressed: sets.isEmpty ? null : removeSet,
                     colorScheme: colorScheme,
                   ),
                   ActionButton(
                     icon: Icons.add,
-                    label: "Add Set",
+                    label: 'Add Set',
                     onPressed: addSet,
                     colorScheme: colorScheme,
                   ),
@@ -248,7 +251,7 @@ class BaseSetRow extends StatelessWidget {
               radius: 14,
               backgroundColor: colorScheme.primaryContainer,
               child: Text(
-                "${index + 1}",
+                '${index + 1}',
                 style: TextStyle(
                   color: colorScheme.onPrimaryContainer,
                   fontSize: 12,
@@ -276,7 +279,7 @@ class QuickSetRow extends StatefulWidget {
 
   final int index;
   final WorkoutConfigSet set;
-  final Function(WorkoutConfigSet) onUpdate;
+  final void Function(WorkoutConfigSet) onUpdate;
 
   @override
   State<QuickSetRow> createState() => _QuickSetRowState();
@@ -311,11 +314,11 @@ class _QuickSetRowState extends State<QuickSetRow> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           AppTextFormField(
-            labelText: "Weight (${context.units})",
-            hintText: "0",
+            labelText: 'Weight (${context.units})',
+            hintText: '0',
             formatters: [
               WeightInputFormatter(),
-              LengthLimitingTextInputFormatter(7)
+              LengthLimitingTextInputFormatter(7),
             ],
             controller: weightController,
             width: 110,
@@ -331,8 +334,8 @@ class _QuickSetRowState extends State<QuickSetRow> {
             },
           ),
           AppTextFormField(
-            labelText: "Reps",
-            hintText: "0",
+            labelText: 'Reps',
+            hintText: '0',
             formatters: [
               RepsInputFormatter(),
               LengthLimitingTextInputFormatter(3),
@@ -366,7 +369,7 @@ class RpeSetRow extends StatefulWidget {
 
   final int index;
   final WorkoutConfigSet set;
-  final Function(WorkoutConfigSet) onUpdate;
+  final void Function(WorkoutConfigSet) onUpdate;
 
   @override
   State<RpeSetRow> createState() => _RpeSetRowState();
@@ -415,12 +418,12 @@ class _RpeSetRowState extends State<RpeSetRow> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           AppTextFormField(
-            labelText: "Rpe",
-            hintText: "0",
+            labelText: 'Rpe',
+            hintText: '0',
             errorStyle: const TextStyle(fontSize: 0),
             formatters: [
               RpeInputFormatter(),
-              LengthLimitingTextInputFormatter(3)
+              LengthLimitingTextInputFormatter(3),
             ],
             controller: rpeController,
             width: 80,
@@ -436,17 +439,19 @@ class _RpeSetRowState extends State<RpeSetRow> {
             spacing: 20,
             children: [
               AppTextFormField(
-                labelText: "Min",
-                hintText: "0",
+                labelText: 'Min',
+                hintText: '0',
                 errorStyle: const TextStyle(fontSize: 0),
                 formatters: [
                   RepsInputFormatter(),
                   LengthLimitingTextInputFormatter(2),
                 ],
                 errorText: isValidRepRange(
-                        widget.set.minRepetitions, widget.set.maxRepetitions)
+                  widget.set.minRepetitions,
+                  widget.set.maxRepetitions,
+                )
                     ? null
-                    : "",
+                    : '',
                 controller: minRepsController,
                 width: 70,
                 height: 45,
@@ -457,8 +462,8 @@ class _RpeSetRowState extends State<RpeSetRow> {
                 },
               ),
               AppTextFormField(
-                labelText: "Max",
-                hintText: "0",
+                labelText: 'Max',
+                hintText: '0',
                 errorStyle: const TextStyle(fontSize: 0),
                 formatters: [
                   RepsInputFormatter(),
@@ -474,7 +479,7 @@ class _RpeSetRowState extends State<RpeSetRow> {
                 },
               ),
             ],
-          )
+          ),
         ],
       ),
     );

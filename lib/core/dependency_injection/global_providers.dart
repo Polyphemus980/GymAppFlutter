@@ -13,11 +13,11 @@ import '../../features/workouts/blocs/workout_bloc.dart';
 import 'get_it_dependency_injection.dart';
 
 class GlobalProviders extends StatelessWidget {
-  final Widget child;
   const GlobalProviders({
     super.key,
     required this.child,
   });
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +26,15 @@ class GlobalProviders extends StatelessWidget {
         ChangeNotifierProvider<ThemeNotifier>(
           create: (_) {
             return ThemeNotifier(
-                preferencesRepository: getIt.get<LocalPreferencesRepository>());
+                preferencesRepository: getIt.get<LocalPreferencesRepository>(),);
           },
         ),
         ChangeNotifierProvider<UnitNotifier>(
           create: (_) => UnitNotifier(
-              preferencesRepository: getIt.get<LocalPreferencesRepository>()),
+              preferencesRepository: getIt.get<LocalPreferencesRepository>(),),
         ),
         BlocProvider<WorkoutBloc>(
-          create: (BuildContext context) => WorkoutBloc(
+          create: (context) => WorkoutBloc(
             workoutRepository: getIt.get<SyncWorkoutRepository>(),
           ),
         ),
@@ -42,8 +42,8 @@ class GlobalProviders extends StatelessWidget {
           create: (_) => TimerNotifier(),
         ),
         BlocProvider<AuthBloc>(
-            create: (BuildContext context) =>
-                AuthBloc(supabaseClient: Supabase.instance.client.auth))
+            create: (context) =>
+                AuthBloc(supabaseClient: Supabase.instance.client.auth),),
       ],
       child: child,
     );

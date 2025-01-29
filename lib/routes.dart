@@ -67,7 +67,7 @@ final router = GoRouter(
                 path: '/train',
                 builder: (context, state) => TrainScreen(
                       workoutRepository: getIt.get<LocalWorkoutRepository>(),
-                    )),
+                    ),),
             GoRoute(
               path: '/exercise',
               builder: (context, state) => const ExerciseListScreen(),
@@ -101,12 +101,12 @@ final router = GoRouter(
                     sets: sets,
                     plannedWorkoutId: id,
                   );
-                }),
+                },),
             GoRoute(
               path: '/profile',
               builder: (context, state) => const ProfileScreen(),
             ),
-          ]),
+          ],),
       GoRoute(
           path: '/add',
           builder: (context, state) => AddExerciseScreen(
@@ -119,8 +119,8 @@ final router = GoRouter(
                   final selectedOptions =
                       state.extra as List<MuscleGroup>? ?? [];
                   return MusclePicker(list: selectedOptions);
-                })
-          ]),
+                },),
+          ],),
       GoRoute(
           path: '/display/:id',
           builder: (context, state) {
@@ -129,7 +129,7 @@ final router = GoRouter(
               syncWorkoutRepository: getIt.get<SyncWorkoutRepository>(),
               workoutPlanId: state.pathParameters['id']!,
             );
-          }),
+          },),
       GoRoute(
         path: '/plan',
         builder: (context, state) {
@@ -139,7 +139,7 @@ final router = GoRouter(
           GoRoute(
               path: 'create',
               builder: (context, state) {
-                Map<String, dynamic> data = state.extra as Map<String, dynamic>;
+                final data = state.extra! as Map<String, dynamic>;
                 return NewWorkoutPlanScreen(
                   name: data['name']! as String,
                   description: data['description']! as String,
@@ -151,24 +151,24 @@ final router = GoRouter(
                 GoRoute(
                     path: 'new',
                     builder: (context, state) {
-                      final data = state.extra as List<SetData>;
+                      final data = state.extra! as List<SetData>;
                       return WorkoutConfigurationScreen(
                         workoutRepository: getIt.get<LocalWorkoutRepository>(),
                         isRpe: true,
                         data: data,
-                        title: "Create workout",
-                        finishButtonText: "Save Workout",
+                        title: 'Create workout',
+                        finishButtonText: 'Save Workout',
                         finishButtonOnTap: (sets, _) {
                           context.pop(sets);
                         },
                       );
-                    })
-              ]),
+                    },),
+              ],),
         ],
       ),
       GoRoute(
           path: '/calculator',
-          builder: (context, state) => const CalculatorScreen()),
+          builder: (context, state) => const CalculatorScreen(),),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
@@ -180,11 +180,11 @@ final router = GoRouter(
       GoRoute(
           path: '/planned_workout',
           builder: (context, state) {
-            final plan = state.extra as UserWorkoutPlans;
+            final plan = state.extra! as UserWorkoutPlans;
             return WorkoutConfigurationScreen(
               workoutRepository: getIt.get<LocalWorkoutRepository>(),
-              title: "Edit workout",
-              finishButtonText: "Start Workout",
+              title: 'Edit workout',
+              finishButtonText: 'Start Workout',
               finishButtonOnTap: (sets, id) {
                 NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
@@ -193,14 +193,14 @@ final router = GoRouter(
               isRpe: true,
               workoutPlan: plan,
             );
-          }),
+          },),
       GoRoute(
           path: '/new',
           builder: (context, state) {
             return WorkoutConfigurationScreen(
               workoutRepository: getIt.get<LocalWorkoutRepository>(),
-              title: "Create workout",
-              finishButtonText: "Start Workout",
+              title: 'Create workout',
+              finishButtonText: 'Start Workout',
               finishButtonOnTap: (sets, id) {
                 NotificationService.showWorkoutNotificationWithActions();
                 Provider.of<TimerNotifier>(context, listen: false).startTimer();
@@ -214,6 +214,6 @@ final router = GoRouter(
                 builder: (context, state) {
                   final selectedList = state.extra as List<Exercise>? ?? [];
                   return SelectExerciseScreen(selectedExercises: selectedList);
-                }),
-          ]),
-    ]);
+                },),
+          ],),
+    ],);

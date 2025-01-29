@@ -3,9 +3,9 @@ import 'package:gym_app/data/models/completed/completed_set.dart';
 import 'package:intl/intl.dart';
 
 class ExerciseSetDetails extends StatelessWidget {
+  const ExerciseSetDetails({required this.index, super.key, required this.set});
   final int index;
   final CompletedSet set;
-  const ExerciseSetDetails({required this.index, super.key, required this.set});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class ExerciseSetDetails extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           child: Text('${index + 1}',
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondaryContainer)),
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,),),
         ),
         title: Text(
           'Set ${index + 1}',

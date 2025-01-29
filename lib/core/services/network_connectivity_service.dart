@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:gym_app/core/services/supabase_synchronization_service.dart';
 
 class NetworkConnectivityService {
-  bool _isOnline = false;
-  final Connectivity _connectivity = Connectivity();
-  final SynchronizationCenter syncCenter;
-
-  bool get isOnline => _isOnline;
 
   NetworkConnectivityService({required this.syncCenter}) {
     _initConnectivity();
     _setupConnectivityStream();
   }
+  bool _isOnline = false;
+  final Connectivity _connectivity = Connectivity();
+  final SynchronizationCenter syncCenter;
+
+  bool get isOnline => _isOnline;
 
   Future<void> _initConnectivity() async {
     try {
@@ -25,7 +25,7 @@ class NetworkConnectivityService {
 
   void _setupConnectivityStream() {
     _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> result) async {
+        .listen((result) async {
       final isOnline = !result.contains(ConnectivityResult.none);
       if (isOnline) {
         await syncCenter.syncFromLocalToRemote();

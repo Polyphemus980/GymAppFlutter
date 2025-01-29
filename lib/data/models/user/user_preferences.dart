@@ -7,10 +7,6 @@ part 'user_preferences.g.dart';
 
 @JsonSerializable()
 class UserPreferences {
-  final String user_id;
-  final bool is_dark_mode;
-  final bool is_metric;
-  final bool dirty;
 
   UserPreferences({
     required this.dirty,
@@ -21,6 +17,10 @@ class UserPreferences {
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>
       _$UserPreferencesFromJson(json);
+  final String user_id;
+  final bool is_dark_mode;
+  final bool is_metric;
+  final bool dirty;
   Map<String, dynamic> toJson() => _$UserPreferencesToJson(this);
 }
 

@@ -7,23 +7,23 @@ part 'set_data.g.dart';
 
 @JsonSerializable()
 class SetData {
-  final Exercise exercise;
-  final List<WorkoutConfigSet> sets;
 
   SetData({required this.exercise, required this.sets});
 
+  factory SetData.fromJson(Map<String, dynamic> json) =>
+      _$SetDataFromJson(json);
+  final Exercise exercise;
+  final List<WorkoutConfigSet> sets;
+
   SetData copyWith({Exercise? exercise, List<WorkoutConfigSet>? sets}) {
     return SetData(
-        exercise: exercise ?? this.exercise, sets: sets ?? this.sets);
+        exercise: exercise ?? this.exercise, sets: sets ?? this.sets,);
   }
 
   SetData copy() {
     return SetData(
         exercise: exercise.copy(),
-        sets: sets.map((set) => set.copy()).toList());
+        sets: sets.map((set) => set.copy()).toList(),);
   }
-
-  factory SetData.fromJson(Map<String, dynamic> json) =>
-      _$SetDataFromJson(json);
   Map<String, dynamic> toJson() => _$SetDataToJson(this);
 }

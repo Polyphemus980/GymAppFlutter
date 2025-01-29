@@ -9,11 +9,11 @@ import 'package:gym_app/data/repositories/exercise/local_exercise_repository.dar
 import 'package:gym_app/features/exercise/widgets/exercise_details_screen_widgets.dart';
 
 class ExerciseDetailsScreen extends StatelessWidget {
-  final String id;
-  final LocalExerciseRepository exerciseRepository;
 
   const ExerciseDetailsScreen(
-      {super.key, required this.id, required this.exerciseRepository});
+      {super.key, required this.id, required this.exerciseRepository,});
+  final String id;
+  final LocalExerciseRepository exerciseRepository;
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -24,10 +24,10 @@ class ExerciseDetailsScreen extends StatelessWidget {
               title: 'Loading...',
               child: Center(
                 child: CircularProgressIndicator(),
-              ));
+              ),);
         } else if (snapshot.hasError) {
           return AppScaffold(
-              title: 'Error', child: Text(snapshot.error.toString()));
+              title: 'Error', child: Text(snapshot.error.toString()),);
         } else {
           return ExerciseWithSetsDisplay(data: snapshot.data!);
         }
@@ -37,8 +37,8 @@ class ExerciseDetailsScreen extends StatelessWidget {
 }
 
 class ExerciseWithSetsDisplay extends HookWidget {
-  final ExerciseWithSets data;
   const ExerciseWithSetsDisplay({super.key, required this.data});
+  final ExerciseWithSets data;
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +48,8 @@ class ExerciseWithSetsDisplay extends HookWidget {
       final timer = Timer.periodic(const Duration(seconds: 2), (timer) {
         isEndPosition.value = !isEndPosition.value;
       });
-      return () {
-        timer.cancel();
-      };
-    }, []);
+      return timer.cancel;
+    }, [],);
 
     return AppScaffold(
       title: data.exercise.name,
@@ -59,7 +57,7 @@ class ExerciseWithSetsDisplay extends HookWidget {
         width: double.infinity,
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -107,7 +105,7 @@ class ExerciseWithSetsDisplay extends HookWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.5,
-                    )),
+                    ),),
                 const SizedBox(height: 24),
                 const Text(
                   'Recent Sets',
@@ -117,8 +115,7 @@ class ExerciseWithSetsDisplay extends HookWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                data.sets.isNotEmpty
-                    ? ListView.builder(
+                if (data.sets.isNotEmpty) ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: data.sets.length,
@@ -128,8 +125,7 @@ class ExerciseWithSetsDisplay extends HookWidget {
                             set: data.sets[index],
                           );
                         },
-                      )
-                    : const Text("No sets done yet for this exercise"),
+                      ) else const Text('No sets done yet for this exercise'),
               ],
             ),
           ),

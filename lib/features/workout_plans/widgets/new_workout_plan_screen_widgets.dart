@@ -8,22 +8,23 @@ import 'package:gym_app/features/workout_plans/blocs/new_workout_plan_bloc.dart'
 import '../../../core/common_widgets/app_widgets.dart';
 
 class DayCard extends StatelessWidget {
+  const DayCard({
+    super.key,
+    required this.sets,
+    this.onAddExercise,
+    required this.index,
+    this.interactable = true,
+  });
   final int index;
   final bool interactable;
   final List<SetData> sets;
   final void Function(int)? onAddExercise;
-  const DayCard(
-      {super.key,
-      required this.sets,
-      this.onAddExercise,
-      required this.index,
-      this.interactable = true});
 
   @override
   Widget build(BuildContext context) {
     return DayContainer(
       width: double.infinity,
-      title: "Day ${index + 1}",
+      title: 'Day ${index + 1}',
       child: Column(
         spacing: 10,
         mainAxisSize: MainAxisSize.min,
@@ -45,7 +46,7 @@ class DayCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                "No exercises added yet",
+                'No exercises added yet',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
@@ -58,7 +59,7 @@ class DayCard extends StatelessWidget {
               },
               width: 200,
               height: 60,
-              text: "Add exercises",
+              text: 'Add exercises',
             ),
         ],
       ),
@@ -67,20 +68,20 @@ class DayCard extends StatelessWidget {
 }
 
 class DraggableHorizontalList extends HookWidget {
-  final int numWeeks;
-  final void Function(int) onSelect;
   const DraggableHorizontalList({
     required this.onSelect,
     super.key,
     required this.numWeeks,
   });
+  final int numWeeks;
+  final void Function(int) onSelect;
 
   @override
   Widget build(BuildContext context) {
     final scrollController = useScrollController();
     final isDragging = useState(false);
-    final startX = useState(0.0);
-    final scrollStartPosition = useState(0.0);
+    final startX = useState(0);
+    final scrollStartPosition = useState(0);
     final selected = useState(0);
 
     return Container(
@@ -88,13 +89,16 @@ class DraggableHorizontalList extends HookWidget {
       color: Theme.of(context).colorScheme.onPrimary,
       child: Center(
         child: Listener(
-          onPointerDown: (PointerDownEvent event) {
+          onPointerDown: (event) {
             isDragging.value = true;
-            startX.value = event.position.dx;
-            scrollStartPosition.value = scrollController.position.pixels;
+            startX.value = event.position.dx.toInt();
+            scrollStartPosition.value =
+                scrollController.position.pixels.toInt();
           },
-          onPointerMove: (PointerMoveEvent event) {
-            if (!isDragging.value) return;
+          onPointerMove: (event) {
+            if (!isDragging.value) {
+              return;
+            }
 
             final dx = event.position.dx - startX.value;
             final newPosition = scrollStartPosition.value - dx;
@@ -106,7 +110,7 @@ class DraggableHorizontalList extends HookWidget {
               ),
             );
           },
-          onPointerUp: (PointerUpEvent event) {
+          onPointerUp: (event) {
             isDragging.value = false;
           },
           child: ListView.builder(
@@ -116,15 +120,17 @@ class DraggableHorizontalList extends HookWidget {
             itemCount: numWeeks,
             itemBuilder: (context, index) {
               return TextButton(
-                  onPressed: () {
-                    onSelect(index);
-                    selected.value = index;
-                  },
-                  style: TextButton.styleFrom(
-                      foregroundColor: selected.value == index
-                          ? Theme.of(context).primaryColor
-                          : Theme.of(context).colorScheme.secondary),
-                  child: Text("Week ${index + 1}"));
+                onPressed: () {
+                  onSelect(index);
+                  selected.value = index;
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: selected.value == index
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).colorScheme.secondary,
+                ),
+                child: Text('Week ${index + 1}'),
+              );
             },
           ),
         ),
@@ -134,6 +140,14 @@ class DraggableHorizontalList extends HookWidget {
 }
 
 class DayContainer extends StatelessWidget {
+  const DayContainer({
+    super.key,
+    required this.child,
+    required this.width,
+    this.height,
+    this.title,
+    this.actions,
+  });
   final Widget child;
 
   final double? height;
@@ -142,51 +156,48 @@ class DayContainer extends StatelessWidget {
 
   final String? title;
   final List<Widget>? actions;
-  const DayContainer(
-      {super.key,
-      required this.child,
-      required this.width,
-      this.height,
-      this.title,
-      this.actions});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: width,
       height: height,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color:
             Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 1),
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Theme.of(context).colorScheme.secondary),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             offset: Offset(0, 4),
-            blurRadius: 8.0,
+            blurRadius: 8,
           ),
         ],
       ),
       child: Column(
         spacing: 10,
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            if (title != null)
-              Flexible(
-                child: Text(
-                  title!,
-                  softWrap: true,
-                  style: TextStyle(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (title != null)
+                Flexible(
+                  child: Text(
+                    title!,
+                    softWrap: true,
+                    style: TextStyle(
                       fontSize: 24,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
-              ),
-            if (actions != null)
-              Row(mainAxisSize: MainAxisSize.min, children: actions!),
-          ]),
+              if (actions != null)
+                Row(mainAxisSize: MainAxisSize.min, children: actions!),
+            ],
+          ),
           child,
         ],
       ),
@@ -195,8 +206,8 @@ class DayContainer extends StatelessWidget {
 }
 
 class PlanExerciseTile extends StatelessWidget {
-  final SetData exercise;
   const PlanExerciseTile({super.key, required this.exercise});
+  final SetData exercise;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +221,6 @@ class PlanExerciseTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outlineVariant,
-          width: 1,
         ),
       ),
       child: Column(
@@ -219,9 +229,12 @@ class PlanExerciseTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(exercise.exercise.name,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary)),
+                child: Text(
+                  exercise.exercise.name,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -236,9 +249,10 @@ class PlanExerciseTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  "${exercise.sets.length} sets",
+                  '${exercise.sets.length} sets',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onTertiary),
+                    color: Theme.of(context).colorScheme.onTertiary,
+                  ),
                 ),
               ),
             ],
@@ -265,7 +279,8 @@ class PlanExerciseTile extends StatelessWidget {
                 child: Text(
                   "Set ${setIndex + 1}: ${set.minRepetitions == set.maxRepetitions ? set.minRepetitions : "${set.minRepetitions} - ${set.maxRepetitions}"} reps ${set.rpe != null ? 'at RPE ${set.rpe}' : ''}",
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onTertiary),
+                    color: Theme.of(context).colorScheme.onTertiary,
+                  ),
                 ),
               );
             }).toList(),
@@ -291,12 +306,12 @@ class CopyModal extends HookWidget {
             color: Theme.of(context).colorScheme.primaryContainer,
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      "Copy Workout Week",
+                      'Copy Workout Week',
                       style:
                           Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
@@ -310,7 +325,7 @@ class CopyModal extends HookWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Source Week",
+                          'Source Week',
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
@@ -324,15 +339,17 @@ class CopyModal extends HookWidget {
                           spacing: 8,
                           runSpacing: 8,
                           children: List<int>.generate(
-                              state.plan.weeks.length, (i) => i).map((index) {
-                            bool isEnabled = state.plan.weeks[index].days
+                            state.plan.weeks.length,
+                            (i) => i,
+                          ).map((index) {
+                            final bool isEnabled = state.plan.weeks[index].days
                                 .every((day) => day.sets.isNotEmpty);
                             return AnimatedScale(
                               scale: isEnabled ? 1.0 : 0.95,
                               duration: const Duration(milliseconds: 200),
                               child: FilterChip(
                                 label: Text(
-                                  "Week ${index + 1}",
+                                  'Week ${index + 1}',
                                   style: TextStyle(
                                     fontWeight: from.value == index
                                         ? FontWeight.bold
@@ -353,7 +370,7 @@ class CopyModal extends HookWidget {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.surface,
                                 onSelected: isEnabled
-                                    ? (bool selected) {
+                                    ? (selected) {
                                         if (!selected) {
                                           from.value = -1;
                                         } else {
@@ -376,7 +393,7 @@ class CopyModal extends HookWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Target Weeks",
+                          'Target Weeks',
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
@@ -390,10 +407,12 @@ class CopyModal extends HookWidget {
                           spacing: 8,
                           runSpacing: 8,
                           children: List<int>.generate(
-                              state.plan.weeks.length, (i) => i).map((index) {
+                            state.plan.weeks.length,
+                            (i) => i,
+                          ).map((index) {
                             return FilterChip(
                               label: Text(
-                                "Week ${index + 1}",
+                                'Week ${index + 1}',
                                 style: TextStyle(
                                   fontWeight: to.value.contains(index)
                                       ? FontWeight.bold
@@ -411,7 +430,7 @@ class CopyModal extends HookWidget {
                                   Theme.of(context).colorScheme.surface,
                               onSelected: from.value == index
                                   ? null
-                                  : (bool selected) {
+                                  : (selected) {
                                       if (selected) {
                                         to.value = [...to.value, index];
                                       } else {
@@ -434,8 +453,9 @@ class CopyModal extends HookWidget {
                           ? () {
                               context.read<NewWorkoutPlanBloc>().add(
                                     CopyWeekEvent(
-                                        fromIndex: from.value,
-                                        toIndices: to.value),
+                                      fromIndex: from.value,
+                                      toIndices: to.value,
+                                    ),
                                   );
                               context.pop();
                             }
@@ -443,11 +463,14 @@ class CopyModal extends HookWidget {
                       icon: const Icon(Icons.copy),
                       label: const Text('Copy Week'),
                       style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondaryContainer),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                      ),
                     ),
                   ],
                 ),

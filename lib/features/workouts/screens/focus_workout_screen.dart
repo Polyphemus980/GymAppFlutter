@@ -18,7 +18,7 @@ import '../widgets/focus_workout_screen_widgets.dart';
 
 class FocusWorkoutScreen extends HookWidget {
   const FocusWorkoutScreen(
-      {super.key, required this.sets, this.plannedWorkoutId});
+      {super.key, required this.sets, this.plannedWorkoutId,});
   final List<SetData> sets;
   final String? plannedWorkoutId;
   @override
@@ -27,54 +27,54 @@ class FocusWorkoutScreen extends HookWidget {
       context.read<WorkoutBloc>().add(InitializeSetsEvent(
           sets: sets,
           userId: context.currentUserId!,
-          plannedWorkoutId: plannedWorkoutId));
+          plannedWorkoutId: plannedWorkoutId,),);
       return null;
-    }, []);
+    }, [],);
     final pageController = usePageController();
     return BlocPresentationListener<WorkoutBloc, WorkoutEvent>(
       listener: (context, event) {
         if (event is ChangePageEvent) {
           pageController.animateToPage(event.page,
               duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut);
+              curve: Curves.easeInOut,);
         } else if (event is EndWorkoutPresentationEvent) {
           context.read<TimerNotifier>().cancelTimer();
           NotificationService.stopWorkoutNotification();
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("Finished workout")));
+              .showSnackBar(const SnackBar(content: Text('Finished workout')));
           context.go('/workout');
         } else if (event is IncorrectRepsEvent) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Set must have more than 0 repetitions")));
+              content: Text('Set must have more than 0 repetitions'),),);
         }
       },
       child: BlocBuilder<WorkoutBloc, WorkoutState>(builder: (context, state) {
         if (state is WorkoutInProgress && state.sets.isNotEmpty) {
           return AppScaffold(
-            title: "Workout",
+            title: 'Workout',
             child: Column(spacing: 16, children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
                 child: SmoothPageIndicator(
-                    controller: pageController, count: state.sets.length),
+                    controller: pageController, count: state.sets.length,),
               ),
               Expanded(
                 child: PageView.builder(
                   controller: pageController,
                   itemCount: state.sets.length,
-                  itemBuilder: (BuildContext context, int index) {
+                  itemBuilder: (context, index) {
                     return Stack(children: [
                       ExerciseList(
-                          exerciseIndex: index, setData: state.sets[index]),
+                          exerciseIndex: index, setData: state.sets[index],),
                       if (Platform.isWindows)
                         Align(
                           alignment: Alignment.centerLeft,
                           child: FloatingActionButton(
-                            heroTag: "previousButton$index",
+                            heroTag: 'previousButton$index',
                             onPressed: () {
                               pageController.previousPage(
                                   duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
+                                  curve: Curves.easeInOut,);
                             },
                             child: const Icon(Icons.keyboard_arrow_left),
                           ),
@@ -83,24 +83,24 @@ class FocusWorkoutScreen extends HookWidget {
                         Align(
                           alignment: Alignment.centerRight,
                           child: FloatingActionButton(
-                            heroTag: "nextButton$index",
+                            heroTag: 'nextButton$index',
                             onPressed: () {
                               pageController.nextPage(
                                   duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
+                                  curve: Curves.easeInOut,);
                             },
                             child: const Icon(Icons.keyboard_arrow_right),
                           ),
-                        )
-                    ]);
+                        ),
+                    ],);
                   },
                 ),
               ),
-            ]),
+            ],),
           );
         }
         return const SizedBox.shrink();
-      }),
+      },),
     );
   }
 }

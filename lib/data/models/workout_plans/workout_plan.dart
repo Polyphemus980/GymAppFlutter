@@ -20,6 +20,9 @@ class WorkoutPlan {
     required this.created_at,
     this.updated_at,
   });
+
+  factory WorkoutPlan.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutPlanFromJson(json);
   final String id;
   final String user_id;
   final String name;
@@ -32,9 +35,6 @@ class WorkoutPlan {
 
   @json.JsonKey(includeFromJson: false, includeToJson: false)
   List<PlannedWorkout>? workouts;
-
-  factory WorkoutPlan.fromJson(Map<String, dynamic> json) =>
-      _$WorkoutPlanFromJson(json);
   Map<String, dynamic> toJson() => _$WorkoutPlanToJson(this);
 }
 

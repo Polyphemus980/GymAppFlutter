@@ -5,15 +5,6 @@ part 'workout_config_set.g.dart';
 
 @JsonSerializable()
 class WorkoutConfigSet {
-  int setNumber;
-  int? repetitions;
-  double? weight;
-  double? rpe;
-  int? maxRepetitions;
-  int? minRepetitions;
-  int? duration;
-  bool isWeight;
-  bool completed;
 
   WorkoutConfigSet({
     required this.setNumber,
@@ -29,7 +20,6 @@ class WorkoutConfigSet {
 
   factory WorkoutConfigSet.fromPlannedSet(PlannedSet plannedSet) {
     return WorkoutConfigSet(
-      completed: false,
       isWeight: false,
       setNumber: plannedSet.set_number,
       minRepetitions: plannedSet.min_repetitions,
@@ -37,6 +27,18 @@ class WorkoutConfigSet {
       rpe: plannedSet.rpe,
     );
   }
+
+  factory WorkoutConfigSet.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutConfigSetFromJson(json);
+  int setNumber;
+  int? repetitions;
+  double? weight;
+  double? rpe;
+  int? maxRepetitions;
+  int? minRepetitions;
+  int? duration;
+  bool isWeight;
+  bool completed;
   WorkoutConfigSet copy() {
     return WorkoutConfigSet(
         setNumber: setNumber,
@@ -47,7 +49,7 @@ class WorkoutConfigSet {
         duration: duration,
         isWeight: isWeight,
         rpe: rpe,
-        completed: completed);
+        completed: completed,);
   }
 
   WorkoutConfigSet copyWith(
@@ -57,7 +59,7 @@ class WorkoutConfigSet {
       double? weight,
       int? duration,
       double? rpe,
-      bool? isWeight}) {
+      bool? isWeight,}) {
     return WorkoutConfigSet(
         setNumber: setNumber ?? this.setNumber,
         repetitions: repetitions ?? this.repetitions,
@@ -65,11 +67,8 @@ class WorkoutConfigSet {
         duration: duration ?? this.duration,
         completed: completed ?? this.completed,
         rpe: rpe ?? this.rpe,
-        isWeight: isWeight ?? this.isWeight);
+        isWeight: isWeight ?? this.isWeight,);
   }
-
-  factory WorkoutConfigSet.fromJson(Map<String, dynamic> json) =>
-      _$WorkoutConfigSetFromJson(json);
 
   Map<String, dynamic> toJson() => _$WorkoutConfigSetToJson(this);
 }

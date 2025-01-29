@@ -8,11 +8,6 @@ part 'user_workout_plans.g.dart';
 
 @json.JsonSerializable()
 class UserWorkoutPlans {
-  final String user_id;
-  final String workout_plan_id;
-  final int current_week;
-  final int current_day;
-  final bool dirty;
 
   UserWorkoutPlans({
     required this.user_id,
@@ -22,11 +17,16 @@ class UserWorkoutPlans {
     required this.current_day,
   });
 
-  @json.JsonKey(includeFromJson: false, includeToJson: false)
-  WorkoutPlan? plan;
-
   factory UserWorkoutPlans.fromJson(Map<String, dynamic> json) =>
       _$UserWorkoutPlansFromJson(json);
+  final String user_id;
+  final String workout_plan_id;
+  final int current_week;
+  final int current_day;
+  final bool dirty;
+
+  @json.JsonKey(includeFromJson: false, includeToJson: false)
+  WorkoutPlan? plan;
   Map<String, dynamic> toJson() => _$UserWorkoutPlansToJson(this);
 }
 

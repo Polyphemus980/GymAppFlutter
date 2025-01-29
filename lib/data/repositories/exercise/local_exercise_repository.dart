@@ -5,13 +5,13 @@ import 'package:gym_app/data/models/exercise/muscle_group.dart';
 
 abstract class LocalExerciseRepository {
   Future<void> addExercise(
-      String name, String description, List<MuscleGroup> muscles);
+      String name, String description, List<MuscleGroup> muscles,);
   Future<void> deleteExercise(String id);
   Future<Exercise> getExercise(String exerciseId);
   Stream<List<Exercise>> watchExercisesWithFilters(
-      String query, List<MuscleGroup> groups);
+      String query, List<MuscleGroup> groups,);
   Future<List<MuscleGroup>> getAllMuscleGroups();
   Future<List<CompletedSet>> getLastCompletedSets(
-      String exerciseId, int numSets);
+      String exerciseId, int numSets,);
   Future<ExerciseWithSets> getExerciseWithSets(String exerciseId);
 }

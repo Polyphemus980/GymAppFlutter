@@ -25,7 +25,7 @@ class _MusclePickerState extends State<MusclePicker> {
       title: 'Pick muscle groups',
       actions: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: FilledButton.icon(
             onPressed: () {
               context.pop();
@@ -107,12 +107,13 @@ class _MusclePickerState extends State<MusclePicker> {
                               trailing: Checkbox(
                                 value: isChecked.value,
                                 onChanged: (value) {
-                                  if (value == true) {
+                                  if (value != null && value == true) {
                                     widget.list
                                         .add(snapshot.data!.elementAt(index));
                                   } else {
                                     widget.list.remove(
-                                        snapshot.data!.elementAt(index));
+                                      snapshot.data!.elementAt(index),
+                                    );
                                   }
                                   isChecked.value = !isChecked.value;
                                 },

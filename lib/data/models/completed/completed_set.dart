@@ -9,17 +9,6 @@ part 'completed_set.g.dart';
 
 @JsonSerializable()
 class CompletedSet {
-  final String id;
-  final String user_id;
-  final String workout_exercise_id;
-  final int set_number;
-  final int repetitions;
-  final int? duration_seconds;
-  final bool dirty;
-  final bool is_metric;
-  final double? weight;
-  final DateTime created_at;
-  final DateTime? updated_at;
 
   CompletedSet({
     required this.dirty,
@@ -37,6 +26,17 @@ class CompletedSet {
 
   factory CompletedSet.fromJson(Map<String, dynamic> json) =>
       _$CompletedSetFromJson(json);
+  final String id;
+  final String user_id;
+  final String workout_exercise_id;
+  final int set_number;
+  final int repetitions;
+  final int? duration_seconds;
+  final bool dirty;
+  final bool is_metric;
+  final double? weight;
+  final DateTime created_at;
+  final DateTime? updated_at;
   Map<String, dynamic> toJson() => _$CompletedSetToJson(this);
 
   double? get volume => weight != null ? weight! * repetitions : null;

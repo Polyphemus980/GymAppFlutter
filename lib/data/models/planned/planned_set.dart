@@ -19,6 +19,9 @@ class PlannedSet {
     required this.min_repetitions,
     required this.max_repetitions,
   });
+
+  factory PlannedSet.fromJson(Map<String, dynamic> json) =>
+      _$PlannedSetFromJson(json);
   final String id;
   final String user_id;
   final String workout_exercise_id;
@@ -27,9 +30,6 @@ class PlannedSet {
   final int max_repetitions;
   final double rpe;
   final bool dirty;
-
-  factory PlannedSet.fromJson(Map<String, dynamic> json) =>
-      _$PlannedSetFromJson(json);
   Map<String, dynamic> toJson() => _$PlannedSetToJson(this);
 }
 

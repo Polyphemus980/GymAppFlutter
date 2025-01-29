@@ -16,21 +16,21 @@ class WorkoutPlanForm extends HookWidget {
     final weeksValue = useState<int?>(null);
     final daysValue = useState<int?>(null);
     return AppScaffold(
-      title: "Custom program",
+      title: 'Custom program',
       child: SingleChildScrollView(
         child: Form(
           key: formKey.value,
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
             child: Column(spacing: 32, children: [
               AppTextFormField(
                 width: double.infinity,
                 controller: nameController,
-                labelText: "Name",
+                labelText: 'Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Must have a name";
+                    return 'Must have a name';
                   } else {
                     return null;
                   }
@@ -39,20 +39,20 @@ class WorkoutPlanForm extends HookWidget {
               AppTextFormField(
                   width: double.infinity,
                   controller: descriptionController,
-                  labelText: "Description",
+                  labelText: 'Description',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Must have a description";
+                      return 'Must have a description';
                     } else {
                       return null;
                     }
-                  }),
+                  },),
               SizedBox(
                 width: double.infinity,
                 child: DropdownButtonFormField(
                     validator: (value) {
                       if (value == null) {
-                        return "Must specify length";
+                        return 'Must specify length';
                       } else {
                         return null;
                       }
@@ -61,9 +61,8 @@ class WorkoutPlanForm extends HookWidget {
                     dropdownColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     decoration: InputDecoration(
-                      labelText: "Length (in weeks)",
+                      labelText: 'Length (in weeks)',
                       contentPadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                      counter: null,
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.primaryContainer,
                       border: OutlineInputBorder(
@@ -83,18 +82,18 @@ class WorkoutPlanForm extends HookWidget {
                     ),
                     items: List.generate(16, (i) => i + 1)
                         .map((i) =>
-                            DropdownMenuItem(value: i, child: Text('$i')))
+                            DropdownMenuItem(value: i, child: Text('$i')),)
                         .toList(),
                     onChanged: (value) {
                       weeksValue.value = value;
-                    }),
+                    },),
               ),
               SizedBox(
                 width: double.infinity,
                 child: DropdownButtonFormField(
                     validator: (value) {
                       if (value == null) {
-                        return "Must specify days per week";
+                        return 'Must specify days per week';
                       } else {
                         return null;
                       }
@@ -103,9 +102,8 @@ class WorkoutPlanForm extends HookWidget {
                     dropdownColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     decoration: InputDecoration(
-                      labelText: "Days per week",
+                      labelText: 'Days per week',
                       contentPadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                      counter: null,
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.primaryContainer,
                       border: OutlineInputBorder(
@@ -125,11 +123,11 @@ class WorkoutPlanForm extends HookWidget {
                     ),
                     items: List.generate(7, (i) => i + 1)
                         .map((i) =>
-                            DropdownMenuItem(value: i, child: Text('$i')))
+                            DropdownMenuItem(value: i, child: Text('$i')),)
                         .toList(),
                     onChanged: (value) {
                       daysValue.value = value;
-                    }),
+                    },),
               ),
               SizedBox(
                 width: double.infinity,
@@ -144,24 +142,24 @@ class WorkoutPlanForm extends HookWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                             content: Text(
-                                'Configured workout plan: ${nameController.text}')),
+                                'Configured workout plan: ${nameController.text}',),),
                       );
                       context.push('/plan/create', extra: {
                         'name': nameController.text.trim(),
                         'description': descriptionController.text.trim(),
                         'days': daysValue.value!,
-                        'weeks': weeksValue.value!
-                      });
+                        'weeks': weeksValue.value!,
+                      },);
                     }
                   },
-                  label: Text("Submit",
+                  label: Text('Submit',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary)),
+                          color: Theme.of(context).colorScheme.onSecondary,),),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,),
                 ),
-              )
-            ]),
+              ),
+            ],),
           ),
         ),
       ),

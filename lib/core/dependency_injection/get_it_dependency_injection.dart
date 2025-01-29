@@ -21,25 +21,43 @@ Future<void> setUp() async {
     return;
   }
 
-  getIt.registerSingleton<AppDatabase>(AppDatabase());
-  getIt.registerSingleton<LocalExerciseRepository>(
-      DriftExerciseRepository(db: getIt.get<AppDatabase>()));
-  getIt.registerSingleton<LocalWorkoutRepository>(
-      DriftWorkoutRepository(db: getIt.get<AppDatabase>()));
-  getIt.registerSingleton<LocalPreferencesRepository>(
-    DriftPreferencesRepository(db: getIt.get<AppDatabase>()),
-  );
-  getIt.registerSingleton<OfflineUserDataSingleton>(
-      OfflineUserDataSingleton(db: getIt.get<AppDatabase>()));
-  getIt.registerSingleton<SyncExerciseRepository>(SyncExerciseRepository(
-      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
-  getIt.registerSingleton<SyncWorkoutRepository>(SyncWorkoutRepository(
-      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
-  getIt.registerSingleton<SynchronizationCenter>(SynchronizationCenter(
-      db: getIt.get<AppDatabase>(), supabaseClient: Supabase.instance.client));
-  getIt.registerSingleton<NetworkConnectivityService>(
+  getIt
+    ..registerSingleton<AppDatabase>(AppDatabase())
+    ..registerSingleton<LocalExerciseRepository>(
+      DriftExerciseRepository(db: getIt.get<AppDatabase>()),
+    )
+    ..registerSingleton<LocalWorkoutRepository>(
+      DriftWorkoutRepository(db: getIt.get<AppDatabase>()),
+    )
+    ..registerSingleton<LocalPreferencesRepository>(
+      DriftPreferencesRepository(db: getIt.get<AppDatabase>()),
+    )
+    ..registerSingleton<OfflineUserDataSingleton>(
+      OfflineUserDataSingleton(db: getIt.get<AppDatabase>()),
+    )
+    ..registerSingleton<SyncExerciseRepository>(
+      SyncExerciseRepository(
+        db: getIt.get<AppDatabase>(),
+        supabaseClient: Supabase.instance.client,
+      ),
+    )
+    ..registerSingleton<SyncWorkoutRepository>(
+      SyncWorkoutRepository(
+        db: getIt.get<AppDatabase>(),
+        supabaseClient: Supabase.instance.client,
+      ),
+    )
+    ..registerSingleton<SynchronizationCenter>(
+      SynchronizationCenter(
+        db: getIt.get<AppDatabase>(),
+        supabaseClient: Supabase.instance.client,
+      ),
+    )
+    ..registerSingleton<NetworkConnectivityService>(
       NetworkConnectivityService(
-          syncCenter: getIt.get<SynchronizationCenter>()));
+        syncCenter: getIt.get<SynchronizationCenter>(),
+      ),
+    );
 
   await getIt.get<OfflineUserDataSingleton>().initialize();
   await getIt

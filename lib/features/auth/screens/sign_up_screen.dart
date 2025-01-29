@@ -15,7 +15,7 @@ class SignUpScreen extends StatelessWidget {
         if (state is AuthLoading) {
           return const AppScaffold(
               title: 'Sign up',
-              child: Center(child: CircularProgressIndicator()));
+              child: Center(child: CircularProgressIndicator()),);
         }
         return const SignUpForm();
       },
@@ -23,11 +23,11 @@ class SignUpScreen extends StatelessWidget {
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content:
-                  Text("Error occurred while authenticating: ${state.error}")));
+                  Text('Error occurred while authenticating: ${state.error}'),),);
         } else if (state is AuthEmailConfirmationRequired) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text(
-                  "Sign-up successful! Please check your email to confirm.")));
+                  'Sign-up successful! Please check your email to confirm.',),),);
           context.go('/login');
         } else if (state is Authenticated) {
           context.go('/workout');

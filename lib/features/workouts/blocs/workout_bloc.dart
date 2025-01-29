@@ -11,67 +11,68 @@ import '../../../core/dependency_injection/get_it_dependency_injection.dart';
 sealed class WorkoutEvent {}
 
 class InitializeSetsEvent extends WorkoutEvent {
-  final List<SetData> sets;
-  final String userId;
-  final String? plannedWorkoutId;
   InitializeSetsEvent({
     required this.sets,
     required this.userId,
     this.plannedWorkoutId,
   });
+  final List<SetData> sets;
+  final String userId;
+  final String? plannedWorkoutId;
 }
 
 class AddSetEvent extends WorkoutEvent {
-  final int exerciseIndex;
-
   AddSetEvent({required this.exerciseIndex});
+  final int exerciseIndex;
 }
 
 class RemoveSetEvent extends WorkoutEvent {
-  final int exerciseIndex;
-
   RemoveSetEvent({required this.exerciseIndex});
+  final int exerciseIndex;
 }
 
 class CompleteSetEvent extends WorkoutEvent {
+  CompleteSetEvent({
+    required this.exerciseIndex,
+    required this.duration,
+    required this.isMetric,
+    required this.onSuccess,
+  });
   final int exerciseIndex;
   final int duration;
   final bool isMetric;
   final VoidCallback onSuccess;
-  CompleteSetEvent(
-      {required this.exerciseIndex,
-      required this.duration,
-      required this.isMetric,
-      required this.onSuccess});
 }
 
 class EndWorkoutEvent extends WorkoutEvent {
+  EndWorkoutEvent({
+    this.userId,
+    this.dismissed = false,
+    required this.isMetric,
+  });
   final String? userId;
   final bool isMetric;
   final bool dismissed;
-
-  EndWorkoutEvent(
-      {this.userId, this.dismissed = false, required this.isMetric});
 }
 
 class EndWorkoutPresentationEvent extends WorkoutEvent {}
 
 class EditSetEvent extends WorkoutEvent {
+  EditSetEvent({
+    required this.exerciseIndex,
+    required this.setIndex,
+    required this.reps,
+    required this.weight,
+  });
   final int reps;
   final double weight;
   final int setIndex;
   final int exerciseIndex;
-  EditSetEvent(
-      {required this.exerciseIndex,
-      required this.setIndex,
-      required this.reps,
-      required this.weight});
 }
 
 class ChangePageEvent extends WorkoutEvent {
-  final int page;
-
   ChangePageEvent({required this.page});
+  final int page;
 }
 
 class IncorrectRepsEvent extends WorkoutEvent {}
@@ -81,9 +82,22 @@ sealed class WorkoutState {}
 class InitialState extends WorkoutState {}
 
 class WorkoutInProgress extends WorkoutState {
+  WorkoutInProgress({
+    required this.userId,
+    required this.sets,
+    this.plannedWorkoutId,
+  });
+
+  factory WorkoutInProgress.fromJson(Map<String, dynamic> json) {
+    return WorkoutInProgress(
+      sets: (json['data'] as List)
+          .map((set) => SetData.fromJson(set as Map<String, dynamic>))
+          .toList(),
+      userId: json['userId'] as String,
+      plannedWorkoutId: json['plannedWorkoutId'] as String,
+    );
+  }
   final List<SetData> sets;
-  WorkoutInProgress(
-      {required this.userId, required this.sets, this.plannedWorkoutId});
   final String? plannedWorkoutId;
   final String userId;
 
@@ -91,18 +105,8 @@ class WorkoutInProgress extends WorkoutState {
     return {
       'data': sets.map((set) => set.toJson()).toList(),
       'userId': userId,
-      'plannedWorkoutId': plannedWorkoutId
+      'plannedWorkoutId': plannedWorkoutId,
     };
-  }
-
-  factory WorkoutInProgress.fromJson(Map<String, dynamic> json) {
-    return WorkoutInProgress(
-      sets: (json['data'] as List)
-          .map((set) => SetData.fromJson(set as Map<String, dynamic>))
-          .toList(),
-      userId: json['userId'],
-      plannedWorkoutId: json['plannedWorkoutId'],
-    );
   }
 }
 
@@ -110,7 +114,6 @@ class WorkoutEnded extends WorkoutState {}
 
 class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
     with BlocPresentationMixin<WorkoutState, WorkoutEvent> {
-  final SyncWorkoutRepository workoutRepository;
   WorkoutBloc({required this.workoutRepository}) : super(InitialState()) {
     on<InitializeSetsEvent>(_initializeSets);
     on<AddSetEvent>(_addSet);
@@ -119,33 +122,41 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
     on<EditSetEvent>(_editSet);
     on<EndWorkoutEvent>(_endWorkout);
   }
+  final SyncWorkoutRepository workoutRepository;
 
-  _initializeSets(InitializeSetsEvent event, Emitter<WorkoutState> emit) {
+  void _initializeSets(InitializeSetsEvent event, Emitter<WorkoutState> emit) {
     if (state is WorkoutInProgress &&
         (state as WorkoutInProgress).sets.isNotEmpty) {
       return;
     }
 
-    emit(WorkoutInProgress(
+    emit(
+      WorkoutInProgress(
         sets: event.sets,
         userId: event.userId,
-        plannedWorkoutId: event.plannedWorkoutId));
+        plannedWorkoutId: event.plannedWorkoutId,
+      ),
+    );
   }
 
-  _addSet(AddSetEvent event, Emitter<WorkoutState> emit) {
+  void _addSet(AddSetEvent event, Emitter<WorkoutState> emit) {
     if (state is WorkoutInProgress) {
       final currentState = state as WorkoutInProgress;
       final sets = List<SetData>.from(currentState.sets);
       sets[event.exerciseIndex].sets.add(
-          WorkoutConfigSet(setNumber: sets[event.exerciseIndex].sets.length));
-      emit(WorkoutInProgress(
+            WorkoutConfigSet(setNumber: sets[event.exerciseIndex].sets.length),
+          );
+      emit(
+        WorkoutInProgress(
           sets: sets,
           plannedWorkoutId: currentState.plannedWorkoutId,
-          userId: currentState.userId));
+          userId: currentState.userId,
+        ),
+      );
     }
   }
 
-  _removeSet(RemoveSetEvent event, Emitter<WorkoutState> emit) {
+  void _removeSet(RemoveSetEvent event, Emitter<WorkoutState> emit) {
     if (state is WorkoutInProgress) {
       final currentState = state as WorkoutInProgress;
       final sets = List<SetData>.from(currentState.sets);
@@ -153,33 +164,39 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
         return;
       }
       sets[event.exerciseIndex].sets.removeLast();
-      emit(WorkoutInProgress(
+      emit(
+        WorkoutInProgress(
           sets: sets,
           plannedWorkoutId: currentState.plannedWorkoutId,
-          userId: currentState.userId));
+          userId: currentState.userId,
+        ),
+      );
     }
   }
 
-  _editSet(EditSetEvent event, Emitter<WorkoutState> emit) {
+  void _editSet(EditSetEvent event, Emitter<WorkoutState> emit) {
     final currentState = state as WorkoutInProgress;
-    final setDatas = List<SetData>.from((currentState).sets);
+    final setDatas = List<SetData>.from(currentState.sets);
     setDatas[event.exerciseIndex].sets[event.setIndex] =
         setDatas[event.exerciseIndex]
             .sets[event.setIndex]
             .copyWith(weight: event.weight, repetitions: event.reps);
-    emit(WorkoutInProgress(
+    emit(
+      WorkoutInProgress(
         sets: setDatas,
         plannedWorkoutId: currentState.plannedWorkoutId,
-        userId: currentState.userId));
+        userId: currentState.userId,
+      ),
+    );
   }
 
-  _completeSet(CompleteSetEvent event, Emitter<WorkoutState> emit) {
+  void _completeSet(CompleteSetEvent event, Emitter<WorkoutState> emit) {
     if (state is! WorkoutInProgress) {
       return;
     }
     final currentState = state as WorkoutInProgress;
-    final sets = List<SetData>.from((currentState).sets);
-    var set = sets[event.exerciseIndex]
+    final sets = List<SetData>.from(currentState.sets);
+    final set = sets[event.exerciseIndex]
         .sets
         .where((set) => !set.completed)
         .firstOrNull;
@@ -189,8 +206,9 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
         emitPresentation(IncorrectRepsEvent());
         return;
       }
-      set.duration = event.duration;
-      set.completed = true;
+      set
+        ..duration = event.duration
+        ..completed = true;
       event.onSuccess();
     }
     final shouldMove =
@@ -204,33 +222,40 @@ class WorkoutBloc extends HydratedBloc<WorkoutEvent, WorkoutState>
       }
       emitPresentation(ChangePageEvent(page: nextIndex));
     }
-    emit(WorkoutInProgress(
+    emit(
+      WorkoutInProgress(
         sets: sets,
         plannedWorkoutId: currentState.plannedWorkoutId,
-        userId: currentState.userId));
+        userId: currentState.userId,
+      ),
+    );
   }
 
-  _endWorkout(EndWorkoutEvent event, Emitter<WorkoutState> emit) {
+  void _endWorkout(EndWorkoutEvent event, Emitter<WorkoutState> emit) {
     emitPresentation(EndWorkoutPresentationEvent());
     final currentState = state as WorkoutInProgress;
     if (!event.dismissed) {
       workoutRepository.addCompletedWorkoutSplit(
-          currentState.sets,
-          currentState.userId,
-          getIt.isOnline,
-          currentState.plannedWorkoutId,
-          event.isMetric);
+        currentState.sets,
+        currentState.userId,
+        getIt.isOnline,
+        currentState.plannedWorkoutId,
+        event.isMetric,
+      );
     }
     emit(WorkoutEnded());
     clear();
   }
 
   @override
-  WorkoutState? fromJson(Map<String, dynamic> json) {
-    final String type = json['type'];
+  WorkoutState? fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return InitialState();
+    }
+    final type = json['type'] as String;
     switch (type) {
       case 'WorkoutInProgress':
-        return WorkoutInProgress.fromJson(json['data']);
+        return WorkoutInProgress.fromJson(json['data'] as Map<String, dynamic>);
       default:
         return InitialState();
     }

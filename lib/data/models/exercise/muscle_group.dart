@@ -7,14 +7,14 @@ part 'muscle_group.g.dart';
 @JsonSerializable()
 class MuscleGroup extends Equatable {
   const MuscleGroup({required this.id, required this.name});
+
+  factory MuscleGroup.fromJson(Map<String, dynamic> json) =>
+      _$MuscleGroupFromJson(json);
   final int id;
   final String name;
 
   @override
   List<Object> get props => [id, name];
-
-  factory MuscleGroup.fromJson(Map<String, dynamic> json) =>
-      _$MuscleGroupFromJson(json);
   Map<String, dynamic> toJson() => _$MuscleGroupToJson(this);
 }
 

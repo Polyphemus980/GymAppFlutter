@@ -29,7 +29,7 @@ CompletedSetsCompanion toCompletedSetCompanion(CompletedSet completedSet) {
 }
 
 CompletedWorkoutsCompanion toCompletedWorkoutCompanion(
-    CompletedWorkout completedWorkout) {
+    CompletedWorkout completedWorkout,) {
   return CompletedWorkoutsCompanion(
     id: Value(completedWorkout.id),
     user_id: Value(completedWorkout.user_id),
@@ -47,7 +47,7 @@ CompletedWorkoutsCompanion toCompletedWorkoutCompanion(
 }
 
 CompletedWorkoutExercisesCompanion toCompletedWorkoutExerciseCompanion(
-    CompletedWorkoutExercise completedWorkoutExercise) {
+    CompletedWorkoutExercise completedWorkoutExercise,) {
   return CompletedWorkoutExercisesCompanion(
     id: Value(completedWorkoutExercise.id), // Use the provided ID
     user_id: Value(completedWorkoutExercise.user_id),
@@ -76,7 +76,7 @@ ExercisesCompanion toExerciseCompanion(Exercise exercise) {
 }
 
 ExerciseMusclesCompanion toExerciseMuscleCompanion(
-    ExerciseMuscle exerciseMuscle) {
+    ExerciseMuscle exerciseMuscle,) {
   return ExerciseMusclesCompanion(
     exercise_id: Value(exerciseMuscle.exercise_id),
     muscle_group_id: Value(exerciseMuscle.muscle_group_id),
@@ -98,7 +98,7 @@ PlannedSetsCompanion toPlannedSetCompanion(PlannedSet plannedSet) {
 }
 
 PlannedWorkoutsCompanion toPlannedWorkoutCompanion(
-    PlannedWorkout plannedWorkout) {
+    PlannedWorkout plannedWorkout,) {
   return PlannedWorkoutsCompanion(
     id: Value(plannedWorkout.id), // Use the provided ID
     user_id: Value(plannedWorkout.user_id),
@@ -114,7 +114,7 @@ PlannedWorkoutsCompanion toPlannedWorkoutCompanion(
 }
 
 PlannedWorkoutExercisesCompanion toPlannedWorkoutExerciseCompanion(
-    PlannedWorkoutExercise plannedWorkoutExercise) {
+    PlannedWorkoutExercise plannedWorkoutExercise,) {
   return PlannedWorkoutExercisesCompanion(
     id: Value(plannedWorkoutExercise.id), // Use the provided ID
     user_id: Value(plannedWorkoutExercise.user_id),
@@ -128,7 +128,7 @@ PlannedWorkoutExercisesCompanion toPlannedWorkoutExerciseCompanion(
 }
 
 UserPreferencesTableCompanion toUserPreferencesCompanion(
-    UserPreferences userPreferences) {
+    UserPreferences userPreferences,) {
   return UserPreferencesTableCompanion(
     user_id: Value(userPreferences.user_id), // Use the provided user_id
     is_dark_mode: Value(userPreferences.is_dark_mode),
@@ -138,11 +138,11 @@ UserPreferencesTableCompanion toUserPreferencesCompanion(
 }
 
 UserWorkoutPlansTableCompanion toUserWorkoutPlansCompanion(
-    UserWorkoutPlans userWorkoutPlans) {
+    UserWorkoutPlans userWorkoutPlans,) {
   return UserWorkoutPlansTableCompanion(
     user_id: Value(userWorkoutPlans.user_id), // Use the provided user_id
     workout_plan_id: Value(
-        userWorkoutPlans.workout_plan_id), // Use the provided workout_plan_id
+        userWorkoutPlans.workout_plan_id,), // Use the provided workout_plan_id
     dirty: Value(userWorkoutPlans.dirty),
     current_week: Value(userWorkoutPlans.current_week),
     current_day: Value(userWorkoutPlans.current_day),

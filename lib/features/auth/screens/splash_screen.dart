@@ -13,11 +13,11 @@ import '../blocs/auth_bloc.dart';
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-  _intializeTheme(BuildContext context) async {
+  Future<void> _intializeTheme(BuildContext context) async {
     final userPrefs = await getIt
         .get<LocalPreferencesRepository>()
         .getUserPreferences(context.currentUserId!);
-    if (userPrefs != null) {
+    if (userPrefs != null && context.mounted) {
       context.read<ThemeNotifier>().setUserTheme(userPrefs.is_dark_mode);
       context.read<UnitNotifier>().setUserUnits(userPrefs.is_metric);
     }
@@ -29,15 +29,21 @@ class SplashScreen extends StatelessWidget {
       listener: (context, state) async {
         if (state is Authenticated) {
           await _intializeTheme(context);
-          context.go('/workout');
+          if (context.mounted) {
+            context.go('/workout');
+          }
           return;
         } else if (state is Unauthenticated) {
           if (getIt.get<OfflineUserDataSingleton>().hasUser) {
             await _intializeTheme(context);
-            context.go('/workout');
+            if (context.mounted) {
+              context.go('/workout');
+            }
           }
         }
-        context.go('/login');
+        if (context.mounted) {
+          context.go('/login');
+        }
       },
       child: const Center(
         child: FlutterLogo(size: 160),

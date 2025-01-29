@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppScaffold extends StatelessWidget {
+  const AppScaffold({super.key, this.actions, required this.title, this.child});
   final List<Widget>? actions;
   final String title;
   final Widget? child;
-  const AppScaffold({super.key, this.actions, required this.title, this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class AppScaffold extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).primaryColor,
-                Theme.of(context).colorScheme.secondary
+                Theme.of(context).colorScheme.secondary,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -38,7 +38,7 @@ class AppScaffold extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
-              )),
+              ),),
         ),
         actions: actions,
       ),
@@ -48,22 +48,6 @@ class AppScaffold extends StatelessWidget {
 }
 
 class AppTextFormField extends StatelessWidget {
-  final List<TextInputFormatter>? formatters;
-  final TextEditingController? controller;
-  final double? height;
-  final double? width;
-  final String? labelText;
-  final String? hintText;
-  final String? errorText;
-  final bool obscureText;
-  final bool readOnly;
-  final int? maxLines;
-  final TextStyle? errorStyle;
-  final String? Function(String?)? validator;
-  final void Function()? onEditingComplete;
-  final void Function(String)? onChanged;
-
-  final TextInputType? keyboardType;
   const AppTextFormField(
       {super.key,
       this.errorStyle,
@@ -80,7 +64,23 @@ class AppTextFormField extends StatelessWidget {
       this.keyboardType,
       this.maxLines,
       this.obscureText = false,
-      this.readOnly = false});
+      this.readOnly = false,});
+  final List<TextInputFormatter>? formatters;
+  final TextEditingController? controller;
+  final double? height;
+  final double? width;
+  final String? labelText;
+  final String? hintText;
+  final String? errorText;
+  final bool obscureText;
+  final bool readOnly;
+  final int? maxLines;
+  final TextStyle? errorStyle;
+  final String? Function(String?)? validator;
+  final void Function()? onEditingComplete;
+  final void Function(String)? onChanged;
+
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,6 @@ class AppTextFormField extends StatelessWidget {
           errorText: errorText,
           errorStyle: errorStyle,
           contentPadding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
-          counter: null,
           filled: true,
           fillColor: Theme.of(context).colorScheme.primaryContainer,
           border: OutlineInputBorder(
@@ -134,7 +133,7 @@ class AppInkWellButton extends StatelessWidget {
       this.child,
       this.text,
       this.width,
-      this.height});
+      this.height,});
 
   final VoidCallback onTap;
   final Widget? child;

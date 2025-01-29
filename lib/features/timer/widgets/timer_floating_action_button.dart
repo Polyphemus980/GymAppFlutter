@@ -45,7 +45,7 @@ class TimerFAB extends StatelessWidget {
               children: [
                 // Timer display and control toggle
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 8),
                   child: FloatingActionButton.small(
                     heroTag: 'expand',
                     onPressed: timerNotifier.toggleExpanded,

@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
       title: 'Profile',
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: Column(
             spacing: 32,
             children: [
@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Dark mode",
+                    'Dark mode',
                     style: TextStyle(fontSize: 20),
                   ),
                   Switch(
@@ -49,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Use metric system",
+                    'Use metric system',
                     style: TextStyle(fontSize: 20),
                   ),
                   Switch(
@@ -66,22 +66,26 @@ class ProfileScreen extends StatelessWidget {
                 onTap: () {
                   context.push('/exercise');
                 },
-                text: "Exercises",
+                text: 'Exercises',
               ),
               AppInkWellButton(
-                  onTap: () {
-                    context.push('/calculator');
-                  },
-                  text: "Calculator"),
+                onTap: () {
+                  context.push('/calculator');
+                },
+                text: 'Calculator',
+              ),
               AppInkWellButton(
                 onTap: () async {
                   context.read<AuthBloc>().add(SignOutRequested());
                   await getIt
                       .get<OfflineUserDataSingleton>()
                       .deleteUserIdFromStorage();
-                  context.go('/login');
+
+                  if (context.mounted) {
+                    context.go('/login');
+                  }
                 },
-                text: "Sign out",
+                text: 'Sign out',
               ),
             ],
           ),

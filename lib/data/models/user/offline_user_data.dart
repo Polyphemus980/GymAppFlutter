@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart';
 
 class OfflineUserData {
+  OfflineUserData({required this.userId, required this.email});
   String userId;
   String email;
-  OfflineUserData({required this.userId, required this.email});
 }
 
 @UseRowClass(OfflineUserData)

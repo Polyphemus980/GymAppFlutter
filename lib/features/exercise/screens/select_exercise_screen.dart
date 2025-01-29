@@ -20,11 +20,11 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ExerciseBloc>(
-      create: (BuildContext context) => ExerciseBloc(
-          exerciseRepository: getIt.get<LocalExerciseRepository>()),
+      create: (context) => ExerciseBloc(
+          exerciseRepository: getIt.get<LocalExerciseRepository>(),),
       child: Builder(builder: (context) {
         return AppScaffold(
-          title: "Select exercises",
+          title: 'Select exercises',
           child: Column(children: [
             const SearchAndFilterRow(),
             Expanded(
@@ -46,15 +46,15 @@ class _SelectExerciseScreenState extends State<SelectExerciseScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsetsDirectional.all(16.0),
+              padding: const EdgeInsetsDirectional.all(16),
               child: FloatingActionButton.extended(
                   onPressed: () => context.pop(widget.selectedExercises),
                   label: Text(
-                      "${widget.selectedExercises.length} exercises selected")),
+                      '${widget.selectedExercises.length} exercises selected',),),
             ),
-          ]),
+          ],),
         );
-      }),
+      },),
     );
   }
 }

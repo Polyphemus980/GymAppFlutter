@@ -11,28 +11,31 @@ import 'package:gym_app/data/repositories/workout/sync_workout_repository.dart';
 import 'package:gym_app/features/workout_plans/widgets/new_workout_plan_screen_widgets.dart';
 
 class WorkoutPlanDisplayScreen extends HookWidget {
+  const WorkoutPlanDisplayScreen({
+    super.key,
+    required this.workoutRepository,
+    required this.workoutPlanId,
+    required this.syncWorkoutRepository,
+  });
   final LocalWorkoutRepository workoutRepository;
   final SyncWorkoutRepository syncWorkoutRepository;
   final String workoutPlanId;
-  const WorkoutPlanDisplayScreen(
-      {super.key,
-      required this.workoutRepository,
-      required this.workoutPlanId,
-      required this.syncWorkoutRepository});
 
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController();
     return AppScaffold(
-      title: "Display workout plan",
+      title: 'Display workout plan',
       child: StreamBuilder(
         stream: workoutRepository.watchWorkoutPlanWithDetails(
-            workoutPlanId, context.currentUserId!),
+          workoutPlanId,
+          context.currentUserId!,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.data == null) {
-            return const Text("No data");
+            return const Text('No data');
           } else {
             final plan = snapshot.data!;
             return Column(
@@ -40,9 +43,11 @@ class WorkoutPlanDisplayScreen extends HookWidget {
               children: [
                 DraggableHorizontalList(
                   onSelect: (index) {
-                    pageController.animateToPage(index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+                    pageController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
                   },
                   numWeeks: plan.num_weeks,
                 ),
@@ -69,35 +74,41 @@ class WorkoutPlanDisplayScreen extends HookWidget {
                                         .exercises!
                                         .map((exercise) {
                                       return SetData(
-                                          exercise: exercise.exercise!,
-                                          sets: exercise.sets!.map((set) {
-                                            return WorkoutConfigSet
-                                                .fromPlannedSet(set);
-                                          }).toList());
+                                        exercise: exercise.exercise!,
+                                        sets: exercise.sets!.map((set) {
+                                          return WorkoutConfigSet
+                                              .fromPlannedSet(set);
+                                        }).toList(),
+                                      );
                                     }).toList(),
                                   );
                                 },
                               ),
                             ),
                             AppInkWellButton(
-                                onTap: () async {
-                                  final alreadyJoined =
-                                      await syncWorkoutRepository
-                                          .signUserUpForWorkoutPlan(
-                                              context.currentUserId!,
-                                              workoutPlanId,
-                                              getIt.isOnline);
-                                  if (alreadyJoined) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            "User has already joined this program"),
+                              onTap: () async {
+                                final alreadyJoined =
+                                    await syncWorkoutRepository
+                                        .signUserUpForWorkoutPlan(
+                                  context.currentUserId!,
+                                  workoutPlanId,
+                                  getIt.isOnline,
+                                );
+                                if (alreadyJoined && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'User has already joined this program',
                                       ),
-                                    );
-                                  }
+                                    ),
+                                  );
+                                }
+                                if (context.mounted) {
                                   context.pop();
-                                },
-                                text: "Join program")
+                                }
+                              },
+                              text: 'Join program',
+                            ),
                           ],
                         ),
                       );

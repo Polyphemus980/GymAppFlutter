@@ -2,14 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:gym_app/data/repositories/user/local_preferences_repository.dart';
 
 class UnitNotifier extends ChangeNotifier {
+  UnitNotifier({required this.preferencesRepository});
   final LocalPreferencesRepository preferencesRepository;
   bool _isMetric = true;
   bool get isMetric => _isMetric;
 
-  toggleUnits(String userId) {
+  void toggleUnits(String userId) {
     _isMetric = !_isMetric;
     preferencesRepository.updateUserPreferences(
-        userId: userId, isMetric: _isMetric);
+      userId: userId,
+      isMetric: _isMetric,
+    );
     notifyListeners();
   }
 
@@ -18,6 +21,5 @@ class UnitNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  UnitNotifier({required this.preferencesRepository});
-  String get units => _isMetric ? "kg" : "lbs";
+  String get units => _isMetric ? 'kg' : 'lbs';
 }

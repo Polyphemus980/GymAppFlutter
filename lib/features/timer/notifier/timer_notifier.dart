@@ -6,6 +6,9 @@ import 'package:gym_app/core/services/android_vibration_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerNotifier extends ChangeNotifier {
+  TimerNotifier() {
+    _loadState();
+  }
   DateTime? _startedAt;
   DateTime? _pausedAt;
   bool _isRunning = false;
@@ -30,10 +33,7 @@ class TimerNotifier extends ChangeNotifier {
     return '$minutes:$remainingSeconds';
   }
 
-  TimerNotifier() {
-    _loadState();
-  }
-  startTimer() {
+  void startTimer() {
     if (!_isRunning) {
       _startedAt = DateTime.now();
       _isRunning = true;
@@ -45,7 +45,9 @@ class TimerNotifier extends ChangeNotifier {
           VibrationService.vibrate();
         }
         NotificationService.updateWorkoutNotificationWithActions(
-            formattedElapsedTime, false);
+          formattedElapsedTime,
+          false,
+        );
         _saveState();
       });
       notifyListeners();
@@ -62,7 +64,9 @@ class TimerNotifier extends ChangeNotifier {
         VibrationService.vibrate();
       }
       NotificationService.updateWorkoutNotificationWithActions(
-          formattedElapsedTime, false);
+        formattedElapsedTime,
+        false,
+      );
       _saveState();
     });
     notifyListeners();
@@ -78,13 +82,15 @@ class TimerNotifier extends ChangeNotifier {
         VibrationService.vibrate();
       }
       NotificationService.updateWorkoutNotificationWithActions(
-          formattedElapsedTime, false);
+        formattedElapsedTime,
+        false,
+      );
       _saveState();
     });
     notifyListeners();
   }
 
-  resetTimer() {
+  void resetTimer() {
     if (!_isRunning && _pausedAt == null) {
       return;
     }
@@ -98,7 +104,7 @@ class TimerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  cancelTimer() {
+  void cancelTimer() {
     if (_isRunning) {
       _notifyTimer?.cancel();
       _pausedAt = null;
@@ -111,31 +117,42 @@ class TimerNotifier extends ChangeNotifier {
     }
   }
 
-  pauseTimer() {
+  void pauseTimer() {
     if (_isRunning) {
       _pausedAt = DateTime.now();
       _isRunning = false;
       _notifyTimer?.cancel();
       NotificationService.updateWorkoutNotificationWithActions(
-          formattedElapsedTime, true);
+        formattedElapsedTime,
+        true,
+      );
       notifyListeners();
     }
   }
 
-  void _deleteState() async {
+  Future<void> _deleteState() async {
     final sharedPrefs = await SharedPreferences.getInstance();
     await sharedPrefs.clear();
   }
 
-  void _saveState() async {
+  Future<void> _saveState() async {
     final sharedPrefs = await SharedPreferences.getInstance();
-    sharedPrefs.setInt('started_at', _startedAt?.millisecondsSinceEpoch ?? 0);
-    sharedPrefs.setInt('paused_at', _pausedAt?.millisecondsSinceEpoch ?? 0);
-    sharedPrefs.setInt('last_saved', DateTime.now().millisecondsSinceEpoch);
-    sharedPrefs.setBool('is_running', _isRunning);
+    await sharedPrefs.setInt(
+      'started_at',
+      _startedAt?.millisecondsSinceEpoch ?? 0,
+    );
+    await sharedPrefs.setInt(
+      'paused_at',
+      _pausedAt?.millisecondsSinceEpoch ?? 0,
+    );
+    await sharedPrefs.setInt(
+      'last_saved',
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    await sharedPrefs.setBool('is_running', _isRunning);
   }
 
-  void _loadState() async {
+  Future<void> _loadState() async {
     final sharedPrefs = await SharedPreferences.getInstance();
     final last_saved = sharedPrefs.getInt('last_saved');
     final last_saved_date = DateTime.fromMillisecondsSinceEpoch(last_saved!);

@@ -20,21 +20,25 @@ class LoginScreen extends StatelessWidget {
       builder: (context, state) {
         if (state is AuthLoading) {
           return const AppScaffold(
-              title: 'Login',
-              child: Center(child: CircularProgressIndicator()));
+            title: 'Login',
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
         return const LoginForm();
       },
       listener: (context, state) async {
         if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
               content:
-                  Text("Error occurred while authenticating: ${state.error}")));
+                  Text('Error occurred while authenticating: ${state.error}'),
+            ),
+          );
         } else if (state is Authenticated) {
           final preferencesRepository = getIt.get<LocalPreferencesRepository>();
           final userPreferences =
               await preferencesRepository.getUserPreferences(state.user.id);
-          if (userPreferences != null) {
+          if (userPreferences != null && context.mounted) {
             context
                 .read<ThemeNotifier>()
                 .setUserTheme(userPreferences.is_dark_mode);
@@ -42,12 +46,16 @@ class LoginScreen extends StatelessWidget {
                 .read<UnitNotifier>()
                 .setUserUnits(userPreferences.is_metric);
           } else {
-            preferencesRepository.insertUserPreferences(userId: state.user.id);
+            await preferencesRepository.insertUserPreferences(
+              userId: state.user.id,
+            );
           }
           await getIt
               .get<OfflineUserDataSingleton>()
               .addUserIdToStorage(state.user.id, state.user.email!);
-          context.go('/workout');
+          if (context.mounted) {
+            context.go('/workout');
+          }
         }
       },
     );

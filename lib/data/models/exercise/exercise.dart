@@ -21,6 +21,9 @@ class Exercise {
     this.updated_at,
   });
 
+  factory Exercise.fromJson(Map<String, dynamic> json) =>
+      _$ExerciseFromJson(json);
+
   final String id;
   final String? user_id;
   final String name;
@@ -49,8 +52,12 @@ class Exercise {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! Exercise) return false;
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is! Exercise) {
+      return false;
+    }
 
     return other.id == id &&
         other.name == name &&
@@ -64,10 +71,7 @@ class Exercise {
   int get hashCode =>
       Object.hash(id, name, description, user_id, created_at, updated_at);
 
-  String? get muscles => muscle_groups?.map((m) => m.name).join(", ");
-
-  factory Exercise.fromJson(Map<String, dynamic> json) =>
-      _$ExerciseFromJson(json);
+  String? get muscles => muscle_groups?.map((m) => m.name).join(', ');
 
   Map<String, dynamic> toJson({bool excludeMuscleGroups = false}) {
     final Map<String, dynamic> data = _$ExerciseToJson(this);

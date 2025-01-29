@@ -3,10 +3,6 @@ import 'package:gym_app/core/common_widgets/app_widgets.dart';
 import 'package:gym_app/data/models/workout_plans/workout_plan.dart';
 
 class WorkoutPlanContinueCard extends StatelessWidget {
-  final int currentDay;
-  final int currentWeek;
-  final WorkoutPlan plan;
-  final VoidCallback onTap;
   const WorkoutPlanContinueCard({
     super.key,
     required this.currentDay,
@@ -14,6 +10,10 @@ class WorkoutPlanContinueCard extends StatelessWidget {
     required this.plan,
     required this.onTap,
   });
+  final int currentDay;
+  final int currentWeek;
+  final WorkoutPlan plan;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

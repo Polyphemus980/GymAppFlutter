@@ -9,34 +9,40 @@ import 'package:gym_app/features/workouts/widgets/train_screen_widgets.dart';
 import 'package:provider/provider.dart';
 
 class TrainScreen extends StatelessWidget {
-  final LocalWorkoutRepository workoutRepository;
   const TrainScreen({super.key, required this.workoutRepository});
+  final LocalWorkoutRepository workoutRepository;
 
   void displayWorkoutPopUp(BuildContext context) {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-              title: const Text("Workout in progress"),
-              content: const Text(
-                  "A workout is currently in progress. Do you want to dismiss it and start a new one?"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      context.read<WorkoutBloc>().add(
-                          EndWorkoutEvent(dismissed: true, isMetric: false));
-                      context.read<TimerNotifier>().cancelTimer();
-                      context.pop();
-                    },
-                    child: const Text("Dismiss it")),
-                TextButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Text("Continue current one"))
-              ]);
-        });
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Workout in progress'),
+          content: const Text(
+            'A workout is currently in progress. Do you want to dismiss it and start a new one?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.read<WorkoutBloc>().add(
+                      EndWorkoutEvent(dismissed: true, isMetric: false),
+                    );
+                context.read<TimerNotifier>().cancelTimer();
+                context.pop();
+              },
+              child: const Text('Dismiss it'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('Continue current one'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -45,78 +51,83 @@ class TrainScreen extends StatelessWidget {
       title: 'Start Workout',
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(spacing: 16, mainAxisSize: MainAxisSize.min, children: [
-            const Text(
-              'Quick Start',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            spacing: 16,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Quick Start',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            AppInkWellButton(
-              onTap: () {
-                if (context.read<WorkoutBloc>().state is WorkoutInProgress) {
-                  displayWorkoutPopUp(context);
-                } else {
-                  context.push('/new');
-                }
-              },
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondaryContainer
-                          .withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
+              AppInkWellButton(
+                onTap: () {
+                  if (context.read<WorkoutBloc>().state is WorkoutInProgress) {
+                    displayWorkoutPopUp(context);
+                  } else {
+                    context.push('/new');
+                  }
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer
+                            .withValues(alpha: 0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        size: 30,
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.add,
-                      size: 30,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Custom Workout',
-                          style: TextStyle(
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Custom Workout',
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context)
                                   .colorScheme
-                                  .onPrimaryContainer),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Start with an empty workout and add exercises as you go',
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer
-                                .withValues(alpha: 0.5),
+                                  .onPrimaryContainer,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            'Start with an empty workout and add exercises as you go',
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer
+                                  .withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Text(
-              'Continue programs',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              const Text(
+                'Continue programs',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            StreamBuilder(
+              StreamBuilder(
                 stream: workoutRepository
                     .watchUserWorkoutPlans(context.currentUserId!),
                 builder: (context, snapshot) {
@@ -131,27 +142,30 @@ class TrainScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final plan = userPlans[index];
                         return WorkoutPlanContinueCard(
-                            onTap: () {
-                              if (context.read<WorkoutBloc>().state
-                                  is WorkoutInProgress) {
-                                displayWorkoutPopUp(context);
-                              } else {
-                                context.push('/planned_workout', extra: plan);
-                              }
-                            },
-                            currentDay: plan.current_day,
-                            currentWeek: plan.current_week,
-                            plan: plan.plan!);
+                          onTap: () {
+                            if (context.read<WorkoutBloc>().state
+                                is WorkoutInProgress) {
+                              displayWorkoutPopUp(context);
+                            } else {
+                              context.push('/planned_workout', extra: plan);
+                            }
+                          },
+                          currentDay: plan.current_day,
+                          currentWeek: plan.current_week,
+                          plan: plan.plan!,
+                        );
                       },
                     );
                   } else if (snapshot.connectionState ==
                       ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else {
-                    return const Text("User hasnt interacted with any plan");
+                    return const Text('User hasnt interacted with any plan');
                   }
-                }),
-          ]),
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

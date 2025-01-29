@@ -5,28 +5,38 @@ import 'package:gym_app/data/models/exercise/muscle_group.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SyncExerciseRepository {
+  SyncExerciseRepository({required this.db, required this.supabaseClient});
   final AppDatabase db;
   final SupabaseClient supabaseClient;
-  SyncExerciseRepository({required this.db, required this.supabaseClient});
 
-  Future<void> addExerciseSync(String userId, String name, String description,
-      List<MuscleGroup> muscles, bool isOnline,
-      {String? startPath, String? endPath}) async {
+  Future<void> addExerciseSync(
+    String userId,
+    String name,
+    String description,
+    List<MuscleGroup> muscles,
+    bool isOnline, {
+    String? startPath,
+    String? endPath,
+  }) async {
     final insertedExercise = await db.into(db.exercises).insertReturning(
-        ExercisesCompanion(
+          ExercisesCompanion(
             user_id: Value(userId),
             name: Value(name),
             description: Value(description),
             start_position_image_path: Value(startPath),
             end_position_image_path: Value(endPath),
-            dirty: Value(!isOnline)));
+            dirty: Value(!isOnline),
+          ),
+        );
 
     final exerciseMuscles = muscles
-        .map((muscle) => ExerciseMusclesCompanion(
-              exercise_id: Value(insertedExercise.id),
-              muscle_group_id: Value(muscle.id),
-              dirty: Value(!isOnline),
-            ))
+        .map(
+          (muscle) => ExerciseMusclesCompanion(
+            exercise_id: Value(insertedExercise.id),
+            muscle_group_id: Value(muscle.id),
+            dirty: Value(!isOnline),
+          ),
+        )
         .toList();
 
     await db.batch((batch) {
@@ -40,11 +50,13 @@ class SyncExerciseRepository {
             .insert(insertedExercise.toJson(excludeMuscleGroups: true));
 
         final exerciseMuscles = muscles
-            .map((muscle) => {
-                  'exercise_id': insertedExercise.id,
-                  'muscle_group_id': muscle.id,
-                  'dirty': !isOnline,
-                })
+            .map(
+              (muscle) => {
+                'exercise_id': insertedExercise.id,
+                'muscle_group_id': muscle.id,
+                'dirty': !isOnline,
+              },
+            )
             .toList();
         await supabaseClient.from('exercise_muscles').insert(exerciseMuscles);
       } catch (e) {
@@ -61,7 +73,7 @@ class SyncExerciseRepository {
 
   Future<void> removeExerciseSync(String exerciseId, bool isOnline) async {
     if (isOnline) {
-      db.transaction(() async {
+      await db.transaction(() async {
         await (db.delete(db.exercises)..where((ex) => ex.id.equals(exerciseId)))
             .go();
 

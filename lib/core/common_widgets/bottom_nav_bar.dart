@@ -19,7 +19,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: BlocBuilder<WorkoutBloc, WorkoutState>(
-        builder: (BuildContext context, state) {
+        builder: (context, state) {
           if (state is WorkoutInProgress) {
             return const TimerFAB();
           } else {

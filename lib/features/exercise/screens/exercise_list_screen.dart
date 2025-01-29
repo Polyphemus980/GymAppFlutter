@@ -15,8 +15,8 @@ class ExerciseListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => ExerciseBloc(
-            exerciseRepository: getIt.get<LocalExerciseRepository>()),
-        child: const ExerciseScreen());
+            exerciseRepository: getIt.get<LocalExerciseRepository>(),),
+        child: const ExerciseScreen(),);
   }
 }
 
@@ -26,9 +26,9 @@ class ExerciseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Exercises",
+      title: 'Exercises',
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Column(children: [
           const SearchAndFilterRow(),
           Expanded(
@@ -38,7 +38,7 @@ class ExerciseScreen extends StatelessWidget {
               },
             ),
           ),
-        ]),
+        ],),
       ),
     );
   }

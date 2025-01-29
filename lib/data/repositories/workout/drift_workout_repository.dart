@@ -1,16 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:gym_app/data/app_database.dart';
 import 'package:gym_app/data/models/planned/planned_workout.dart';
-import 'package:gym_app/data/models/planned/planned_workout_exercise.dart';
 import 'package:gym_app/data/models/workout_plans/user_workout_plans.dart';
 import 'package:gym_app/data/models/workout_plans/workout_plan.dart';
 import 'package:gym_app/data/repositories/workout/local_workout_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DriftWorkoutRepository implements LocalWorkoutRepository {
-  final AppDatabase db;
-
   DriftWorkoutRepository({required this.db});
+  final AppDatabase db;
   @override
   Stream<List<WorkoutPlan>> watchWorkoutPlans(String userId) {
     final workoutPlanStream = (db.select(db.workoutPlans)
@@ -26,7 +24,7 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
           return plan;
         });
       });
-      return Rx.combineLatest(workoutStreams, (List<WorkoutPlan> updatedPlans) {
+      return Rx.combineLatest(workoutStreams, (updatedPlans) {
         return updatedPlans;
       });
     }).startWith([]);
@@ -50,7 +48,8 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
               final setStreams = exercises.map((exercise) {
                 return (db.select(db.plannedSets)
                       ..where(
-                          (set) => set.workout_exercise_id.equals(exercise.id)))
+                        (set) => set.workout_exercise_id.equals(exercise.id),
+                      ))
                     .watch()
                     .map((sets) {
                   exercise.sets = sets;
@@ -58,22 +57,20 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
                 });
               });
 
-              return Rx.combineLatest(setStreams,
-                  (List<PlannedWorkoutExercise> exercisesWithSets) {
+              return Rx.combineLatest(setStreams, (exercisesWithSets) {
                 workout.exercises = exercisesWithSets;
                 return workout;
               });
             });
           });
 
-          return Rx.combineLatest(exerciseStreams,
-              (List<PlannedWorkout> workoutsWithExercises) {
+          return Rx.combineLatest(exerciseStreams, (workoutsWithExercises) {
             plan.workouts = workoutsWithExercises;
             return plan;
           });
         });
       });
-      return Rx.combineLatest(planStreams, (List<WorkoutPlan> plansComplete) {
+      return Rx.combineLatest(planStreams, (plansComplete) {
         return plansComplete;
       });
     }).startWith([]);
@@ -81,7 +78,9 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
 
   @override
   Stream<WorkoutPlan?> watchWorkoutPlanWithDetails(
-      String planId, String userId) {
+    String planId,
+    String userId,
+  ) {
     final workoutPlanStream = (db.select(db.workoutPlans)
           ..where((plan) => plan.id.equals(planId)))
         .watchSingleOrNull();
@@ -108,26 +107,26 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
               return exerciseStream.switchMap((exerciseDetails) {
                 return (db.select(db.plannedSets)
                       ..where(
-                          (set) => set.workout_exercise_id.equals(exercise.id)))
+                        (set) => set.workout_exercise_id.equals(exercise.id),
+                      ))
                     .watch()
                     .map((sets) {
-                  exercise.sets = sets;
-                  exercise.exercise = exerciseDetails;
+                  exercise
+                    ..sets = sets
+                    ..exercise = exerciseDetails;
                   return exercise;
                 });
               });
             });
 
-            return Rx.combineLatest(setStreams,
-                (List<PlannedWorkoutExercise> exercisesWithSets) {
+            return Rx.combineLatest(setStreams, (exercisesWithSets) {
               workout.exercises = exercisesWithSets;
               return workout;
             });
           });
         });
 
-        return Rx.combineLatest(exerciseStreams,
-            (List<PlannedWorkout> workoutsWithExercises) {
+        return Rx.combineLatest(exerciseStreams, (workoutsWithExercises) {
           plan.workouts = workoutsWithExercises;
           return plan;
         });
@@ -139,21 +138,24 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
 
   @override
   Stream<List<UserWorkoutPlans>> watchUserWorkoutPlans(String userId) {
-    return (db.select(db.userWorkoutPlansTable)).watch().map((userPlans) {
-      return Future.wait(userPlans.map((workoutPlan) async {
-        workoutPlan.plan = await (db.select(db.workoutPlans)
-              ..where((plan) => plan.id.equals(workoutPlan.workout_plan_id)))
-            .getSingleOrNull();
-        return workoutPlan;
-      }));
-    }).switchMap((futureList) => Stream.fromFuture(futureList));
+    return db.select(db.userWorkoutPlansTable).watch().map((userPlans) {
+      return Future.wait(
+        userPlans.map((workoutPlan) async {
+          workoutPlan.plan = await (db.select(db.workoutPlans)
+                ..where((plan) => plan.id.equals(workoutPlan.workout_plan_id)))
+              .getSingleOrNull();
+          return workoutPlan;
+        }),
+      );
+    }).switchMap(Stream.fromFuture);
   }
 
   @override
   Future<PlannedWorkout> getPlannedWorkout(UserWorkoutPlans plan) async {
     final plannedWorkout = await (db.select(db.plannedWorkouts)
           ..where(
-              (workout) => workout.workout_plan_id.equals(plan.workout_plan_id))
+            (workout) => workout.workout_plan_id.equals(plan.workout_plan_id),
+          )
           ..where((workout) => workout.day_number.equals(plan.current_day))
           ..where((workout) => workout.week_number.equals(plan.current_week)))
         .getSingle();
@@ -163,11 +165,13 @@ class DriftWorkoutRepository implements LocalWorkoutRepository {
     for (final workoutExercise in workoutExercises) {
       workoutExercise.sets = await (db.select(db.plannedSets)
             ..where(
-                (set) => set.workout_exercise_id.equals(workoutExercise.id)))
+              (set) => set.workout_exercise_id.equals(workoutExercise.id),
+            ))
           .get();
       final exercise = await (db.select(db.exercises)
             ..where(
-                (exercise) => exercise.id.equals(workoutExercise.exercise_id)))
+              (exercise) => exercise.id.equals(workoutExercise.exercise_id),
+            ))
           .getSingle();
       final query = db.select(db.muscleGroups).join(
         [

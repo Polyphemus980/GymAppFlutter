@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_app/data/models/workout_plans/workout_plan.dart';
 
 class PlanCard extends StatelessWidget {
-  final WorkoutPlan plan;
   const PlanCard({super.key, required this.plan});
+  final WorkoutPlan plan;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -14,7 +14,7 @@ class PlanCard extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).primaryColor,
-              Theme.of(context).colorScheme.secondary
+              Theme.of(context).colorScheme.secondary,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -62,14 +62,14 @@ class PlanCard extends StatelessWidget {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onPrimary
-                                      .withValues(alpha: 0.7)),
+                                      .withValues(alpha: 0.7),),
                             ),
                           ],
                         ),
                       ),
                       Icon(Icons.open_in_new,
                           size: 24,
-                          color: Theme.of(context).colorScheme.onSecondary),
+                          color: Theme.of(context).colorScheme.onSecondary,),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -82,7 +82,7 @@ class PlanCard extends StatelessWidget {
                       const SizedBox(width: 12),
                       PlanInfoChip(
                           icon: Icons.schedule,
-                          text: '${plan.days_per_week} days/week'),
+                          text: '${plan.days_per_week} days/week',),
                     ],
                   ),
                 ],
@@ -96,9 +96,9 @@ class PlanCard extends StatelessWidget {
 }
 
 class PlanInfoChip extends StatelessWidget {
+  const PlanInfoChip({super.key, required this.icon, required this.text});
   final IconData icon;
   final String text;
-  const PlanInfoChip({super.key, required this.icon, required this.text});
   @override
   Widget build(BuildContext context) {
     return Container(

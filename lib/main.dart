@@ -27,7 +27,7 @@ void main() async {
   await NotificationService.initialize();
   runApp(const GlobalProviders(
     child: MyApp(),
-  ));
+  ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -38,7 +38,6 @@ class MyApp extends StatelessWidget {
     final theme = context.watch<ThemeNotifier>().currentTheme;
     return MaterialApp.router(
       theme: theme,
-      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }

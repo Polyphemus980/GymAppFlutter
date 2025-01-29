@@ -29,23 +29,25 @@ typedef ExerciseWithMuscleGroups = ({
   List<MuscleGroup> muscleGroups,
 });
 
-@DriftDatabase(tables: [
-  PlannedWorkouts,
-  CompletedWorkouts,
-  WorkoutPlans,
-  CompletedSets,
-  Exercises,
-  PlannedWorkoutExercises,
-  CompletedWorkoutExercises,
-  MuscleGroups,
-  ExerciseMuscles,
-  PlannedSets,
-  UserPreferencesTable,
-  UserWorkoutPlansTable,
-  OfflineUserDataTable
-])
+@DriftDatabase(
+  tables: [
+    PlannedWorkouts,
+    CompletedWorkouts,
+    WorkoutPlans,
+    CompletedSets,
+    Exercises,
+    PlannedWorkoutExercises,
+    CompletedWorkoutExercises,
+    MuscleGroups,
+    ExerciseMuscles,
+    PlannedSets,
+    UserPreferencesTable,
+    UserWorkoutPlansTable,
+    OfflineUserDataTable,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection()) {}
+  AppDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
@@ -54,12 +56,12 @@ class AppDatabase extends _$AppDatabase {
     return LazyDatabase(() async {
       final dbFolder = await getApplicationDocumentsDirectory();
       final file = File(p.join(dbFolder.path, 'app.db'));
-
-      if (!await file.exists()) {
+      if (!file.existsSync()) {
         final blob = await rootBundle.load('assets/asset_database.db');
         final buffer = blob.buffer;
         await file.writeAsBytes(
-            buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes));
+          buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes),
+        );
       }
 
       final cachebase = (await getTemporaryDirectory()).path;
